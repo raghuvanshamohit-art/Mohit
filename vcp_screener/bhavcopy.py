@@ -84,7 +84,14 @@ class BhavcopyProvider:
         self._idx_cache: Dict[date, Optional[pd.Series]] = {}
 
     # -- HTTP --------------------------------------------------------------
-    def _get(self, url: str) -> Optional[bytes]:
+    def _get(self, url: str):
+        """Fetch a URL. Returns ``(content, absent)``.
+
+        ``content`` is bytes on success, else ``None``. ``absent`` is True only
+        on a definitive HTTP 404 (file not published -- e.g. a market holiday),
+        and False on success or on a network error. Callers use this to cache a
+        holiday marker while still retrying transient failures next run.
+        """
         import requests
 
         if self._session is None:
@@ -94,13 +101,13 @@ class BhavcopyProvider:
             try:
                 resp = self._session.get(url, timeout=30)
                 if resp.status_code == 404:
-                    return None  # no trading that day / file absent
+                    return None, True
                 resp.raise_for_status()
-                return resp.content
+                return resp.content, False
             except Exception:
                 if attempt == self.max_retries:
-                    return None
-        return None
+                    return None, False
+        return None, False
 
     @staticmethod
     def _read_zip_csv(blob: bytes) -> Optional[pd.DataFrame]:
@@ -135,26 +142,39 @@ class BhavcopyProvider:
     def _cm_cache_path(self, d: date) -> str:
         return os.path.join(self.cache_dir, f"cm_{d:%Y%m%d}.csv")
 
+    _CM_COLS = ["Date", "Symbol", "Series", "Open", "High", "Low", "Close", "PrevClose", "Volume"]
+
     def _fetch_cm_day(self, d: date) -> Optional[pd.DataFrame]:
         """Return a normalized frame for one day, or None (holiday/no data)."""
         path = self._cm_cache_path(d)
         if os.path.exists(path):
-            df = pd.read_csv(path)
+            try:
+                df = pd.read_csv(path)
+            except pd.errors.EmptyDataError:
+                return None
             return df if len(df) else None
 
         raw = None
+        got_error = False
         for url in self._cm_urls(d):
-            blob = self._get(url)
+            blob, absent = self._get(url)
             if blob is not None:
-                raw = self._read_zip_csv(blob)
-                if raw is not None and len(raw):
+                parsed = self._read_zip_csv(blob)
+                if parsed is not None and len(parsed):
+                    raw = parsed
                     break
+            elif not absent:
+                got_error = True
+
         norm = self._normalize_cm(raw, d)
-        # Cache even an empty frame (as a marker) so holidays aren't refetched.
-        (norm if norm is not None else pd.DataFrame(
-            columns=["Date", "Symbol", "Open", "High", "Low", "Close", "PrevClose", "Volume"]
-        )).to_csv(path, index=False)
-        return norm
+        if norm is not None:
+            norm.to_csv(path, index=False)
+            return norm
+        # Cache an empty marker only when the day is definitively absent
+        # (holiday); never after a network error, so blips get retried.
+        if not got_error:
+            pd.DataFrame(columns=self._CM_COLS).to_csv(path, index=False)
+        return None
 
     def _normalize_cm(self, raw: Optional[pd.DataFrame], d: date) -> Optional[pd.DataFrame]:
         if raw is None or len(raw) == 0:
@@ -182,22 +202,31 @@ class BhavcopyProvider:
     def _idx_cache_path(self, d: date) -> str:
         return os.path.join(self.cache_dir, f"idx_{d:%Y%m%d}.csv")
 
+    _IDX_COLS = ["Date", "Open", "High", "Low", "Close", "Volume"]
+
     def _fetch_index_day(self, d: date) -> Optional[pd.Series]:
         path = self._idx_cache_path(d)
         if os.path.exists(path):
-            df = pd.read_csv(path)
+            try:
+                df = pd.read_csv(path)
+            except pd.errors.EmptyDataError:
+                return None
             return df.iloc[0] if len(df) else None
 
+        blob, absent = self._get(self._index_url(d))
         raw = None
-        blob = self._get(self._index_url(d))
         if blob is not None:
             try:
                 raw = pd.read_csv(io.BytesIO(blob))
             except Exception:
                 raw = None
         row = self._normalize_index(raw, d)
-        (pd.DataFrame([row]) if row is not None else pd.DataFrame()).to_csv(path, index=False)
-        return pd.Series(row) if row is not None else None
+        if row is not None:
+            pd.DataFrame([row]).to_csv(path, index=False)
+            return pd.Series(row)
+        if absent:  # definitively no file (holiday) -> cache a marker
+            pd.DataFrame(columns=self._IDX_COLS).to_csv(path, index=False)
+        return None
 
     @staticmethod
     def _normalize_index(raw: Optional[pd.DataFrame], d: date, index_name: str = "Nifty 50"):

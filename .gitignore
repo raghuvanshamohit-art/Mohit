@@ -11,3 +11,4 @@ output/
 cache/
 sample_data/
 *.local.csv
+logs/

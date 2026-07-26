@@ -99,6 +99,24 @@ python run_screener.py --provider csv --csv-dir sample_data \
     --index-file NIFTY --universe-file sample_data/symbols.txt
 ```
 
+## Automate the daily 8 PM scan
+
+Run it once a day after the close. Ready-made runner scripts and scheduler
+recipes (cron, systemd, macOS launchd, Windows Task Scheduler) are in
+[`docs/AUTOMATION.md`](docs/AUTOMATION.md). Quick version on Linux/macOS:
+
+```bash
+chmod +x tools/daily_run.sh
+crontab -e
+# weekdays at 8 PM (machine clock on IST); use 30 14 on a UTC server
+0 20 * * 1-5 /full/path/to/Mohit/tools/daily_run.sh
+```
+
+The runner writes timestamped reports to `output/`, refreshes
+`output/latest.html`, and logs to `logs/`. It needs outbound access to
+`archives.nseindia.com`, so run it on a machine/VM where NSE is reachable
+(many sandboxed/cloud environments block it).
+
 ## How it's wired
 
 ```
