@@ -144,6 +144,15 @@ schtasks /Run   /TN "VCP F&O Screener"
 
 ---
 
+## Cloud Routine (Claude Code on the web)
+
+A scheduled **Routine** runs the scan in the cloud at **8 PM IST on weekdays**
+(`30 14 * * 1-5` UTC), commits the board to `reports/` on this branch, and sends
+a push/email summary. It uses [`tools/cloud_daily.sh`](../tools/cloud_daily.sh),
+which runs the live bhavcopy scan into `reports/` (timestamped + `latest.*`) and
+keeps the newest ~90 dated reports. This requires the environment's network
+policy to allow `archives.nseindia.com`.
+
 ## Running it in the cloud instead
 
 The runner needs outbound access to `archives.nseindia.com`. Managed/sandboxed
