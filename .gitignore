@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# Screener outputs, caches & generated sample data
+output/
+cache/
+sample_data/
+*.local.csv
