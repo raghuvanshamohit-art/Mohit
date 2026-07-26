@@ -66,7 +66,7 @@ class BhavcopyProvider:
         history_days: int = 900,
         series: Iterable[str] = ("EQ", "BE"),
         adjust_corporate_actions: bool = True,
-        ca_min_gap: float = 0.10,
+        ca_min_gap: float = 0.30,
         workers: int = 6,
         max_retries: int = 3,
         session=None,
@@ -322,34 +322,45 @@ class BhavcopyProvider:
 def _back_adjust(df: pd.DataFrame, min_gap: float) -> pd.DataFrame:
     """Back-adjust prices/volume for splits & bonuses.
 
-    On an ex-date NSE reports an adjusted previous close in ``PrevClose``. When
-    that differs from the actual prior close by more than ``min_gap``, a
-    corporate action occurred; historical prices before it are scaled onto the
-    current price basis (and volumes scaled inversely, so price x volume is
-    preserved).
+    A split or bonus reprices the whole bar at the open, so it appears as a large
+    *overnight gap*: today's open vs yesterday's close. When that gap exceeds
+    ``min_gap`` (a 2:1 split ~ -50%, a 1:10 split ~ -90%), the bars before it are
+    scaled onto the current price basis and volumes scaled inversely, so traded
+    value (price x volume) is preserved.
+
+    The overnight gap is used rather than NSE's reported previous close, because
+    the UDiFF bhavcopy's ``PrvsClsgPric`` is not reliably split-adjusted on the
+    ex-date. Limitation: a genuine >``min_gap`` overnight move (rare for liquid
+    F&O names) would be mis-treated as a corporate action; a proper corporate-
+    actions feed (ex-date + ratio) is the robust fix.
     """
     df = df.copy()
     close = df["Close"].to_numpy(dtype=float)
-    prevc = df["PrevClose"].to_numpy(dtype=float)
+    open_ = df["Open"].to_numpy(dtype=float) if "Open" in df.columns else close
     n = len(df)
     if n < 2:
         return df
 
-    # factor[i] compares day i's reported prev-close with day i-1's actual close.
+    upper = 1.0 / (1.0 - min_gap)          # reverse-split / consolidation bound
     factor = np.ones(n)
     for i in range(1, n):
-        if prevc[i] > 0 and close[i - 1] > 0:
-            factor[i] = prevc[i] / close[i - 1]
+        base = close[i - 1]
+        px = open_[i] if np.isfinite(open_[i]) and open_[i] > 0 else close[i]
+        if base > 0 and np.isfinite(px):
+            ratio = px / base
+            if ratio < (1.0 - min_gap) or ratio > upper:
+                factor[i] = ratio
 
     adj = np.ones(n)
     cum = 1.0
     for i in range(n - 1, -1, -1):
         adj[i] = cum
-        if i >= 1 and abs(factor[i] - 1.0) > min_gap:
+        if factor[i] != 1.0:
             cum *= factor[i]
 
     for col in ("Open", "High", "Low", "Close"):
-        df[col] = df[col].to_numpy(dtype=float) * adj
+        if col in df.columns:
+            df[col] = df[col].to_numpy(dtype=float) * adj
     with np.errstate(divide="ignore", invalid="ignore"):
         df["Volume"] = df["Volume"].to_numpy(dtype=float) / np.where(adj == 0, 1.0, adj)
     return df

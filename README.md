@@ -128,9 +128,11 @@ vcp_screener/
   criteria.py              the 15 checks + FULL-SETUP aggregation
   screener.py              orchestration + cross-sectional RS Rating
   bhavcopy.py              NSE Bhavcopy EOD provider (default; back-adjusts CA)
+  backtest.py              vectorized historical backtest of the setup
   data.py                  YFinanceProvider (live) & CSVProvider (offline)
   universe.py              the NSE F&O symbol list
   report.py                console summary, CSV matrix, styled HTML board
+run_backtest.py            CLI: backtest the setup over history
 tools/generate_sample_data.py   synthetic OHLCV for offline demos/tests
 tests/                     unit + integration tests (run fully offline)
 ```
@@ -139,6 +141,46 @@ The data layer is abstracted behind a two-method provider interface
 (`get_index`, `get_many`), so the entire criteria/report pipeline is testable
 offline and you can bolt on a broker API (Kite, Upstox, …) by writing one more
 provider.
+
+## Backtesting
+
+Backtest the setup over history to see how it would have performed:
+
+```bash
+python run_backtest.py --history-days 1750          # ~5 years of NSE data
+python run_backtest.py --no-market-filter           # compare without the Nifty gate
+python run_backtest.py --stop-pct 0.07 --trail-ma 50 --max-hold 250
+```
+
+**Rules simulated:** enter at next-day open when a stock *first* becomes a FULL
+VCP SETUP; exit on the first of — an initial stop (`--stop-pct`, default 8%), a
+close back below the trailing MA (`--trail-ma`, default 50-DMA), an optional %
+trailing stop, a max-hold time stop, or end of data. A round-trip cost is
+applied. It reports per-trade stats (win rate, expectancy, profit factor),
+a by-year table, an equal-weight capped-concurrency equity curve, and an
+A/B of the market filter on vs off. Outputs a trades CSV and an HTML report.
+
+The engine is **vectorized and look-ahead-free** — every criterion on day *T*
+uses only data up to *T*, and the cross-sectional RS Rating ranks stocks within
+the same day (there is a unit test asserting truncating future bars doesn't
+change past signals).
+
+**Read results with care — known limitations:**
+
+- **Survivorship bias.** The backtest applies *today's* F&O list historically;
+  names added/removed over time aren't handled point-in-time.
+- **Corporate actions.** Splits/bonuses are back-adjusted heuristically from the
+  overnight gap (NSE's bhavcopy prev-close isn't reliably adjusted). A genuine
+  >30% overnight move could be mis-treated; a corporate-actions feed is the
+  robust fix.
+- **Fills.** Entries fill at the next open; there's no intraday path within a
+  bar, and slippage is modelled only as a flat cost.
+- **The equity curve is illustrative** (equal-weight, capped concurrency, open
+  positions marked at cost) — the per-trade expectancy and profit factor are the
+  more reliable measures of the setup's edge.
+- **A signal is not a strategy.** Entering on "the checklist just went green" is
+  cruder than a real breakout entry (through the pivot on volume); refining the
+  entry is the biggest lever on results.
 
 ## Tuning
 

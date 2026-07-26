@@ -64,19 +64,17 @@ def test_normalize_index():
 # Split / bonus back-adjustment
 # --------------------------------------------------------------------------- #
 def test_back_adjust_handles_5_for_1_split():
-    # 10 days at ~500, then a 5:1 split: price falls to ~100 and NSE reports an
-    # adjusted prev-close (= prior close / 5).
+    # 10 days at ~500, then a 5:1 split: the open on the ex-date gaps to ~1/5.
     dates = pd.bdate_range("2024-01-01", periods=12)
     close = np.array([500, 505, 510, 508, 512, 515, 518, 520, 522, 525,  # pre-split
                       105, 106], dtype=float)                            # post-split
-    prevc = np.concatenate([[500.0], close[:9], [525.0 / 5.0], [105.0]])
     vol = np.concatenate([np.full(10, 100_000.0), np.full(2, 500_000.0)])  # ~5x after
     df = pd.DataFrame(
         {"Open": close, "High": close * 1.01, "Low": close * 0.99,
-         "Close": close, "PrevClose": prevc, "Volume": vol},
+         "Close": close, "Volume": vol},
         index=dates,
     )
-    adj = _back_adjust(df, min_gap=0.10)
+    adj = _back_adjust(df, min_gap=0.30)
 
     # No artificial ~80% cliff remains: adjusted day-to-day returns stay small.
     rets = adj["Close"].pct_change().dropna().abs()
@@ -89,17 +87,34 @@ def test_back_adjust_handles_5_for_1_split():
     assert np.allclose(pre.to_numpy(), post.to_numpy(), rtol=1e-6)
 
 
-def test_back_adjust_ignores_dividend_sized_gaps():
-    dates = pd.bdate_range("2024-01-01", periods=6)
-    close = np.array([200, 201, 202, 203, 204, 205], dtype=float)
-    # A ~1.5% dividend adjustment in prev-close should NOT trigger adjustment.
-    prevc = np.array([200, 200, 201, 202 * 0.985, 203, 204], dtype=float)
+def test_back_adjust_detects_split_when_prevclose_unadjusted():
+    # Real NSE case (BAJFINANCE, Jun 2025): the price gaps ~10x at the open but
+    # the reported PrevClose stays UN-adjusted. Detection must use the gap.
+    dates = pd.bdate_range("2025-06-09", periods=6)
+    close = np.array([9607.5, 9497.5, 9425.0, 938.0, 923.0, 919.0], dtype=float)
+    prevc = np.array([9371.5, 9607.5, 9497.5, 9331.0, 938.0, 923.0], dtype=float)  # unadjusted!
     df = pd.DataFrame(
-        {"Open": close, "High": close, "Low": close, "Close": close,
-         "PrevClose": prevc, "Volume": np.full(6, 1000.0)},
+        {"Open": close, "High": close * 1.01, "Low": close * 0.99,
+         "Close": close, "PrevClose": prevc, "Volume": np.full(6, 1e6)},
         index=dates,
     )
-    adj = _back_adjust(df, min_gap=0.10)
+    adj = _back_adjust(df, min_gap=0.30)
+    rets = adj["Close"].pct_change().dropna().abs()
+    assert rets.max() < 0.10                       # the -90% cliff is gone
+    assert 900 < adj["Close"].iloc[0] < 1000       # pre-split scaled onto ~940 basis
+
+
+def test_back_adjust_ignores_normal_gaps():
+    dates = pd.bdate_range("2024-01-01", periods=6)
+    close = np.array([200, 201, 202, 203, 204, 205], dtype=float)
+    # A ~2% overnight gap up is a normal move, not a corporate action.
+    open_ = np.array([200, 200.5, 202.5, 205, 203.5, 204.5], dtype=float)
+    df = pd.DataFrame(
+        {"Open": open_, "High": close * 1.01, "Low": close * 0.98, "Close": close,
+         "Volume": np.full(6, 1000.0)},
+        index=dates,
+    )
+    adj = _back_adjust(df, min_gap=0.30)
     assert np.allclose(adj["Close"].to_numpy(), close)   # untouched
 
 
