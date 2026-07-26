@@ -49,26 +49,43 @@ needed for live data).
 
 ## Usage
 
-### Live scan (Yahoo Finance)
+### Live scan — NSE Bhavcopy (default)
 
-Scans the built-in F&O universe using free Yahoo Finance data (needs internet):
+Uses NSE's official, free **End-Of-Day bhavcopy** (one file per trading day).
+The first run **backfills ~2 years** of daily bhavcopies into `cache/bhav/`;
+every run after that only fetches the new trading days, so it's fast:
 
 ```bash
 python run_screener.py
 ```
 
-Useful options:
+The screen is meant to be run **once a day after the close** — NSE publishes the
+bhavcopy around 6–7pm IST. Useful options:
 
 ```bash
 python run_screener.py --full-only                 # print only FULL VCP SETUP names
 python run_screener.py --min-passed 13             # + a watchlist of near-misses
+python run_screener.py --history-days 1200         # backfill more history
+python run_screener.py --no-adjust                 # skip split/bonus back-adjustment
 python run_screener.py --limit 30                  # quick test on first 30 symbols
-python run_screener.py --cache-dir cache           # cache downloads to disk
 python run_screener.py --universe-file my_fno.txt  # custom symbol list
 ```
 
+**Corporate actions:** bhavcopy prices are unadjusted, so splits/bonuses are
+**back-adjusted automatically** using the adjusted previous-close NSE reports on
+each ex-date (traded value = price × volume is preserved). Disable with
+`--no-adjust`.
+
 Each run writes a timestamped **CSV** (full matrix) and a **styled HTML board**
 (green ✓ / red ✕ cells, one row per stock) into `output/`.
+
+### Live scan — Yahoo Finance (alternative)
+
+Free, no account, but unofficial and prone to occasional gaps/rate-limits:
+
+```bash
+python run_screener.py --provider yfinance --cache-dir cache
+```
 
 ### Offline scan (local CSVs)
 
@@ -92,6 +109,7 @@ vcp_screener/
   indicators.py            SMA/EMA/ATR/returns/weekly resample (pure functions)
   criteria.py              the 15 checks + FULL-SETUP aggregation
   screener.py              orchestration + cross-sectional RS Rating
+  bhavcopy.py              NSE Bhavcopy EOD provider (default; back-adjusts CA)
   data.py                  YFinanceProvider (live) & CSVProvider (offline)
   universe.py              the NSE F&O symbol list
   report.py                console summary, CSV matrix, styled HTML board
@@ -128,16 +146,23 @@ python -m pytest -q
 ```
 
 The suite is fully offline: it checks the indicators, each criterion against
-designed synthetic data with known outcomes, the FULL-SETUP aggregation, and the
-RS Rating overlay.
+designed synthetic data with known outcomes, the FULL-SETUP aggregation, the
+RS Rating overlay, and the bhavcopy parsing + split/bonus back-adjustment.
 
 ## Data note
 
-The default provider uses **Yahoo Finance** (`<SYMBOL>.NS`, Nifty = `^NSEI`),
-which is free but unofficial and occasionally rate-limits or gaps. For
-production use, swap in a paid/official feed or your broker's API by adding a
-provider in `data.py`. Note that some sandboxed environments block outbound
-access to Yahoo Finance — run live scans where that host is reachable.
+The default provider uses NSE's official **Bhavcopy** archives
+(`archives.nseindia.com`). It reads both the current **UDiFF** common bhavcopy
+and the **legacy** equities bhavcopy, and pulls Nifty 50 from the daily indices
+close file. Each trading day is cached under `cache/bhav/` as a small CSV, so the
+heavy backfill happens once and daily runs are cheap. Holidays return 404 and are
+skipped automatically.
+
+Yahoo Finance (`<SYMBOL>.NS`, Nifty = `^NSEI`) is available as an alternative.
+To use a broker feed (Kite, Upstox, Angel One …), add a provider exposing
+`get_index()` / `get_many()` — nothing else needs to change. Note that some
+sandboxed/corporate networks block `archives.nseindia.com` and Yahoo; run live
+scans where those hosts are reachable.
 
 ## Disclaimer
 

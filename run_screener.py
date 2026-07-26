@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
 """Command-line entry point for the VCP F&O screener.
 
-Live run (needs internet to Yahoo Finance)::
+Live run -- official NSE Bhavcopy EOD data (the default). The first run
+backfills ~2 years of daily bhavcopies into a local cache; later runs only
+fetch new trading days::
 
     python run_screener.py
+
+Alternative live source (Yahoo Finance)::
+
+    python run_screener.py --provider yfinance
 
 Offline run against local CSVs (e.g. the bundled sample data)::
 
@@ -14,6 +20,7 @@ Common options::
     --limit 30            only the first N symbols (quick test)
     --full-only           print only FULL VCP SETUP stocks
     --min-passed 13       treat "near misses" >= N mandatory checks as watchlist
+    --history-days 900    bhavcopy: how much history to backfill
     --output-dir output   where CSV + HTML reports are written
 """
 
@@ -38,6 +45,16 @@ def build_provider(args):
             sys.exit("--csv-dir is required when --provider csv")
         return CSVProvider(args.csv_dir, index_file=args.index_file)
 
+    if args.provider == "bhavcopy":
+        from vcp_screener.bhavcopy import BhavcopyProvider
+
+        return BhavcopyProvider(
+            cache_dir=args.cache_dir or "cache/bhav",
+            history_days=args.history_days,
+            adjust_corporate_actions=not args.no_adjust,
+            workers=args.workers,
+        )
+
     from vcp_screener.data import YFinanceProvider
 
     return YFinanceProvider(period=args.period, cache_dir=args.cache_dir)
@@ -45,11 +62,17 @@ def build_provider(args):
 
 def parse_args(argv=None):
     p = argparse.ArgumentParser(description="VCP screener for the NSE F&O universe.")
-    p.add_argument("--provider", choices=["yfinance", "csv"], default="yfinance",
-                   help="data source (default: yfinance / live)")
+    p.add_argument("--provider", choices=["bhavcopy", "yfinance", "csv"], default="bhavcopy",
+                   help="data source (default: bhavcopy / official NSE EOD)")
     p.add_argument("--period", default="2y", help="yfinance history window (default: 2y)")
+    p.add_argument("--history-days", type=int, default=900,
+                   help="bhavcopy: calendar days of history to fetch (default: 900)")
+    p.add_argument("--no-adjust", action="store_true",
+                   help="bhavcopy: skip split/bonus back-adjustment")
+    p.add_argument("--workers", type=int, default=6,
+                   help="bhavcopy: parallel download workers (default: 6)")
     p.add_argument("--cache-dir", default=None,
-                   help="cache downloaded CSVs here (yfinance provider)")
+                   help="cache directory (bhavcopy day-files / yfinance CSVs)")
     p.add_argument("--csv-dir", default=None, help="directory of per-symbol CSVs (csv provider)")
     p.add_argument("--index-file", default="NIFTY",
                    help="index CSV basename for csv provider (default: NIFTY)")
