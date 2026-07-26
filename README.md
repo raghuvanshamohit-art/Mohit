@@ -177,10 +177,19 @@ python run_backtest.py --stop-pct 0.07 --trail-ma 50 --max-hold 250
 ```
 
 **Rules simulated:** enter at next-day open when a stock *first* becomes a FULL
-VCP SETUP; exit on the first of — an initial stop (`--stop-pct`, default 8%), a
-close back below the trailing MA (`--trail-ma`, default 50-DMA), an optional %
-trailing stop, a max-hold time stop, or end of data. A round-trip cost is
-applied. It reports per-trade stats (win rate, expectancy, profit factor),
+VCP SETUP; exit on the first of — an initial stop (`--stop-pct`, default 8%),
+the profit-exit chosen by `--exit-mode`, a max-hold time stop, or end of data.
+A round-trip cost is applied.
+
+Two profit-exits (`--exit-mode`):
+
+- `trail_ma` (default) — ride the trend, exit on a close back below the
+  `--trail-ma` (default 50-DMA). Also supports an optional `--trail-pct`.
+- `big_candle` — sell into strength on the first bullish day whose range is
+  `>= --big-candle-atr` × ATR (default 3×), or whose gain `>= --big-candle-pct`
+  (e.g. `0.07`). No MA trail, so winners run until a big candle, the stop, or
+  the time exit. This models "enter when all green, book profit on the next big
+  candle." It reports per-trade stats (win rate, expectancy, profit factor),
 a by-year table, an equal-weight capped-concurrency equity curve, and an
 A/B of the market filter on vs off. Outputs a trades CSV and an HTML report.
 

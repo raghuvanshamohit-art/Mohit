@@ -55,6 +55,13 @@ def parse_args(argv=None):
     p.add_argument("--universe-file", default=None)
     p.add_argument("--limit", type=int, default=None)
     p.add_argument("--stop-pct", type=float, default=0.08)
+    p.add_argument("--exit-mode", choices=["trail_ma", "big_candle"], default="trail_ma",
+                   help="profit exit: ride the trend (trail_ma) or sell into the "
+                        "first big up candle (big_candle)")
+    p.add_argument("--big-candle-atr", type=float, default=3.0,
+                   help="big_candle: bullish day with range >= N x ATR triggers the exit")
+    p.add_argument("--big-candle-pct", type=float, default=0.0,
+                   help="big_candle: alternatively, a day gaining >= this fraction (e.g. 0.07)")
     p.add_argument("--trail-ma", type=int, default=50)
     p.add_argument("--no-trail-ma", action="store_true")
     p.add_argument("--trail-pct", type=float, default=0.0)
@@ -227,7 +234,9 @@ def main(argv=None):
     args = parse_args(argv)
     cfg = Config()
     bt = BacktestConfig(
-        stop_pct=args.stop_pct, use_trail_ma=not args.no_trail_ma, trail_ma=args.trail_ma,
+        stop_pct=args.stop_pct, exit_mode=args.exit_mode,
+        big_candle_atr_mult=args.big_candle_atr, big_candle_pct=args.big_candle_pct,
+        use_trail_ma=not args.no_trail_ma, trail_ma=args.trail_ma,
         trail_pct=args.trail_pct, max_hold=args.max_hold, entry=args.entry,
         apply_market_filter=not args.no_market_filter, cost_pct=args.cost_pct,
         max_positions=args.max_positions, capital=args.capital,

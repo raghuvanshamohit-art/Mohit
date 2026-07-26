@@ -73,6 +73,27 @@ def test_gap_through_stop_fills_at_open():
     assert abs(trades[0]["exit"] - 85.0) < 1e-6  # filled at the gapped-down open
 
 
+def test_big_candle_exit():
+    # Flat at 100 (small ranges -> small ATR), signal at bar 20, then a big green
+    # candle at bar 25 (range ~33 >> 3xATR) -> take profit at its close.
+    n = 40
+    close = np.full(n, 100.0)
+    high = close + 0.5
+    low = close - 0.5
+    open_ = close.copy()
+    j = 25
+    open_[j], low[j], high[j], close[j] = 100.0, 99.5, 132.0, 130.0
+    df = _df(close, open_=open_, high=high, low=low)
+    sig = pd.Series(False, index=df.index)
+    sig.iloc[20] = True
+    trades = simulate_stock("X", df, sig,
+                            BacktestConfig(exit_mode="big_candle", big_candle_atr_mult=3.0,
+                                           stop_pct=0.5, cost_pct=0.0))
+    assert len(trades) == 1
+    assert trades[0]["reason"] == "big_candle"
+    assert abs(trades[0]["exit"] - 130.0) < 1e-6
+
+
 def test_no_lookahead():
     # Criteria computed on the full series must match those computed on a
     # truncated (past-only) series, for every overlapping date.

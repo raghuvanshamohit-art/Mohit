@@ -50,9 +50,14 @@ from .constants import (
 @dataclass
 class BacktestConfig:
     stop_pct: float = 0.08          # initial hard stop below entry
+    exit_mode: str = "trail_ma"     # "trail_ma" or "big_candle" (sell into strength)
     use_trail_ma: bool = True       # exit when close falls below the trail MA
     trail_ma: int = 50
     trail_pct: float = 0.0          # optional % trailing stop from peak (0 = off)
+    # "big_candle" exit: book profit on the first bullish day whose range is
+    # >= big_candle_atr_mult x ATR, or whose gain >= big_candle_pct (if > 0).
+    big_candle_atr_mult: float = 3.0
+    big_candle_pct: float = 0.0
     max_hold: int = 250             # max trading days held
     entry: str = "next_open"        # "next_open" or "signal_close"
     apply_market_filter: bool = True  # include "Nifty in Uptrend" in the setup
@@ -135,7 +140,11 @@ def simulate_stock(sym: str, df: pd.DataFrame, signal: pd.Series, bt: BacktestCo
     h = df["High"].to_numpy(float)
     lo = df["Low"].to_numpy(float)
     cl = df["Close"].to_numpy(float)
-    trail = ind.sma(df["Close"], bt.trail_ma).to_numpy(float) if bt.use_trail_ma else None
+    big_candle = bt.exit_mode == "big_candle"
+    trail = (ind.sma(df["Close"], bt.trail_ma).to_numpy(float)
+             if bt.use_trail_ma and not big_candle else None)
+    atr = (ind.atr(df["High"], df["Low"], df["Close"], 14).to_numpy(float)
+           if big_candle else None)
     sig = signal.reindex(idx).fillna(False).to_numpy(bool)
     n = len(df)
 
@@ -169,6 +178,14 @@ def simulate_stock(sym: str, df: pd.DataFrame, signal: pd.Series, bt: BacktestCo
             if lo[j] <= stop:                                   # hard stop (intraday)
                 exit_price = min(o[j], stop)                    # gap-through fills at open
                 reason = "stop"; x = j; break
+            if big_candle:                                      # sell into the first big up day
+                rng = h[j] - lo[j]
+                gain = (cl[j] / cl[j - 1] - 1.0) if cl[j - 1] > 0 else 0.0
+                is_up = cl[j] > o[j]
+                big = ((atr[j] > 0 and rng >= bt.big_candle_atr_mult * atr[j])
+                       or (bt.big_candle_pct > 0 and gain >= bt.big_candle_pct))
+                if is_up and big:
+                    exit_price = cl[j]; reason = "big_candle"; x = j; break
             if trail is not None and np.isfinite(trail[j]) and cl[j] < trail[j]:
                 exit_price = cl[j]; reason = "trail_ma"; x = j; break
             if bt.trail_pct > 0:
