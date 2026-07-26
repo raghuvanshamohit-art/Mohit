@@ -79,6 +79,28 @@ each ex-date (traded value = price × volume is preserved). Disable with
 Each run writes a timestamped **CSV** (full matrix) and a **styled HTML board**
 (green ✓ / red ✕ cells, one row per stock) into `output/`.
 
+### Options enrichment
+
+Add `--options` to layer options context onto each stock setup (needs the NSE
+**FO/derivatives bhavcopy**):
+
+```bash
+python run_screener.py --options
+```
+
+For every candidate it computes, from the latest option chain: the tradeable
+monthly **expiry & DTE** (skipping near-expiry), **ATM implied volatility**
+(solved from settle prices via Black-Scholes — Indian stock options are
+European), a **vol-rank** (IV-rank once history accrues in `cache/iv/`, else
+HV-rank from realized vol), the **expected move** to expiry, **ATM OI/volume
+liquidity**, and a **suggested structure** — buy a ~0.65Δ call when vol is
+cheap and liquid, a **bull-call debit spread** when IV is rich, or "trade the
+stock" when options are thin. Writes `vcp_fno_options_<ts>.{csv,html}`.
+
+> Options change the payoff: this setup is low-win-rate with big winners, so
+> long premium bleeds theta/IV on the many losers. The enrichment is decision
+> support (structure, timing, liquidity) — not a signal to buy calls blindly.
+
 ### Live scan — Yahoo Finance (alternative)
 
 Free, no account, but unofficial and prone to occasional gaps/rate-limits:
@@ -128,6 +150,8 @@ vcp_screener/
   criteria.py              the 15 checks + FULL-SETUP aggregation
   screener.py              orchestration + cross-sectional RS Rating
   bhavcopy.py              NSE Bhavcopy EOD provider (default; back-adjusts CA)
+  fo_bhavcopy.py           NSE derivatives bhavcopy (option chains)
+  options.py               Black-Scholes IV, ranks, expected move, suggestions
   backtest.py              vectorized historical backtest of the setup
   data.py                  YFinanceProvider (live) & CSVProvider (offline)
   universe.py              the NSE F&O symbol list

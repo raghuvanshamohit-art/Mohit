@@ -84,6 +84,10 @@ def parse_args(argv=None):
     p.add_argument("--full-only", action="store_true", help="console: only FULL VCP SETUP")
     p.add_argument("--output-dir", default="output", help="report output directory")
     p.add_argument("--index-symbol", default="^NSEI", help="index ticker (yfinance)")
+    p.add_argument("--options", action="store_true",
+                   help="enrich with options: IV, IV/HV-rank, DTE, expected move, "
+                        "OI/liquidity and a suggested structure (needs NSE FO bhavcopy)")
+    p.add_argument("--fo-cache-dir", default="cache/fo", help="FO bhavcopy cache dir")
     return p.parse_args(argv)
 
 
@@ -97,7 +101,7 @@ def main(argv=None) -> int:
 
     print(f"Screening {len(symbols)} symbols via '{args.provider}' ...")
     provider = build_provider(args)
-    results, market = run_screen(symbols, provider, config, index_symbol=args.index_symbol)
+    results, market, data = run_screen(symbols, provider, config, index_symbol=args.index_symbol)
 
     ranked = rank_results(results, config)
 
@@ -129,6 +133,25 @@ def main(argv=None) -> int:
                 miss = [l for l in r.mandatory_labels(config) if not r.criteria.get(l)]
                 print(f"  {r.symbol:<14} {r.passed_count(config)}/{r.total_mandatory(config)}"
                       f"  missing: {', '.join(miss)}")
+
+    if args.options:
+        from vcp_screener import options as opt
+        from vcp_screener.fo_bhavcopy import FOBhavcopyProvider
+
+        print("\nFetching NSE options (FO bhavcopy) ...")
+        fo = FOBhavcopyProvider(cache_dir=args.fo_cache_dir)
+        fo_day, fo_df = fo.latest_day()
+        if fo_df is None:
+            print("  ! no FO bhavcopy available - skipping options enrichment")
+        else:
+            import pandas as pd
+            metrics = opt.enrich(ranked, fo_df, data, pd.Timestamp(fo_day), opt.OptionsConfig())
+            opt.print_table(ranked, metrics, config)
+            opt_csv = os.path.join(args.output_dir, f"vcp_fno_options_{stamp}.csv")
+            opt.to_frame(ranked, metrics, config).to_csv(opt_csv, index=False)
+            opt_html = os.path.join(args.output_dir, f"vcp_fno_options_{stamp}.html")
+            opt.write_html(ranked, metrics, config, opt_html, as_of=fo_day)
+            print(f"  options data as of {fo_day}  ->  {opt_csv}\n  {opt_html}")
 
     print(f"\nReports written:\n  {csv_path}\n  {html_path}")
     return 0

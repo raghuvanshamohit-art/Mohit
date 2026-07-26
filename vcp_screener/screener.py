@@ -22,8 +22,8 @@ def run_screen(
     provider,
     config: Optional[Config] = None,
     index_symbol: str = "^NSEI",
-) -> Tuple[List[StockResult], MarketContext]:
-    """Evaluate ``symbols`` and return ``(results, market_context)``.
+) -> Tuple[List[StockResult], MarketContext, dict]:
+    """Evaluate ``symbols`` and return ``(results, market_context, data)``.
 
     ``provider`` is any object exposing ``get_index`` and ``get_many`` (see
     :mod:`vcp_screener.data`).
@@ -45,7 +45,7 @@ def run_screen(
         results.append(evaluate_stock(sym, df, weekly, market, config))
 
     _assign_rs_ratings(results, config)
-    return results, market
+    return results, market, data
 
 
 def _assign_rs_ratings(results: List[StockResult], config: Config) -> None:
