@@ -69,8 +69,16 @@ Three stop references, applied together:
 1. **Initial stop — 20% below the entry price.** Active from entry; acts as the
    floor for the trailing stop.
 2. **100 EMA** trailing reference.
-3. **ATR chandelier — `highest_high_since_entry − 1.8 × ATR(14)`.** Trails up as new
-   highs are made; never moves down.
+3. **Volatility trail** — the ATR-based trailing line, chosen via the
+   `Volatility trail engine` input:
+   - **SuperTrend** *(default)* — `ta.supertrend(factor = 1.8, atrPeriod = 14)`.
+     The classic SuperTrend support line that trails up in an uptrend and flips
+     above price when the trend breaks.
+   - **ATR chandelier** — `highest_high_since_entry − 1.8 × ATR(14)`. Trails up as
+     new highs are made; never moves down.
+
+   Both are ATR-driven; SuperTrend simply replaces the chandelier as the default.
+   Note a SuperTrend `factor` of `1.8` is tighter than the common `~3`.
 
 **Exit test:** on a confirmed weekly close **below the effective stop**, exit at the
 next open.
@@ -81,12 +89,14 @@ The podcast says exit on *"whichever is earlier"*, yet also says the system hold
 through 50%+ corrections in strong movers — these tug in opposite directions, so the
 combination is a configurable input (`Effective trailing stop`):
 
+In the table, `vol_trail` is the chosen engine (SuperTrend or ATR chandelier):
+
 | Mode | `effective_stop =` |
 |---|---|
-| **Whichever hit first (tightest)** *(default)* | `max( 20%_stop, max(EMA100, ATR_chandelier) )` |
-| ATR chandelier only | `max( 20%_stop, ATR_chandelier )` |
+| **Whichever hit first (tightest)** *(default)* | `max( 20%_stop, max(EMA100, vol_trail) )` |
+| Volatility trail only | `max( 20%_stop, vol_trail )` |
 | 100 EMA only | `max( 20%_stop, EMA100 )` |
-| Both broken (loosest) | `max( 20%_stop, min(EMA100, ATR_chandelier) )` |
+| Both broken (loosest) | `max( 20%_stop, min(EMA100, vol_trail) )` |
 
 - The 20% initial stop is always the floor.
 - Early in a trade the 20% stop dominates; as price rises the trailing references
@@ -102,7 +112,7 @@ combination is a configurable input (`Effective trailing stop`):
 |---|---|
 | Blue | Upper Bollinger Band `(50, 2)` — the entry trigger |
 | Red | `100 EMA` |
-| Green | `ATR(14) × 1.8` chandelier trailing line |
+| Green | Volatility trail — SuperTrend `(1.8, 14)` *(default)* or `ATR(14) × 1.8` chandelier |
 | Orange | Initial 20% stop (fixed from entry) |
 | Fuchsia | Effective stop used for the exit test |
 | Grey | Entry price |
@@ -132,5 +142,6 @@ guaranteed here** — always run your own back-test.
   costs (the talk assumes ~0.25% cost + brokerage) are not modelled by the plot.
 - **EMA vs SMA:** "100 EMA" is used; if the original used an SMA, change `emaLen`'s
   calculation accordingly.
-- **ATR basis:** `ta.atr()` (Wilder/RMA smoothing) over 14 weekly bars, multiplier
-  1.8, chandelier-anchored to the highest high since entry.
+- **Volatility trail:** default is `ta.supertrend(1.8, 14)`; the alternative ATR
+  chandelier uses `ta.atr()` (Wilder/RMA smoothing) over 14 weekly bars ×1.8,
+  anchored to the highest high since entry. Both use the same ATR family.

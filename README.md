@@ -17,7 +17,7 @@ the system on a **weekly** chart and shows a live dashboard:
 
 - **Blue** — Upper Bollinger Band `(50, 2)`; the breakout trigger (the "2σ").
 - **Red** — `100 EMA`, one of the trailing-stop references.
-- **Green** — `ATR(14) × 1.8` chandelier trailing line.
+- **Green** — volatility trailing line: **SuperTrend** (default) or an `ATR(14) × 1.8` chandelier.
 - **Orange** — the initial **20%** stop, fixed from the entry price.
 - **Fuchsia** — the *effective* stop actually used for the exit test.
 - **BUY / EXIT** markers, an in-trade background tint, and a corner dashboard.
@@ -31,7 +31,7 @@ the system on a **weekly** chart and shows a live dashboard:
 | **Entry** | Weekly **close crosses above the Upper Bollinger Band (50, 2)** → buy at the **next weekly open**. |
 | **Position size** | Fixed **2% of capital** per stock → `qty = floor(capital × 2% ÷ price)`. |
 | **Initial stop** | **20% below** the entry price (weekly-close basis). |
-| **Trailing stop** | Built from the **100 EMA** and an **ATR(14) × 1.8** chandelier; exit on a weekly close below the effective stop. |
+| **Trailing stop** | Built from the **100 EMA** and a volatility line — **SuperTrend** (default) or an **ATR(14) × 1.8** chandelier; exit on a weekly close below the effective stop. |
 | **Style** | Ride winners, cut losers. Pure price action — **no fundamentals**. |
 | **Tracked metric** | Calmar ratio = CAGR ÷ max drawdown (the "cal-mar ratio" in the talk). |
 
@@ -50,8 +50,10 @@ Full spec, including the interpretation choices, is in [`docs/RULES.md`](docs/RU
 ## Inputs
 
 - **Entry — Bollinger Band:** length `50`, σ multiplier `2.0`, source `close`.
-- **Exit — Stops:** initial stop `20%`, trailing EMA `100`, ATR length `14`,
-  ATR multiplier `1.8`, and an **effective-stop mode** (see below).
+- **Exit — Stops:** initial stop `20%`, trailing EMA `100`, a **volatility trail
+  engine** (SuperTrend *default*, or ATR chandelier), SuperTrend `factor 1.8` /
+  `ATR period 14` (chandelier `length 14` / `mult 1.8`), and an **effective-stop
+  mode** (see below).
 - **Position sizing:** capital (₹) and allocation per position (`2%`).
 - **Display:** toggle lines, labels, dashboard, and the in-trade background tint.
 
@@ -59,17 +61,23 @@ Full spec, including the interpretation choices, is in [`docs/RULES.md`](docs/RU
 
 The podcast phrases the trailing exit as *"whichever is earlier"* while also noting
 the system tolerates deep (50%+) corrections in strong movers. Those pull in
-opposite directions, so the combination is exposed as an input:
+opposite directions, so the combination is exposed as an input. The *volatility
+trail* below is whichever engine you pick — **SuperTrend** (default) or the ATR
+chandelier:
 
 | Mode | Exit when weekly close falls below… |
 |---|---|
-| **Whichever hit first (tightest)** *(default)* | `max(100 EMA, ATR chandelier)`, floored by the 20% stop |
-| ATR chandelier only | the ATR line (floored by the 20% stop) |
+| **Whichever hit first (tightest)** *(default)* | `max(100 EMA, volatility trail)`, floored by the 20% stop |
+| Volatility trail only | the SuperTrend/ATR line (floored by the 20% stop) |
 | 100 EMA only | the 100 EMA (floored by the 20% stop) |
-| Both broken (loosest) | `min(100 EMA, ATR chandelier)` — most room to run |
+| Both broken (loosest) | `min(100 EMA, volatility trail)` — most room to run |
 
 Use **loosest** if you want to give multi-baggers the room the podcast describes;
 **tightest** locks profits earlier. All modes keep the 20% initial floor.
+
+> **SuperTrend note:** a `factor` of `1.8` keeps parity with the original ATR
+> setting and is fairly tight; the more common SuperTrend default is ~`3`, which
+> gives price more room. Tune it to taste.
 
 ## Notes & caveats
 
