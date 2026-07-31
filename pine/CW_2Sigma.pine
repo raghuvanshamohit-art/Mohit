@@ -1,0 +1,172 @@
+//@version=5
+// =============================================================================
+//  CW 2σ (Reconstructed) — Weekly Bollinger-Breakout Trend-Following System
+// =============================================================================
+//  An independent, educational reconstruction of the rule-based investment
+//  system publicly described by Rakesh Pujara (Compounding Wealth) on the
+//  "Masters in One" podcast with Vijay Thakkar.
+//
+//  This is NOT the official invite-only "CW 2σ" script. It re-implements only
+//  the publicly stated rules so they can be studied, charted and back-tested.
+//  It is provided for education only and is not investment advice.
+//
+//  ---------------------------------------------------------------------------
+//  Rules (designed for the WEEKLY timeframe — apply on a 1W chart):
+//    ENTRY  : weekly close crosses ABOVE the Upper Bollinger Band (50, 2).
+//             "2σ" = 2 standard deviations. Act on the NEXT weekly open (Mon).
+//    SIZING : fixed % of capital per position (default 2%).
+//    STOPS  : (1) initial stop 20% below entry, then a TRAILING stop built from
+//             (2) the 100 EMA and (3) an ATR(14) x 1.8 chandelier line.
+//             Exit when the weekly close falls below the effective stop.
+//    STYLE  : ride winners, cut losers, pure price action — no fundamentals.
+//  ---------------------------------------------------------------------------
+indicator("CW 2σ (Reconstructed) — Weekly BB Trend System", shorttitle="CW 2σ", overlay=true, max_labels_count=500)
+
+// -----------------------------------------------------------------------------
+//  Inputs
+// -----------------------------------------------------------------------------
+grpEntry = "Entry — Bollinger Band"
+bbLen    = input.int(50,   "BB length",           minval=1,            group=grpEntry, tooltip="Length of the Bollinger Band basis (SMA). Rakesh uses 50.")
+bbMult   = input.float(2.0,"BB std-dev mult (σ)", minval=0.1, step=0.1, group=grpEntry, tooltip="Number of standard deviations for the band. The '2σ' in the name.")
+bbSrc    = input.source(close, "BB source",                            group=grpEntry)
+
+grpStop  = "Exit — Stops"
+initStopPct = input.float(20.0, "Initial stop (% below entry)", minval=0.1, step=0.5, group=grpStop)
+emaLen      = input.int(100, "Trailing EMA length", minval=1,             group=grpStop)
+atrLen      = input.int(14,  "ATR length",          minval=1,             group=grpStop)
+atrMult     = input.float(1.8,"ATR multiplier",     minval=0.1, step=0.1, group=grpStop)
+exitMode    = input.string("Whichever hit first (tightest)", "Effective trailing stop", options=["Whichever hit first (tightest)", "ATR chandelier only", "100 EMA only", "Both broken (loosest)"], group=grpStop, tooltip="How the 100 EMA and ATR trailing lines are combined once price rises above the initial 20% stop. Default follows the podcast wording 'whichever is earlier'.")
+
+grpSize  = "Position sizing"
+capital  = input.float(100000, "Capital (₹)",                minval=0,            group=grpSize)
+riskPct  = input.float(2.0,    "Allocation per position (%)", minval=0.1, step=0.1, group=grpSize)
+
+grpView  = "Display"
+showLines = input.bool(true, "Show band / stop lines",   group=grpView)
+showLbls  = input.bool(true, "Show entry / exit labels",  group=grpView)
+showTable = input.bool(true, "Show dashboard",            group=grpView)
+tintBG    = input.bool(true, "Tint background while in trade", group=grpView)
+
+// -----------------------------------------------------------------------------
+//  Indicator maths (evaluated every bar)
+// -----------------------------------------------------------------------------
+basis   = ta.sma(bbSrc, bbLen)
+dev     = bbMult * ta.stdev(bbSrc, bbLen)
+upperBB = basis + dev
+ema100  = ta.ema(close, emaLen)
+atr     = ta.atr(atrLen)
+
+// -----------------------------------------------------------------------------
+//  State machine  (one open position per symbol)
+// -----------------------------------------------------------------------------
+var bool  inTrade    = false
+var float entryPrice = na
+var int   entryBar   = na
+var float initStop   = na
+var float hiSinceEnt = na
+var bool  armed      = false
+var int   nTrades    = 0
+var int   nWins      = 0
+
+// (1) execute a pending entry at THIS bar's open (i.e. Monday open) ------------
+if armed and not inTrade
+    inTrade    := true
+    entryPrice := open
+    entryBar   := bar_index
+    initStop   := entryPrice * (1.0 - initStopPct / 100.0)
+    hiSinceEnt := high
+    armed      := false
+
+// (2) maintain trailing references while in a trade ---------------------------
+float atrStop = na
+float effStop = na
+if inTrade
+    hiSinceEnt := math.max(hiSinceEnt, high)
+    atrStop := hiSinceEnt - atrMult * atr
+    emaStop = ema100
+    tight   = math.max(atrStop, emaStop)
+    loose   = math.min(atrStop, emaStop)
+    trail = switch exitMode
+        "ATR chandelier only"   => atrStop
+        "100 EMA only"          => emaStop
+        "Both broken (loosest)" => loose
+        => tight
+    effStop := math.max(initStop, trail)
+
+// (3) exit on a confirmed weekly close below the effective stop ---------------
+//     (never on the entry bar itself)
+exitNow = inTrade and bar_index > entryBar and barstate.isconfirmed and close < effStop
+if exitNow
+    nTrades += 1
+    if close > entryPrice
+        nWins += 1
+    inTrade    := false
+    entryPrice := na
+    initStop   := na
+    hiSinceEnt := na
+
+// (4) arm a fresh breakout (act next bar) -------------------------------------
+buySignal = not inTrade and not armed and barstate.isconfirmed and ta.crossover(close, upperBB)
+if buySignal
+    armed := true
+
+justEntered = inTrade and bar_index == entryBar
+
+// -----------------------------------------------------------------------------
+//  Plots
+// -----------------------------------------------------------------------------
+plot(showLines ? upperBB : na, "Upper BB (50,2)", color=color.new(color.blue, 0),   linewidth=2)
+plot(showLines ? ema100  : na, "100 EMA",         color=color.new(color.red,  0),   linewidth=2)
+plot(showLines and inTrade ? entryPrice : na, "Entry price", color=color.new(color.gray, 40), style=plot.style_linebr, linewidth=1)
+plot(showLines and inTrade ? initStop   : na, "Initial 20% stop",  color=color.new(color.orange,  0), style=plot.style_linebr, linewidth=2)
+plot(showLines and inTrade ? atrStop    : na, "ATR trail (14,1.8)",color=color.new(color.green,   0), style=plot.style_linebr, linewidth=2)
+plot(showLines and inTrade ? effStop    : na, "Effective stop",    color=color.new(color.fuchsia, 30), style=plot.style_linebr, linewidth=1)
+
+plotshape(showLbls and justEntered, title="BUY",  style=shape.triangleup,   location=location.belowbar, color=color.new(color.green, 0), size=size.small, text="BUY")
+plotshape(showLbls and exitNow,     title="EXIT", style=shape.triangledown, location=location.abovebar, color=color.new(color.red,   0), size=size.small, text="EXIT")
+
+bgcolor(tintBG and inTrade ? color.new(color.green, 92) : na, title="In-trade tint")
+
+// -----------------------------------------------------------------------------
+//  Alerts
+// -----------------------------------------------------------------------------
+alertcondition(buySignal, title="CW 2σ — breakout (act next open)", message="CW 2σ breakout on {{ticker}} — weekly close broke above upper band. Enter at next weekly open.")
+alertcondition(justEntered, title="CW 2σ — ENTRY", message="CW 2σ ENTRY on {{ticker}} at {{open}}")
+alertcondition(exitNow, title="CW 2σ — EXIT", message="CW 2σ EXIT on {{ticker}} — weekly close below effective stop at {{close}}")
+
+// -----------------------------------------------------------------------------
+//  Dashboard
+// -----------------------------------------------------------------------------
+fmt(float x)  => na(x) ? "—" : str.tostring(x, "#.##")
+fpc(float x)  => na(x) ? "—" : str.tostring(x, "#.##") + " %"
+
+sizeRef  = inTrade ? entryPrice : close
+qty      = sizeRef > 0 ? math.floor((capital * riskPct / 100.0) / sizeRef) : na
+posValue = na(qty) ? na : qty * sizeRef
+pnlPctV  = inTrade and entryPrice > 0 ? (close - entryPrice) / entryPrice * 100.0 : na
+winRate  = nTrades > 0 ? nWins / nTrades * 100.0 : na
+
+statusTxt = inTrade ? "IN TRADE" : armed ? "BUY next open" : "FLAT"
+statusCol = inTrade ? color.new(color.green, 65) : armed ? color.new(color.orange, 55) : color.new(color.gray, 80)
+
+var table dash = table.new(position.top_right, 2, 12, border_width=1, frame_color=color.new(color.gray, 50), frame_width=1)
+
+row(int r, string k, string v, color vc) =>
+    table.cell(dash, 0, r, k, text_size=size.small, text_color=color.white, text_halign=text.align_left,  bgcolor=color.new(color.black, 70))
+    table.cell(dash, 1, r, v, text_size=size.small, text_color=color.white, text_halign=text.align_right, bgcolor=vc)
+
+if showTable and barstate.islast
+    hdr = color.new(color.blue, 20)
+    table.cell(dash, 0, 0, "CW 2σ (Reconstructed)", text_size=size.small, text_color=color.white, bgcolor=hdr)
+    table.cell(dash, 1, 0, syminfo.ticker + " · " + timeframe.period, text_size=size.small, text_color=color.white, text_halign=text.align_right, bgcolor=hdr)
+    row(1,  "Status",            statusTxt,        statusCol)
+    row(2,  "Last close",        fmt(close),       color.new(color.black, 70))
+    row(3,  "Entry price",       fmt(entryPrice),  color.new(color.black, 70))
+    row(4,  "Initial SL (20%)",  fmt(initStop),    color.new(color.orange, 70))
+    row(5,  "100 EMA",           fmt(ema100),      color.new(color.red, 70))
+    row(6,  "ATR SL (14×1.8)",   fmt(atrStop),     color.new(color.green, 70))
+    row(7,  "Effective SL",      fmt(effStop),     color.new(color.fuchsia, 70))
+    row(8,  "Open P&L",          fpc(pnlPctV),     inTrade and pnlPctV >= 0 ? color.new(color.green, 55) : inTrade ? color.new(color.red, 55) : color.new(color.black, 70))
+    row(9,  "Suggested qty",     fmt(qty),         color.new(color.black, 70))
+    row(10, "Position value",    fmt(posValue),    color.new(color.black, 70))
+    row(11, "Trades / Win%",     str.tostring(nTrades) + " / " + fmt(winRate), color.new(color.black, 70))
