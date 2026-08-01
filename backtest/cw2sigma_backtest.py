@@ -131,10 +131,13 @@ def build_symbol(symbol, bars):
 # ----------------------------------------------------------------------------- portfolio sim
 def simulate(symbols, data, master_dates, trail_fn,
              regime_ok=None, init_stop_pct=20.0, atr_mult=ATR_MULT, max_pos=MAX_POS,
-             rank_by="strength", trail_type="atr", pct_trail=0.20):
+             rank_by="strength", trail_type="atr", pct_trail=0.20,
+             size_mode="fixed", vol_ref=0.06, vol_cap=0.04, equity_filter=None):
     """regime_ok: optional {date: bool} gate — entries only allowed when True.
     rank_by: 'strength' (breakout distance) or 'mom' (26-week momentum) for priority.
-    trail_type: 'atr' (ratcheting close-atr_mult*ATR) or 'pct' (ratcheting close*(1-pct_trail))."""
+    trail_type: 'atr' (ratcheting close-atr_mult*ATR) or 'pct' (ratcheting close*(1-pct_trail)).
+    size_mode: 'fixed' (2% equity) or 'vol' (2% x clamp(vol_ref/ATR%), capped at vol_cap).
+    equity_filter: int N — block new entries when equity < its own N-week SMA (de-risk)."""
     stop_frac = 1.0 - init_stop_pct / 100.0
     cash = INIT_CAPITAL
     held = {}            # sym -> dict(shares, entry, entry_date, hi)
@@ -164,14 +167,27 @@ def simulate(symbols, data, master_dates, trail_fn,
                 del held[sym]
             exit_queue.discard(sym)
 
+        # portfolio equity-curve filter: block new entries while equity < its own SMA
+        ef_ok = True
+        if equity_filter and len(equity_curve) >= equity_filter:
+            sma_eq = sum(v for _, v in equity_curve[-equity_filter:]) / equity_filter
+            ef_ok = prev_equity >= sma_eq
+
         # 2) execute ENTRIES queued from last week (ranked, one-week validity)
         for _, sym in sorted(entry_queue, reverse=True):
+            if not ef_ok:
+                break
             if len(held) >= max_pos or sym in held:
                 continue
             bar = data[sym].get(d)
             if bar is None:
                 continue
-            target = POS_PCT * prev_equity
+            if size_mode == "vol":                       # inverse-volatility sizing
+                atrp = (bar["atr"] or bar["o"] * 0.05) / bar["o"]
+                scale = min(2.0, max(0.5, vol_ref / atrp)) if atrp > 0 else 1.0
+                target = min(POS_PCT * prev_equity * scale, vol_cap * prev_equity)
+            else:
+                target = POS_PCT * prev_equity
             shares = math.floor(target / bar["o"])
             if shares <= 0:
                 continue
