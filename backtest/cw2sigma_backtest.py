@@ -368,8 +368,8 @@ def bench_curve(symbol, start_d):
     base = bars[0][4]
     return [(b[0], INIT_CAPITAL * b[4] / base) for b in bars]
 
-def annotate_rs(data, symbols, lookback=26, index_sym="%5ECRSLDX"):
-    """Tag each bar with 'rs' = stock's L-week return minus Nifty 500's L-week return
+def annotate_rs(data, symbols, lookback=26, index_sym="%5ECRSLDX", key="rs"):
+    """Tag each bar[key] with stock's L-week return minus Nifty 500's L-week return
     (positive => outperforming the index). Weekly, as-of carry-forward on the index."""
     import bisect
     bars = fetch_weekly(index_sym)
@@ -387,7 +387,7 @@ def annotate_rs(data, symbols, lookback=26, index_sym="%5ECRSLDX"):
         for p, x in enumerate(ds):
             sret = cl[p] / cl[p - lookback] - 1.0 if p >= lookback else None
             ir = idx_ret_asof(x)
-            data[s][x]["rs"] = (sret - ir) if (sret is not None and ir is not None) else None
+            data[s][x][key] = (sret - ir) if (sret is not None and ir is not None) else None
 
 # ----------------------------------------------------------------------------- main
 def load_universe():
