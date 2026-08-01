@@ -132,12 +132,15 @@ def build_symbol(symbol, bars):
 def simulate(symbols, data, master_dates, trail_fn,
              regime_ok=None, init_stop_pct=20.0, atr_mult=ATR_MULT, max_pos=MAX_POS,
              rank_by="strength", trail_type="atr", pct_trail=0.20,
-             size_mode="fixed", vol_ref=0.06, vol_cap=0.04, equity_filter=None):
+             size_mode="fixed", vol_ref=0.06, vol_cap=0.04, equity_filter=None,
+             rs_entry=False, rs_exit=False, rs_thresh=0.0):
     """regime_ok: optional {date: bool} gate — entries only allowed when True.
     rank_by: 'strength' (breakout distance) or 'mom' (26-week momentum) for priority.
     trail_type: 'atr' (ratcheting close-atr_mult*ATR) or 'pct' (ratcheting close*(1-pct_trail)).
     size_mode: 'fixed' (2% equity) or 'vol' (2% x clamp(vol_ref/ATR%), capped at vol_cap).
-    equity_filter: int N — block new entries when equity < its own N-week SMA (de-risk)."""
+    equity_filter: int N — block new entries when equity < its own N-week SMA (de-risk).
+    rs_entry: only enter when the stock's relative strength vs Nifty 500 (bar['rs']) > rs_thresh.
+    rs_exit:  also exit a held name when its relative strength drops below 0 (underperforms)."""
     stop_frac = 1.0 - init_stop_pct / 100.0
     cash = INIT_CAPITAL
     held = {}            # sym -> dict(shares, entry, entry_date, hi)
@@ -230,6 +233,9 @@ def simulate(symbols, data, master_dates, trail_fn,
             eff = max(pos["init_stop"], trail_fn(bar["ema"], pos["atr_trail"]))
             if d != pos["entry_date"] and bar["c"] < eff:
                 exit_queue.add(sym)
+            elif (rs_exit and d != pos["entry_date"]
+                  and bar.get("rs") is not None and bar["rs"] < 0):
+                exit_queue.add(sym)               # underperforming Nifty 500 -> exit
         regime_on = True if regime_ok is None else regime_ok.get(d, True)
         if regime_on:
             for sym in symbols:
@@ -237,6 +243,8 @@ def simulate(symbols, data, master_dates, trail_fn,
                     continue
                 bar = data[sym].get(d)
                 if bar is not None and bar.get("signal"):
+                    if rs_entry and not (bar.get("rs") is not None and bar["rs"] > rs_thresh):
+                        continue                  # require Nifty 500 outperformance to enter
                     entry_queue.append((bar.get(rank_by, bar["strength"]), sym))
 
     return dict(curve=equity_curve, trades=trades,
@@ -359,6 +367,27 @@ def bench_curve(symbol, start_d):
         return None
     base = bars[0][4]
     return [(b[0], INIT_CAPITAL * b[4] / base) for b in bars]
+
+def annotate_rs(data, symbols, lookback=26, index_sym="%5ECRSLDX"):
+    """Tag each bar with 'rs' = stock's L-week return minus Nifty 500's L-week return
+    (positive => outperforming the index). Weekly, as-of carry-forward on the index."""
+    import bisect
+    bars = fetch_weekly(index_sym)
+    idates = [b[0] for b in bars]; iclose = [b[4] for b in bars]
+    iret = {}
+    for p in range(lookback, len(bars)):
+        iret[idates[p]] = iclose[p] / iclose[p - lookback] - 1.0
+    ik = sorted(iret)
+    def idx_ret_asof(d):
+        j = bisect.bisect_right(ik, d) - 1
+        return iret[ik[j]] if j >= 0 else None
+    for s in symbols:
+        ds = sorted(data[s].keys())
+        cl = [data[s][x]["c"] for x in ds]
+        for p, x in enumerate(ds):
+            sret = cl[p] / cl[p - lookback] - 1.0 if p >= lookback else None
+            ir = idx_ret_asof(x)
+            data[s][x]["rs"] = (sret - ir) if (sret is not None and ir is not None) else None
 
 # ----------------------------------------------------------------------------- main
 def load_universe():
