@@ -128,10 +128,12 @@ pine/CW_2Sigma.pine           # the indicator
 backtest/cw2sigma_backtest.py # portfolio backtester (stdlib only)
 backtest/calmar_experiments.py # Calmar-lever experiments (regime filter, stop/ATR tuning)
 backtest/improve_setup.py     # return + equity-curve improvements (momentum, regime, trail)
+backtest/no_atr_test.py       # exit variants without the ATR stop (20% + 100 EMA)
 backtest/results/             # equity_curve.csv/.svg, improve_equity.svg, trades.csv
 docs/RULES.md                 # detailed rule specification & interpretation notes
 docs/BACKTEST.md              # backtest methodology, results & limitations
 docs/CALMAR.md                # how to raise the Calmar ratio (tested)
 docs/IMPROVEMENTS.md          # improving return & equity curve (tested)
+docs/NO_ATR.md                # dropping the ATR stop: 20% + 100 EMA variants (tested)
 README.md                     # this file
 ```

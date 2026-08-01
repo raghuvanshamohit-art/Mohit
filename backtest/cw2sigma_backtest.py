@@ -131,9 +131,10 @@ def build_symbol(symbol, bars):
 # ----------------------------------------------------------------------------- portfolio sim
 def simulate(symbols, data, master_dates, trail_fn,
              regime_ok=None, init_stop_pct=20.0, atr_mult=ATR_MULT, max_pos=MAX_POS,
-             rank_by="strength"):
+             rank_by="strength", trail_type="atr", pct_trail=0.20):
     """regime_ok: optional {date: bool} gate — entries only allowed when True.
-    rank_by: 'strength' (breakout distance) or 'mom' (26-week momentum) for priority."""
+    rank_by: 'strength' (breakout distance) or 'mom' (26-week momentum) for priority.
+    trail_type: 'atr' (ratcheting close-atr_mult*ATR) or 'pct' (ratcheting close*(1-pct_trail))."""
     stop_frac = 1.0 - init_stop_pct / 100.0
     cash = INIT_CAPITAL
     held = {}            # sym -> dict(shares, entry, entry_date, hi)
@@ -182,9 +183,10 @@ def simulate(symbols, data, master_dates, trail_fn,
                 cost = shares * bar["o"] * (1 + COST_PSIDE)
             cash -= cost
             atr0 = bar["atr"] if bar["atr"] is not None else bar["o"] * 0.2
+            tr0 = bar["o"] * (1 - pct_trail) if trail_type == "pct" else bar["o"] - atr_mult * atr0
             held[sym] = dict(shares=shares, entry=bar["o"], entry_date=d,
                              cost=cost, weeks=0, init_stop=bar["o"] * stop_frac,
-                             atr_trail=bar["o"] - atr_mult * atr0)
+                             atr_trail=tr0)
         entry_queue = []
 
         # 3) mark-to-market at this week's close
@@ -205,7 +207,8 @@ def simulate(symbols, data, master_dates, trail_fn,
             if bar is None or bar["i"] < WARMUP:
                 continue
             pos["weeks"] += 1
-            cand = bar["c"] - atr_mult * bar["atr"]      # ratcheting ATR trailing stop
+            cand = (bar["c"] * (1 - pct_trail) if trail_type == "pct"
+                    else bar["c"] - atr_mult * bar["atr"])   # ratcheting trailing stop
             if cand > pos["atr_trail"]:
                 pos["atr_trail"] = cand
             eff = max(pos["init_stop"], trail_fn(bar["ema"], pos["atr_trail"]))
