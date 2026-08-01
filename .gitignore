@@ -1,0 +1,4 @@
+# Backtest data cache (regenerated from Yahoo; can be large)
+backtest/cache/
+__pycache__/
+*.pyc

@@ -11,14 +11,18 @@
 //  It is provided for education only and is not investment advice.
 //
 //  ---------------------------------------------------------------------------
+//  Settings confirmed from the official indicator's on-chart legend:
+//    "%Stop close 20 · BB 52 SMA close 2 · EMA 100 close · ATR Stop Loss % 14 1.8"
+//
 //  Rules (designed for the WEEKLY timeframe — apply on a 1W chart):
-//    ENTRY  : weekly close crosses ABOVE the Upper Bollinger Band (50, 2).
+//    ENTRY  : weekly close crosses ABOVE the Upper Bollinger Band (52, 2).
 //             "2σ" = 2 standard deviations. Act on the NEXT weekly open (Mon).
 //    SIZING : fixed % of capital per position (default 2%).
 //    STOPS  : (1) initial stop 20% below entry, then a TRAILING stop built from
-//             (2) the 100 EMA and (3) a volatility line — SuperTrend (default)
-//             or an ATR(14) x 1.8 chandelier. Exit when the weekly close falls
-//             below the effective stop.
+//             (2) the 100 EMA and (3) a volatility line — a ratcheting
+//             ATR(14) x 1.8 trailing stop (matches the official "ATR Stop Loss"),
+//             or SuperTrend. Exit when the weekly close falls below the effective
+//             stop.
 //    STYLE  : ride winners, cut losers, pure price action — no fundamentals.
 //  ---------------------------------------------------------------------------
 indicator("CW 2σ (Reconstructed) — Weekly BB Trend System", shorttitle="CW 2σ", overlay=true, max_labels_count=500)
@@ -27,18 +31,18 @@ indicator("CW 2σ (Reconstructed) — Weekly BB Trend System", shorttitle="CW 2�
 //  Inputs
 // -----------------------------------------------------------------------------
 grpEntry = "Entry — Bollinger Band"
-bbLen    = input.int(50,   "BB length",           minval=1,            group=grpEntry, tooltip="Length of the Bollinger Band basis (SMA). Rakesh uses 50.")
+bbLen    = input.int(52,   "BB length",           minval=1,            group=grpEntry, tooltip="Length of the Bollinger Band basis (SMA). Official indicator uses 52 (≈ 1 year of weekly bars).")
 bbMult   = input.float(2.0,"BB std-dev mult (σ)", minval=0.1, step=0.1, group=grpEntry, tooltip="Number of standard deviations for the band. The '2σ' in the name.")
 bbSrc    = input.source(close, "BB source",                            group=grpEntry)
 
 grpStop  = "Exit — Stops"
 initStopPct = input.float(20.0, "Initial stop (% below entry)", minval=0.1, step=0.5, group=grpStop)
 emaLen      = input.int(100, "Trailing EMA length", minval=1, group=grpStop)
-trailEngine = input.string("SuperTrend", "Volatility trail engine", options=["SuperTrend", "ATR chandelier"], group=grpStop, tooltip="The volatility-based trailing line. 'SuperTrend' (default) replaces the original ATR chandelier; both are ATR-driven.")
-stFactor    = input.float(1.8,"SuperTrend — factor",     minval=0.1, step=0.1, group=grpStop, tooltip="ATR multiplier for SuperTrend. 1.8 keeps parity with the original ATR setting; the common default is ~3 (looser).")
-stAtrPeriod = input.int(14,   "SuperTrend — ATR period", minval=1, group=grpStop)
-atrLen      = input.int(14,   "ATR chandelier — length", minval=1, group=grpStop, tooltip="Used only when the engine is 'ATR chandelier'.")
-atrMult     = input.float(1.8,"ATR chandelier — mult",   minval=0.1, step=0.1, group=grpStop, tooltip="Used only when the engine is 'ATR chandelier'.")
+trailEngine = input.string("ATR trailing stop", "Volatility trail engine", options=["ATR trailing stop", "SuperTrend"], group=grpStop, tooltip="'ATR trailing stop' (default) is the ratcheting close − mult×ATR line that matches the official 'ATR Stop Loss'. 'SuperTrend' is an hl2-based cousin.")
+atrLen      = input.int(14,   "ATR stop — length",   minval=1, group=grpStop, tooltip="ATR period for the ATR trailing stop (official: 14).")
+atrMult     = input.float(1.8,"ATR stop — mult",     minval=0.1, step=0.1, group=grpStop, tooltip="ATR multiplier for the ATR trailing stop (official: 1.8).")
+stFactor    = input.float(1.8,"SuperTrend — factor",     minval=0.1, step=0.1, group=grpStop, tooltip="Used only when the engine is 'SuperTrend'. Common default is ~3 (looser).")
+stAtrPeriod = input.int(14,   "SuperTrend — ATR period", minval=1, group=grpStop, tooltip="Used only when the engine is 'SuperTrend'.")
 exitMode    = input.string("Whichever hit first (tightest)", "Effective trailing stop", options=["Whichever hit first (tightest)", "Volatility trail only", "100 EMA only", "Both broken (loosest)"], group=grpStop, tooltip="How the 100 EMA and the volatility trail (SuperTrend/ATR) are combined once price rises above the initial 20% stop. Default follows the podcast wording 'whichever is earlier'.")
 
 grpSize  = "Position sizing"
@@ -68,7 +72,7 @@ var bool  inTrade    = false
 var float entryPrice = na
 var int   entryBar   = na
 var float initStop   = na
-var float hiSinceEnt = na
+var float atrTrail   = na
 var bool  armed      = false
 var int   nTrades    = 0
 var int   nWins      = 0
@@ -79,16 +83,15 @@ if armed and not inTrade
     entryPrice := open
     entryBar   := bar_index
     initStop   := entryPrice * (1.0 - initStopPct / 100.0)
-    hiSinceEnt := high
+    atrTrail   := entryPrice - atrMult * atr
     armed      := false
 
 // (2) maintain trailing references while in a trade ---------------------------
 float volStop = na
 float effStop = na
 if inTrade
-    hiSinceEnt := math.max(hiSinceEnt, high)
-    chandStop = hiSinceEnt - atrMult * atr
-    volStop := trailEngine == "SuperTrend" ? stLine : chandStop
+    atrTrail := math.max(nz(atrTrail, close - atrMult * atr), close - atrMult * atr)  // ratchets up, never down
+    volStop := trailEngine == "SuperTrend" ? stLine : atrTrail
     emaStop = ema100
     tight   = math.max(volStop, emaStop)
     loose   = math.min(volStop, emaStop)
@@ -109,7 +112,7 @@ if exitNow
     inTrade    := false
     entryPrice := na
     initStop   := na
-    hiSinceEnt := na
+    atrTrail   := na
 
 // (4) arm a fresh breakout (act next bar) -------------------------------------
 buySignal = not inTrade and not armed and barstate.isconfirmed and ta.crossover(close, upperBB)
@@ -121,11 +124,11 @@ justEntered = inTrade and bar_index == entryBar
 // -----------------------------------------------------------------------------
 //  Plots
 // -----------------------------------------------------------------------------
-plot(showLines ? upperBB : na, "Upper BB (50,2)", color=color.new(color.blue, 0),   linewidth=2)
+plot(showLines ? upperBB : na, "Upper BB (52,2)", color=color.new(color.blue, 0),   linewidth=2)
 plot(showLines ? ema100  : na, "100 EMA",         color=color.new(color.red,  0),   linewidth=2)
 plot(showLines and inTrade ? entryPrice : na, "Entry price", color=color.new(color.gray, 40), style=plot.style_linebr, linewidth=1)
 plot(showLines and inTrade ? initStop   : na, "Initial 20% stop",  color=color.new(color.orange,  0), style=plot.style_linebr, linewidth=2)
-plot(showLines and inTrade ? volStop    : na, "Volatility trail (SuperTrend/ATR)", color=color.new(color.green, 0), style=plot.style_linebr, linewidth=2)
+plot(showLines and inTrade ? volStop    : na, "ATR / SuperTrend trail", color=color.new(color.green, 0), style=plot.style_linebr, linewidth=2)
 plot(showLines and inTrade ? effStop    : na, "Effective stop",    color=color.new(color.fuchsia, 30), style=plot.style_linebr, linewidth=1)
 
 plotshape(showLbls and justEntered, title="BUY",  style=shape.triangleup,   location=location.belowbar, color=color.new(color.green, 0), size=size.small, text="BUY")
@@ -170,7 +173,7 @@ if showTable and barstate.islast
     row(3,  "Entry price",       fmt(entryPrice),  color.new(color.black, 70))
     row(4,  "Initial SL (20%)",  fmt(initStop),    color.new(color.orange, 70))
     row(5,  "100 EMA",           fmt(ema100),      color.new(color.red, 70))
-    row(6,  trailEngine == "SuperTrend" ? "SuperTrend SL" : "ATR SL (chand.)", fmt(volStop) + (trailEngine == "SuperTrend" ? (stDir < 0 ? " up" : " dn") : ""), color.new(color.green, 70))
+    row(6,  trailEngine == "SuperTrend" ? "SuperTrend SL" : "ATR trail SL", fmt(volStop) + (trailEngine == "SuperTrend" ? (stDir < 0 ? " up" : " dn") : ""), color.new(color.green, 70))
     row(7,  "Effective SL",      fmt(effStop),     color.new(color.fuchsia, 70))
     row(8,  "Open P&L",          fpc(pnlPctV),     inTrade and pnlPctV >= 0 ? color.new(color.green, 55) : inTrade ? color.new(color.red, 55) : color.new(color.black, 70))
     row(9,  "Suggested qty",     fmt(qty),         color.new(color.black, 70))

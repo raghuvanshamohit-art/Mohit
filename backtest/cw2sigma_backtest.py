@@ -3,9 +3,9 @@
 CW 2σ (Reconstructed) — 20-year portfolio backtest.
 
 Implements the rule set:
-  ENTRY  : weekly close crosses ABOVE Upper Bollinger Band (50, 2) -> buy next weekly open
+  ENTRY  : weekly close crosses ABOVE Upper Bollinger Band (52, 2) -> buy next weekly open
   SIZING : fixed 2% of current equity per position (max 50 concurrent)
-  STOP   : initial 20% below entry, then trailing = 100 EMA + ATR(14 x 1.8) chandelier
+  STOP   : initial 20% below entry, then trailing = 100 EMA + ATR(14 x 1.8) trailing stop
   EXIT   : weekly close below the effective stop -> sell next weekly open
 
 Data      : Yahoo Finance weekly, split/bonus/div adjusted (stdlib urllib only).
@@ -23,19 +23,19 @@ INIT_CAPITAL = 2_000_000      # ₹20 lakh
 POS_PCT      = 0.02           # 2% of equity per position
 MAX_POS      = 50             # concurrency cap (2% each => ~100% invested)
 COST_PSIDE   = 0.0025         # 0.25% per side (slippage + charges)
-BB_LEN, BB_MULT = 50, 2.0
+BB_LEN, BB_MULT = 52, 2.0     # official indicator legend: "BB 52 SMA close 2"
 EMA_LEN         = 100
-ATR_LEN, ATR_MULT = 14, 1.8
+ATR_LEN, ATR_MULT = 14, 1.8   # official: "ATR Stop Loss % 14 1.8" (ratcheting trail)
 WARMUP          = EMA_LEN     # a symbol is eligible once it has >= WARMUP weekly bars
 RANGE           = "20y"
 UA              = {"User-Agent": "Mozilla/5.0"}
 OUTDIR          = os.path.dirname(os.path.abspath(__file__))
 
-EXIT_MODES = {                # how EMA & ATR chandelier combine (floored by 20% stop)
-    "tightest (max EMA,ATR)": lambda ema, chand: max(ema, chand),
-    "loosest (min EMA,ATR)":  lambda ema, chand: min(ema, chand),
-    "100 EMA only":           lambda ema, chand: ema,
-    "ATR chandelier only":    lambda ema, chand: chand,
+EXIT_MODES = {                # how EMA & ATR trailing stop combine (floored by 20% stop)
+    "tightest (max EMA,ATR)": lambda ema, atr: max(ema, atr),
+    "loosest (min EMA,ATR)":  lambda ema, atr: min(ema, atr),
+    "100 EMA only":           lambda ema, atr: ema,
+    "ATR trail only":         lambda ema, atr: atr,
 }
 
 # ----------------------------------------------------------------------------- fetch
@@ -138,8 +138,8 @@ def simulate(symbols, data, master_dates, trail_fn):
     prev_equity = INIT_CAPITAL
 
     for d in master_dates:
-        # 1) execute EXITS queued for this open
-        for sym in list(exit_queue):
+        # 1) execute EXITS queued for this open (sorted => deterministic)
+        for sym in sorted(exit_queue):
             bar = data[sym].get(d)
             if bar is None:
                 continue
@@ -173,9 +173,10 @@ def simulate(symbols, data, master_dates, trail_fn):
                     continue
                 cost = shares * bar["o"] * (1 + COST_PSIDE)
             cash -= cost
+            atr0 = bar["atr"] if bar["atr"] is not None else bar["o"] * 0.2
             held[sym] = dict(shares=shares, entry=bar["o"], entry_date=d,
-                             hi=bar["h"], cost=cost, weeks=0,
-                             init_stop=bar["o"] * 0.8)
+                             cost=cost, weeks=0, init_stop=bar["o"] * 0.8,
+                             atr_trail=bar["o"] - ATR_MULT * atr0)
         entry_queue = []
 
         # 3) mark-to-market at this week's close
@@ -196,10 +197,10 @@ def simulate(symbols, data, master_dates, trail_fn):
             if bar is None or bar["i"] < WARMUP:
                 continue
             pos["weeks"] += 1
-            if bar["h"] > pos["hi"]:
-                pos["hi"] = bar["h"]
-            chand = pos["hi"] - ATR_MULT * bar["atr"]
-            eff = max(pos["init_stop"], trail_fn(bar["ema"], chand))
+            cand = bar["c"] - ATR_MULT * bar["atr"]      # ratcheting ATR trailing stop
+            if cand > pos["atr_trail"]:
+                pos["atr_trail"] = cand
+            eff = max(pos["init_stop"], trail_fn(bar["ema"], pos["atr_trail"]))
             if d != pos["entry_date"] and bar["c"] < eff:
                 exit_queue.add(sym)
         for sym in symbols:
@@ -331,16 +332,19 @@ def load_universe():
             syms.append(s.replace("&", "%26") + ".NS")
     return syms
 
-def main():
-    limit = int(os.environ.get("LIMIT", "0"))
-    print("Fetching Nifty 500 constituents ...", flush=True)
-    universe = load_universe()
-    if limit:
-        universe = universe[:limit]
-    print(f"Universe: {len(universe)} symbols. Downloading 20y weekly data ...", flush=True)
+CACHE = os.path.join(OUTDIR, "cache", "weekly.json")
 
-    data, bars_map = {}, {}
-    ok = 0
+def load_bars_map(universe):
+    """Fetch (or load from cache) weekly bars for the universe. Caching makes runs
+    deterministic & reproducible; delete backtest/cache/ or set REFRESH=1 to refetch."""
+    if os.path.exists(CACHE) and not os.environ.get("REFRESH"):
+        with open(CACHE) as f:
+            raw = json.load(f)
+        bmap = {s: [(dt.date.fromisoformat(r[0]), r[1], r[2], r[3], r[4]) for r in rows]
+                for s, rows in raw.items() if s in set(universe)}
+        print(f"Loaded {len(bmap)} symbols from cache ({CACHE}).", flush=True)
+        return bmap
+    bmap, ok = {}, 0
     with ThreadPoolExecutor(max_workers=12) as ex:
         futs = {ex.submit(fetch_weekly, s): s for s in universe}
         for i, fut in enumerate(as_completed(futs)):
@@ -350,15 +354,32 @@ def main():
             except Exception:
                 bars = None
             if bars:
-                bars_map[s] = bars
+                bmap[s] = bars
                 ok += 1
             if (i + 1) % 50 == 0:
                 print(f"  ... {i+1}/{len(universe)} fetched (usable so far: {ok})", flush=True)
-    print(f"Usable symbols: {ok}/{len(universe)}", flush=True)
+    os.makedirs(os.path.dirname(CACHE), exist_ok=True)
+    with open(CACHE, "w") as f:
+        json.dump({s: [[b[0].isoformat(), round(b[1], 4), round(b[2], 4),
+                        round(b[3], 4), round(b[4], 4)] for b in bars]
+                   for s, bars in bmap.items()}, f)
+    return bmap
 
+def main():
+    limit = int(os.environ.get("LIMIT", "0"))
+    print("Fetching Nifty 500 constituents ...", flush=True)
+    universe = load_universe()
+    if limit:
+        universe = universe[:limit]
+    print(f"Universe: {len(universe)} symbols. Loading 20y weekly data ...", flush=True)
+
+    bars_map = load_bars_map(universe)
+    print(f"Usable symbols: {len(bars_map)}/{len(universe)}", flush=True)
+
+    data = {}
     for s, bars in bars_map.items():
         data[s] = build_symbol(s, bars)
-    symbols = list(data.keys())
+    symbols = sorted(data.keys())          # deterministic ordering
 
     # master weekly timeline
     all_dates = set()
@@ -393,13 +414,13 @@ def main():
         if bc:
             benches[label] = dict(m=metrics(bc), curve=bc)
 
-    write_report(results, benches, ok, len(universe), master_dates)
+    write_report(results, benches, len(bars_map), len(universe), master_dates)
     print("\nWrote docs/BACKTEST.md and backtest/results/*.csv", flush=True)
 
 def write_report(results, benches, ok, total, master_dates):
     resdir = os.path.join(OUTDIR, "results")
     os.makedirs(resdir, exist_ok=True)
-    headline = "loosest (min EMA,ATR)"
+    headline = "tightest (max EMA,ATR)"
     hr = results[headline]
     hm, ht = hr["m"], hr["t"]
 
@@ -425,14 +446,16 @@ def write_report(results, benches, ok, total, master_dates):
     P(f"- **Initial capital:** ₹{INIT_CAPITAL:,} (₹20 lakh)")
     P(f"- **Window:** {master_dates[0]} → {master_dates[-1]}  ({(master_dates[-1]-master_dates[0]).days/365.25:.1f} years)")
     P(f"- **Universe:** current NSE Nifty 500 — {ok} of {total} symbols had usable Yahoo data")
-    P(f"- **Rules:** BB({BB_LEN},{BB_MULT}) upper-band breakout entry · 2% equity/position · "
-      f"20% initial stop · trailing 100 EMA + ATR({ATR_LEN}×{ATR_MULT}) chandelier · weekly")
+    P(f"- **Rules:** BB({BB_LEN},{BB_MULT:.0f}) upper-band breakout entry · 2% equity/position · "
+      f"20% initial stop · trailing 100 EMA + ratcheting ATR({ATR_LEN}×{ATR_MULT}) stop · weekly")
+    P("- **Settings source:** confirmed from the official indicator legend "
+      "(*%Stop 20 · BB 52 SMA 2 · EMA 100 · ATR Stop Loss 14 1.8*).")
     P(f"- **Costs:** {COST_PSIDE*100:.2f}% per side · max {MAX_POS} concurrent positions · cash earns 0%\n")
 
-    P("## Headline result — exit mode: *loosest* (EMA/ATR give room; matches the 'hold winners' design)\n")
-    P("> The podcast's literal *'whichever hit first'* wording corresponds to the **tightest** row in "
-      "the comparison below (far more whipsaw, lower return). All four interpretations are shown so "
-      "nothing is cherry-picked.\n")
+    P("## Headline result — exit mode: *tightest* (exit on whichever stop is hit first)\n")
+    P("> This matches the podcast's literal *'whichever is earlier'* wording — the effective stop is the "
+      "**highest** of {20% initial, 100 EMA, ATR trail}. With the ratcheting ATR stop it is also the best "
+      "risk-adjusted here. All four interpretations are shown below so nothing is cherry-picked.\n")
     P(f"| Metric | Value |")
     P(f"|---|---|")
     P(f"| Final equity | **₹{hm['end_v']:,.0f}** |")
@@ -483,15 +506,21 @@ def write_report(results, benches, ok, total, master_dates):
     P("3. **Costs & liquidity:** a flat 0.25%/side is modelled; real slippage in small-caps, impact "
       "cost, STT, and the assumption of filling at the weekly open can differ.")
     P("4. **Cash earns 0%** (conservative); dividends are included via adjusted prices.")
-    P("5. **Not the official CW 2σ** and not tuned to match the presenter's quoted figures. "
+    P("5. **Concentration / fragility.** The run is deterministic (cached dataset, sorted execution), "
+      "but the *outcome* leans on a handful of huge winners caught when cash was free. Change the "
+      "universe, costs, or start date a little and the looser modes in particular can move a lot "
+      "(observed ₹9–14 cr across dataset refetches). Treat the level as indicative, the *shape* "
+      "(beats index on return and drawdown) as the robust takeaway.")
+    P("6. **Not the official CW 2σ** and not tuned to match the presenter's quoted figures. "
       "This reproduces the *publicly stated rules* only.")
-    P("\n*Generated by `backtest/cw2sigma_backtest.py` — re-run to reproduce.*")
+    P("\n*Generated by `backtest/cw2sigma_backtest.py` (cached dataset for reproducibility) — "
+      "set `REFRESH=1` to refetch.*")
 
     with open(os.path.join(os.path.dirname(OUTDIR), "docs", "BACKTEST.md"), "w") as f:
         f.write("\n".join(L) + "\n")
 
     # equity-curve chart: headline strategy vs benchmarks
-    series = [("CW 2σ (loosest)", "#2563eb", hr["curve"])]
+    series = [("CW 2σ (tightest)", "#2563eb", hr["curve"])]
     bcolors = ["#f59e0b", "#6b7280"]
     for (label, b), col in zip(benches.items(), bcolors):
         series.append((label, col, b["curve"]))

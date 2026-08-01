@@ -87,20 +87,24 @@ Use **loosest** if you want to give multi-baggers the room the podcast describes
   back-tester — position sizing across many symbols is a portfolio-level rule).
 - The `2%` cap and universe selection are enforced by you across your watchlist.
 
-## Backtest (20-year portfolio simulation)
+## Backtest (portfolio simulation)
 
-A pure-Python portfolio backtester implements the exact rule set over ~18 years
-(the honest maximum — free Indian-equity history starts ~2006), ₹20 lakh start,
-current Nifty 500 universe, Nifty 50 / Nifty 500 benchmarks.
+A pure-Python portfolio backtester implements the exact rule set — using the
+settings confirmed from the official indicator legend (**BB 52 · %Stop 20 ·
+EMA 100 · ATR 14×1.8**) — over ~18 years (the honest maximum; free Indian-equity
+history starts ~2006), ₹20 lakh start, current Nifty 500 universe, vs Nifty 50 /
+Nifty 500 benchmarks.
 
 ```bash
-python3 backtest/cw2sigma_backtest.py      # downloads data & writes docs/BACKTEST.md
+python3 backtest/cw2sigma_backtest.py      # first run downloads & caches data, writes docs/BACKTEST.md
 ```
 
-Headline (2008–2026, *loosest* exit; **survivorship-biased**, see the report):
-**₹20L → ~₹13.6 cr, CAGR ~26%, max DD ~28%, Calmar ~0.93** — vs Nifty 50 buy &
-hold ~10.5% CAGR / 43% DD. Full numbers, all four exit modes, year-by-year and a
-long list of caveats are in **[`docs/BACKTEST.md`](docs/BACKTEST.md)**.
+Headline (2008–2026, *tightest* exit = the podcast's literal "whichever hit first";
+**survivorship-biased**, see the report):
+**₹20L → ~₹8.6 cr, CAGR ~23%, max DD ~26%, Calmar ~0.88** — vs Nifty 50 buy & hold
+~10.5% CAGR / 43% DD (Calmar 0.24). The looser exit variants reach ~₹9.6–10 cr but
+with deeper drawdowns; all four modes, year-by-year and a full caveat list are in
+**[`docs/BACKTEST.md`](docs/BACKTEST.md)**.
 
 > ⚠️ Results use *today's* index members, so they overstate reality (delisted
 > losers are excluded). Treat as indicative of the rules' *character*, not a promise.

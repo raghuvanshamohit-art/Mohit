@@ -6,35 +6,36 @@
 - **Initial capital:** ₹2,000,000 (₹20 lakh)
 - **Window:** 2008-06-23 → 2026-07-27  (18.1 years)
 - **Universe:** current NSE Nifty 500 — 456 of 500 symbols had usable Yahoo data
-- **Rules:** BB(50,2.0) upper-band breakout entry · 2% equity/position · 20% initial stop · trailing 100 EMA + ATR(14×1.8) chandelier · weekly
+- **Rules:** BB(52,2) upper-band breakout entry · 2% equity/position · 20% initial stop · trailing 100 EMA + ratcheting ATR(14×1.8) stop · weekly
+- **Settings source:** confirmed from the official indicator legend (*%Stop 20 · BB 52 SMA 2 · EMA 100 · ATR Stop Loss 14 1.8*).
 - **Costs:** 0.25% per side · max 50 concurrent positions · cash earns 0%
 
-## Headline result — exit mode: *loosest* (EMA/ATR give room; matches the 'hold winners' design)
+## Headline result — exit mode: *tightest* (exit on whichever stop is hit first)
 
-> The podcast's literal *'whichever hit first'* wording corresponds to the **tightest** row in the comparison below (far more whipsaw, lower return). All four interpretations are shown so nothing is cherry-picked.
+> This matches the podcast's literal *'whichever is earlier'* wording — the effective stop is the **highest** of {20% initial, 100 EMA, ATR trail}. With the ratcheting ATR stop it is also the best risk-adjusted here. All four interpretations are shown below so nothing is cherry-picked.
 
 | Metric | Value |
 |---|---|
-| Final equity | **₹135,953,870** |
-| Total return | 6,698% (×68.0) |
-| CAGR | **26.3%** |
-| Max drawdown | 28.2% |
-| Calmar (CAGR/MaxDD) | **0.93** |
-| Exposure (avg invested) | 94% |
-| Trades | 490 |
-| Win rate | 50.0% |
-| Avg win / loss | +279% / -16% |
-| Avg hold winners / losers | 980d / 175d |
-| Best trade | EICHERMOT +8,877% |
+| Final equity | **₹85,722,059** |
+| Total return | 4,186% (×42.9) |
+| CAGR | **23.1%** |
+| Max drawdown | 26.2% |
+| Calmar (CAGR/MaxDD) | **0.88** |
+| Exposure (avg invested) | 76% |
+| Trades | 3116 |
+| Win rate | 44.8% |
+| Avg win / loss | +30% / -9% |
+| Avg hold winners / losers | 124d / 42d |
+| Best trade | GRAPHITE +604% |
 
 ## All exit modes compared
 
 | Exit mode | Final equity | CAGR | Max DD | Calmar | Trades | Win% | Exposure |
 |---|--:|--:|--:|--:|--:|--:|--:|
-| tightest (max EMA,ATR) | ₹31,242,761 | 16.4% | 20.6% | 0.80 | 5676 | 45% | 65% |
-| loosest (min EMA,ATR) ⭐ | ₹135,953,870 | 26.3% | 28.2% | 0.93 | 490 | 50% | 94% |
-| 100 EMA only | ₹125,720,427 | 25.7% | 28.4% | 0.91 | 483 | 50% | 94% |
-| ATR chandelier only | ₹31,737,791 | 16.5% | 20.6% | 0.80 | 5644 | 45% | 65% |
+| tightest (max EMA,ATR) ⭐ | ₹85,722,059 | 23.1% | 26.2% | 0.88 | 3116 | 45% | 76% |
+| loosest (min EMA,ATR) | ₹98,438,942 | 24.0% | 30.8% | 0.78 | 498 | 49% | 94% |
+| 100 EMA only | ₹96,104,245 | 23.9% | 31.1% | 0.77 | 487 | 50% | 94% |
+| ATR trail only | ₹86,832,247 | 23.2% | 26.7% | 0.87 | 3092 | 45% | 77% |
 
 ## Benchmarks — ₹20 lakh buy & hold, same window
 
@@ -47,25 +48,25 @@
 
 | Year | Return | Year-end equity |
 |---|--:|--:|
-| 2008 | — | ₹1,928,821 |
-| 2009 | +50.1% | ₹2,894,296 |
-| 2010 | +31.0% | ₹3,791,697 |
-| 2011 | -6.0% | ₹3,566,049 |
-| 2012 | +51.9% | ₹5,418,174 |
-| 2013 | +24.4% | ₹6,738,637 |
-| 2014 | +77.2% | ₹11,940,347 |
-| 2015 | +18.6% | ₹14,166,371 |
-| 2016 | +10.9% | ₹15,710,876 |
-| 2017 | +76.1% | ₹27,661,556 |
-| 2018 | -17.7% | ₹22,753,959 |
-| 2019 | +14.0% | ₹25,949,772 |
-| 2020 | +29.7% | ₹33,650,330 |
-| 2021 | +37.7% | ₹46,331,369 |
-| 2022 | +3.7% | ₹48,066,125 |
-| 2023 | +101.2% | ₹96,694,963 |
-| 2024 | +27.9% | ₹123,694,882 |
-| 2025 | +2.0% | ₹126,160,907 |
-| 2026 | +7.8% | ₹135,953,870 |
+| 2008 | — | ₹1,959,223 |
+| 2009 | +45.9% | ₹2,858,804 |
+| 2010 | +15.6% | ₹3,303,649 |
+| 2011 | -10.3% | ₹2,962,988 |
+| 2012 | +34.8% | ₹3,993,260 |
+| 2013 | +11.2% | ₹4,440,148 |
+| 2014 | +104.2% | ₹9,066,535 |
+| 2015 | +3.5% | ₹9,382,412 |
+| 2016 | +8.8% | ₹10,205,515 |
+| 2017 | +80.4% | ₹18,406,307 |
+| 2018 | -10.5% | ₹16,475,696 |
+| 2019 | -3.7% | ₹15,869,718 |
+| 2020 | +37.9% | ₹21,882,617 |
+| 2021 | +61.3% | ₹35,287,263 |
+| 2022 | +5.6% | ₹37,277,958 |
+| 2023 | +70.3% | ₹63,480,748 |
+| 2024 | +27.8% | ₹81,136,947 |
+| 2025 | +2.5% | ₹83,185,068 |
+| 2026 | +3.0% | ₹85,722,059 |
 
 ## ⚠️ Honest limitations (read before trusting any number)
 
@@ -73,6 +74,7 @@
 2. **Newer listings** enter the tradable set only after ~2 years (100-week warm-up), so early years trade a smaller universe than the full 500.
 3. **Costs & liquidity:** a flat 0.25%/side is modelled; real slippage in small-caps, impact cost, STT, and the assumption of filling at the weekly open can differ.
 4. **Cash earns 0%** (conservative); dividends are included via adjusted prices.
-5. **Not the official CW 2σ** and not tuned to match the presenter's quoted figures. This reproduces the *publicly stated rules* only.
+5. **Concentration / fragility.** The run is deterministic (cached dataset, sorted execution), but the *outcome* leans on a handful of huge winners caught when cash was free. Change the universe, costs, or start date a little and the looser modes in particular can move a lot (observed ₹9–14 cr across dataset refetches). Treat the level as indicative, the *shape* (beats index on return and drawdown) as the robust takeaway.
+6. **Not the official CW 2σ** and not tuned to match the presenter's quoted figures. This reproduces the *publicly stated rules* only.
 
-*Generated by `backtest/cw2sigma_backtest.py` — re-run to reproduce.*
+*Generated by `backtest/cw2sigma_backtest.py` (cached dataset for reproducibility) — set `REFRESH=1` to refetch.*

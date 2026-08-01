@@ -38,8 +38,10 @@ Higher is better; it rewards return *per unit of drawdown pain*.
 
 ## 3. Entry
 
-- Indicator: **Bollinger Band** with basis length **50** and **2** standard
-  deviations (this "2σ" is the source of the name). Source: `close`.
+- Indicator: **Bollinger Band** with basis length **52** (SMA) and **2** standard
+  deviations (this "2σ" is the source of the name). Source: `close`. 52 weeks ≈ one
+  year. *(The podcast said "50"; the official indicator legend reads "BB 52 SMA
+  close 2", so 52 is used here.)*
 - **Signal:** the weekly `close` **crosses above the Upper Bollinger Band**.
   Rationale: ~95% of observations sit within ±2σ, so a close beyond +2σ is a
   statistically unusual, high-momentum event worth participating in.
@@ -71,14 +73,14 @@ Three stop references, applied together:
 2. **100 EMA** trailing reference.
 3. **Volatility trail** — the ATR-based trailing line, chosen via the
    `Volatility trail engine` input:
-   - **SuperTrend** *(default)* — `ta.supertrend(factor = 1.8, atrPeriod = 14)`.
-     The classic SuperTrend support line that trails up in an uptrend and flips
-     above price when the trend breaks.
-   - **ATR chandelier** — `highest_high_since_entry − 1.8 × ATR(14)`. Trails up as
-     new highs are made; never moves down.
+   - **ATR trailing stop** *(default)* — a ratcheting `close − 1.8 × ATR(14)`:
+     `stop = max(prev_stop, close − 1.8 × ATR)`. Steps up, never down. This matches
+     the official indicator's on-chart legend, **"ATR Stop Loss % 14 1.8"** (the
+     red stepped line in the screenshot).
+   - **SuperTrend** — `ta.supertrend(factor = 1.8, atrPeriod = 14)`, an hl2-based
+     cousin that trails up and flips above price when the trend breaks.
 
-   Both are ATR-driven; SuperTrend simply replaces the chandelier as the default.
-   Note a SuperTrend `factor` of `1.8` is tighter than the common `~3`.
+   Both are ATR-driven. Note a `1.8` multiplier is tighter than the common `~3`.
 
 **Exit test:** on a confirmed weekly close **below the effective stop**, exit at the
 next open.
@@ -89,7 +91,7 @@ The podcast says exit on *"whichever is earlier"*, yet also says the system hold
 through 50%+ corrections in strong movers — these tug in opposite directions, so the
 combination is a configurable input (`Effective trailing stop`):
 
-In the table, `vol_trail` is the chosen engine (SuperTrend or ATR chandelier):
+In the table, `vol_trail` is the chosen engine (ATR trailing stop or SuperTrend):
 
 | Mode | `effective_stop =` |
 |---|---|
@@ -110,9 +112,9 @@ In the table, `vol_trail` is the chosen engine (SuperTrend or ATR chandelier):
 
 | Colour | Meaning |
 |---|---|
-| Blue | Upper Bollinger Band `(50, 2)` — the entry trigger |
+| Blue | Upper Bollinger Band `(52, 2)` — the entry trigger |
 | Red | `100 EMA` |
-| Green | Volatility trail — SuperTrend `(1.8, 14)` *(default)* or `ATR(14) × 1.8` chandelier |
+| Green | Volatility trail — ratcheting `ATR(14) × 1.8` stop *(default)* or SuperTrend `(1.8, 14)` |
 | Orange | Initial 20% stop (fixed from entry) |
 | Fuchsia | Effective stop used for the exit test |
 | Grey | Entry price |
@@ -142,6 +144,9 @@ guaranteed here** — always run your own back-test.
   costs (the talk assumes ~0.25% cost + brokerage) are not modelled by the plot.
 - **EMA vs SMA:** "100 EMA" is used; if the original used an SMA, change `emaLen`'s
   calculation accordingly.
-- **Volatility trail:** default is `ta.supertrend(1.8, 14)`; the alternative ATR
-  chandelier uses `ta.atr()` (Wilder/RMA smoothing) over 14 weekly bars ×1.8,
-  anchored to the highest high since entry. Both use the same ATR family.
+- **Volatility trail:** default is the ratcheting ATR trailing stop
+  (`max(prev, close − 1.8 × ATR(14))`, matching the official "ATR Stop Loss 14 1.8");
+  SuperTrend `(1.8, 14)` is the alternative. `ta.atr()` uses Wilder/RMA smoothing.
+- **Settings source:** entry/stop parameters are taken from the official indicator's
+  on-chart legend — *"%Stop close 20 · BB 52 SMA close 2 · EMA 100 close · ATR Stop
+  Loss % 14 1.8"* — not from the (approximate) spoken numbers in the podcast.
