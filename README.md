@@ -87,10 +87,31 @@ Use **loosest** if you want to give multi-baggers the room the podcast describes
   back-tester — position sizing across many symbols is a portfolio-level rule).
 - The `2%` cap and universe selection are enforced by you across your watchlist.
 
+## Backtest (20-year portfolio simulation)
+
+A pure-Python portfolio backtester implements the exact rule set over ~18 years
+(the honest maximum — free Indian-equity history starts ~2006), ₹20 lakh start,
+current Nifty 500 universe, Nifty 50 / Nifty 500 benchmarks.
+
+```bash
+python3 backtest/cw2sigma_backtest.py      # downloads data & writes docs/BACKTEST.md
+```
+
+Headline (2008–2026, *loosest* exit; **survivorship-biased**, see the report):
+**₹20L → ~₹13.6 cr, CAGR ~26%, max DD ~28%, Calmar ~0.93** — vs Nifty 50 buy &
+hold ~10.5% CAGR / 43% DD. Full numbers, all four exit modes, year-by-year and a
+long list of caveats are in **[`docs/BACKTEST.md`](docs/BACKTEST.md)**.
+
+> ⚠️ Results use *today's* index members, so they overstate reality (delisted
+> losers are excluded). Treat as indicative of the rules' *character*, not a promise.
+
 ## Files
 
 ```
-pine/CW_2Sigma.pine   # the indicator
-docs/RULES.md         # detailed rule specification & interpretation notes
-README.md             # this file
+pine/CW_2Sigma.pine          # the indicator
+backtest/cw2sigma_backtest.py # 20-year portfolio backtester (stdlib only)
+backtest/results/            # equity_curve.csv/.svg, trades.csv
+docs/RULES.md                # detailed rule specification & interpretation notes
+docs/BACKTEST.md             # backtest methodology, results & limitations
+README.md                    # this file
 ```
