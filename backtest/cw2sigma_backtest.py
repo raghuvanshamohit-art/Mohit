@@ -120,15 +120,20 @@ def build_symbol(symbol, bars):
                  and cur["c"] > cur["upper"] and prev["c"] <= prev["upper"])
         cur["signal"] = cross
         cur["strength"] = (cur["c"] / cur["upper"] - 1.0) if cross else -1.0
+        # 26-week relative-strength / momentum for entry ranking
+        cur["mom"] = (cur["c"] / bars[i - 26][4] - 1.0) if i >= 26 else -1.0
     if bars:
         by_date[bars[0][0]]["signal"] = False
         by_date[bars[0][0]]["strength"] = -1.0
+        by_date[bars[0][0]]["mom"] = -1.0
     return by_date
 
 # ----------------------------------------------------------------------------- portfolio sim
 def simulate(symbols, data, master_dates, trail_fn,
-             regime_ok=None, init_stop_pct=20.0, atr_mult=ATR_MULT, max_pos=MAX_POS):
-    """regime_ok: optional {date: bool} gate — entries only allowed when True."""
+             regime_ok=None, init_stop_pct=20.0, atr_mult=ATR_MULT, max_pos=MAX_POS,
+             rank_by="strength"):
+    """regime_ok: optional {date: bool} gate — entries only allowed when True.
+    rank_by: 'strength' (breakout distance) or 'mom' (26-week momentum) for priority."""
     stop_frac = 1.0 - init_stop_pct / 100.0
     cash = INIT_CAPITAL
     held = {}            # sym -> dict(shares, entry, entry_date, hi)
@@ -213,7 +218,7 @@ def simulate(symbols, data, master_dates, trail_fn,
                     continue
                 bar = data[sym].get(d)
                 if bar is not None and bar.get("signal"):
-                    entry_queue.append((bar["strength"], sym))
+                    entry_queue.append((bar.get(rank_by, bar["strength"]), sym))
 
     return dict(curve=equity_curve, trades=trades,
                 exposure=sum(invested_frac) / len(invested_frac) if invested_frac else 0.0)
@@ -231,8 +236,18 @@ def metrics(curve):
         peak = max(peak, v)
         maxdd = max(maxdd, (peak - v) / peak if peak > 0 else 0.0)
     calmar = cagr / maxdd if maxdd > 0 else float("nan")
+    # weekly-return based Sharpe / Sortino (rf = 0, annualised x sqrt(52))
+    rets = [curve[i][1] / curve[i - 1][1] - 1 for i in range(1, len(curve)) if curve[i - 1][1] > 0]
+    sharpe = sortino = float("nan")
+    if len(rets) > 2:
+        mu = sum(rets) / len(rets)
+        sd = math.sqrt(sum((r - mu) ** 2 for r in rets) / len(rets))
+        dd = math.sqrt(sum(min(r, 0.0) ** 2 for r in rets) / len(rets))
+        sharpe = mu / sd * math.sqrt(52) if sd > 0 else float("nan")
+        sortino = mu / dd * math.sqrt(52) if dd > 0 else float("nan")
     return dict(start=start_d, end=end_d, years=years, start_v=start_v, end_v=end_v,
-                total=end_v / start_v - 1, cagr=cagr, maxdd=maxdd, calmar=calmar)
+                total=end_v / start_v - 1, cagr=cagr, maxdd=maxdd, calmar=calmar,
+                sharpe=sharpe, sortino=sortino)
 
 def trade_stats(trades):
     if not trades:

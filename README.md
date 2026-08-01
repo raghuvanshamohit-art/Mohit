@@ -115,15 +115,23 @@ tight**; loosening it to ~2.2–3.5 lifted Calmar from 0.88 to ~1.05–1.14 by r
 CAGR *and* cutting drawdown (less whipsaw). Regime filter / more concentration did
 *not* help here. Full table and caveats in **[`docs/CALMAR.md`](docs/CALMAR.md)**.
 
+**Improving return + equity curve (Calmar > 1)** — `backtest/improve_setup.py` stacks
+the levers that help *for a reason*: looser ATR trail (2.5), **26-week momentum entry
+ranking**, and the regime filter. The improved setup lifts CAGR (~23%→25–28%), cuts
+drawdown (~26%→23.5%) and pushes **Calmar past 1** (Sharpe ~1.5→1.6) — a visibly
+smoother curve. Details in **[`docs/IMPROVEMENTS.md`](docs/IMPROVEMENTS.md)**.
+
 ## Files
 
 ```
 pine/CW_2Sigma.pine           # the indicator
 backtest/cw2sigma_backtest.py # portfolio backtester (stdlib only)
 backtest/calmar_experiments.py # Calmar-lever experiments (regime filter, stop/ATR tuning)
-backtest/results/             # equity_curve.csv/.svg, trades.csv
+backtest/improve_setup.py     # return + equity-curve improvements (momentum, regime, trail)
+backtest/results/             # equity_curve.csv/.svg, improve_equity.svg, trades.csv
 docs/RULES.md                 # detailed rule specification & interpretation notes
 docs/BACKTEST.md              # backtest methodology, results & limitations
 docs/CALMAR.md                # how to raise the Calmar ratio (tested)
+docs/IMPROVEMENTS.md          # improving return & equity curve (tested)
 README.md                     # this file
 ```
