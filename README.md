@@ -133,6 +133,7 @@ backtest/stack_20pct.py       # stacking levers on the 20% trailing base (regime
 backtest/rs_filter_test.py    # 20% trailing + Nifty 500 outperformance (relative strength) filter
 backtest/rs_multi_test.py     # outperformance over 3M / 6M / 1Y and combined
 backtest/monthly_test.py      # monthly-timeframe run (weekly->monthly settings)
+backtest/daily_test.py        # daily-timeframe run (weekly->daily settings)
 backtest/results/             # equity curves (.csv/.svg) and trades.csv
 docs/RULES.md                 # detailed rule specification & interpretation notes
 docs/BACKTEST.md              # backtest methodology, results & limitations
@@ -143,5 +144,6 @@ docs/STACK.md                 # what to add on the 20% trailing stop (tested)
 docs/OUTPERFORMANCE.md        # 20% trailing + Nifty 500 outperformance filter (tested)
 docs/OUTPERF_MULTI.md         # outperformance over 3M / 6M / 1Y and combined (tested)
 docs/MONTHLY.md               # monthly-timeframe settings & results (tested)
+docs/DAILY.md                 # daily-timeframe settings & results (tested)
 README.md                     # this file
 ```
