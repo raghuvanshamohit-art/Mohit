@@ -1,0 +1,71 @@
+{
+  "strategy_net": {
+    "start": "2006-07-31",
+    "end": "2026-07-31",
+    "years": 20.0,
+    "months": 240,
+    "total_return_pct": 56669.8,
+    "CAGR_pct": 37.31,
+    "annual_vol_pct": 29.5,
+    "max_drawdown_pct": -54.44,
+    "max_dd_peak": "2007-12-31",
+    "max_dd_trough": "2008-11-30",
+    "sharpe": 1.02,
+    "sortino": 1.9,
+    "calmar": 0.69,
+    "best_month_pct": 55.3,
+    "worst_month_pct": -21.1,
+    "pct_positive_months": 65.0,
+    "final_multiple": 567.7
+  },
+  "strategy_gross": {
+    "start": "2006-07-31",
+    "end": "2026-07-31",
+    "years": 20.0,
+    "months": 240,
+    "total_return_pct": 69333.9,
+    "CAGR_pct": 38.7,
+    "annual_vol_pct": 29.5,
+    "max_drawdown_pct": -53.99,
+    "max_dd_peak": "2007-12-31",
+    "max_dd_trough": "2008-10-31",
+    "sharpe": 1.06,
+    "sortino": 1.96,
+    "calmar": 0.72,
+    "best_month_pct": 55.4,
+    "worst_month_pct": -21.0,
+    "pct_positive_months": 66.2,
+    "final_multiple": 694.3
+  },
+  "strategy_12_1": {
+    "start": "2006-08-31",
+    "end": "2026-07-31",
+    "years": 19.92,
+    "months": 239,
+    "total_return_pct": 23177.0,
+    "CAGR_pct": 31.47,
+    "annual_vol_pct": 27.2,
+    "max_drawdown_pct": -54.18,
+    "max_dd_peak": "2007-12-31",
+    "max_dd_trough": "2009-02-28",
+    "sharpe": 0.93,
+    "sortino": 1.53,
+    "calmar": 0.58,
+    "best_month_pct": 54.9,
+    "worst_month_pct": -24.9,
+    "pct_positive_months": 64.4,
+    "final_multiple": 232.8
+  },
+  "benchmark_nifty50": {
+    "CAGR_pct": 8.75,
+    "annual_vol_pct": 20.5,
+    "max_drawdown_pct": -55.12,
+    "sharpe": 0.22
+  },
+  "benchmark_ew_buyhold": {
+    "CAGR_pct": 33.33,
+    "annual_vol_pct": 50.67,
+    "max_drawdown_pct": -55.33,
+    "sharpe": 0.6
+  }
+}
