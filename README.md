@@ -10,3 +10,7 @@ Content notes and articles.
 
 - [Designing a System-Based Trading Strategy](strategy/system-based-strategy-design.md) — a rule-first framework: the seven components of a tradable system, a shared risk model, two fully-specified example systems (NIFTY momentum & Bank NIFTY range), and a validation checklist.
 - [Strategy Specification Template](strategy/strategy-spec-template.md) — a reusable blank spec to define any new system in writing before it goes live.
+
+## Backtest
+
+- [System A — NIFTY Weekly Momentum backtest](backtest/) — a dependency-free Python engine that implements System A exactly and computes expectancy, drawdown, Sharpe and Calmar. Runs out of the box on synthetic data; point `--data` at real NIFTY weekly OHLC to evaluate the real edge.
