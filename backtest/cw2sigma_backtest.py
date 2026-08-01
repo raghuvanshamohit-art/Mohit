@@ -126,7 +126,10 @@ def build_symbol(symbol, bars):
     return by_date
 
 # ----------------------------------------------------------------------------- portfolio sim
-def simulate(symbols, data, master_dates, trail_fn):
+def simulate(symbols, data, master_dates, trail_fn,
+             regime_ok=None, init_stop_pct=20.0, atr_mult=ATR_MULT, max_pos=MAX_POS):
+    """regime_ok: optional {date: bool} gate — entries only allowed when True."""
+    stop_frac = 1.0 - init_stop_pct / 100.0
     cash = INIT_CAPITAL
     held = {}            # sym -> dict(shares, entry, entry_date, hi)
     entry_queue = []     # list of (strength, sym) valid for the NEXT master week only
@@ -157,7 +160,7 @@ def simulate(symbols, data, master_dates, trail_fn):
 
         # 2) execute ENTRIES queued from last week (ranked, one-week validity)
         for _, sym in sorted(entry_queue, reverse=True):
-            if len(held) >= MAX_POS or sym in held:
+            if len(held) >= max_pos or sym in held:
                 continue
             bar = data[sym].get(d)
             if bar is None:
@@ -175,8 +178,8 @@ def simulate(symbols, data, master_dates, trail_fn):
             cash -= cost
             atr0 = bar["atr"] if bar["atr"] is not None else bar["o"] * 0.2
             held[sym] = dict(shares=shares, entry=bar["o"], entry_date=d,
-                             cost=cost, weeks=0, init_stop=bar["o"] * 0.8,
-                             atr_trail=bar["o"] - ATR_MULT * atr0)
+                             cost=cost, weeks=0, init_stop=bar["o"] * stop_frac,
+                             atr_trail=bar["o"] - atr_mult * atr0)
         entry_queue = []
 
         # 3) mark-to-market at this week's close
@@ -197,18 +200,20 @@ def simulate(symbols, data, master_dates, trail_fn):
             if bar is None or bar["i"] < WARMUP:
                 continue
             pos["weeks"] += 1
-            cand = bar["c"] - ATR_MULT * bar["atr"]      # ratcheting ATR trailing stop
+            cand = bar["c"] - atr_mult * bar["atr"]      # ratcheting ATR trailing stop
             if cand > pos["atr_trail"]:
                 pos["atr_trail"] = cand
             eff = max(pos["init_stop"], trail_fn(bar["ema"], pos["atr_trail"]))
             if d != pos["entry_date"] and bar["c"] < eff:
                 exit_queue.add(sym)
-        for sym in symbols:
-            if sym in held or sym in exit_queue:
-                continue
-            bar = data[sym].get(d)
-            if bar is not None and bar.get("signal"):
-                entry_queue.append((bar["strength"], sym))
+        regime_on = True if regime_ok is None else regime_ok.get(d, True)
+        if regime_on:
+            for sym in symbols:
+                if sym in held or sym in exit_queue:
+                    continue
+                bar = data[sym].get(d)
+                if bar is not None and bar.get("signal"):
+                    entry_queue.append((bar["strength"], sym))
 
     return dict(curve=equity_curve, trades=trades,
                 exposure=sum(invested_frac) / len(invested_frac) if invested_frac else 0.0)

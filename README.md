@@ -109,13 +109,21 @@ with deeper drawdowns; all four modes, year-by-year and a full caveat list are i
 > ⚠️ Results use *today's* index members, so they overstate reality (delisted
 > losers are excluded). Treat as indicative of the rules' *character*, not a promise.
 
+**Raising the Calmar ratio** (CAGR ÷ max drawdown): `backtest/calmar_experiments.py`
+tests the classic levers. The biggest finding — the default **ATR×1.8 trail is too
+tight**; loosening it to ~2.2–3.5 lifted Calmar from 0.88 to ~1.05–1.14 by raising
+CAGR *and* cutting drawdown (less whipsaw). Regime filter / more concentration did
+*not* help here. Full table and caveats in **[`docs/CALMAR.md`](docs/CALMAR.md)**.
+
 ## Files
 
 ```
-pine/CW_2Sigma.pine          # the indicator
-backtest/cw2sigma_backtest.py # 20-year portfolio backtester (stdlib only)
-backtest/results/            # equity_curve.csv/.svg, trades.csv
-docs/RULES.md                # detailed rule specification & interpretation notes
-docs/BACKTEST.md             # backtest methodology, results & limitations
-README.md                    # this file
+pine/CW_2Sigma.pine           # the indicator
+backtest/cw2sigma_backtest.py # portfolio backtester (stdlib only)
+backtest/calmar_experiments.py # Calmar-lever experiments (regime filter, stop/ATR tuning)
+backtest/results/             # equity_curve.csv/.svg, trades.csv
+docs/RULES.md                 # detailed rule specification & interpretation notes
+docs/BACKTEST.md              # backtest methodology, results & limitations
+docs/CALMAR.md                # how to raise the Calmar ratio (tested)
+README.md                     # this file
 ```
