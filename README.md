@@ -14,3 +14,4 @@ Content notes and articles.
 ## Backtest
 
 - [System A — NIFTY Weekly Momentum backtest](backtest/) — a dependency-free Python engine that implements System A exactly and computes expectancy, drawdown, Sharpe and Calmar. Runs out of the box on synthetic data; point `--data` at real NIFTY weekly OHLC to evaluate the real edge.
+- [Long ATM Straddle backtest (10 years, real data)](backtest/straddle/) — buy ATM Call + ATM Put monthly, held to expiry, on **10 years of real NIFTY + India VIX data**. Includes a month-wise return table and positive/negative breakdown ([results](backtest/straddle/RESULTS.md)). Finding: holding straddles to expiry has negative expectancy (≈ −10%).
