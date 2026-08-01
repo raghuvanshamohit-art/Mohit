@@ -55,10 +55,15 @@ def monday(ts):
     d = dt.datetime.utcfromtimestamp(ts).date()
     return d - dt.timedelta(days=d.weekday())
 
-def fetch_weekly(symbol):
-    """Return list of consecutive (weekstart_date, o,h,l,c) with adjusted prices, or None."""
+def month_start(ts):
+    return dt.datetime.utcfromtimestamp(ts).date().replace(day=1)
+
+def fetch_weekly(symbol, interval="1wk", norm=None):
+    """Return list of consecutive (period_date, o,h,l,c) with adjusted prices, or None.
+    interval='1wk' (default) or '1mo'; norm maps a timestamp to the period's key date."""
+    nf = norm or monday
     url = (f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
-           f"?range={RANGE}&interval=1wk&events=div%2Csplit")
+           f"?range={RANGE}&interval={interval}&events=div%2Csplit")
     try:
         d = json.loads(http_get(url))
         res = d["chart"]["result"][0]
@@ -73,7 +78,7 @@ def fetch_weekly(symbol):
         if None in (o[i], h[i], l[i], c[i], adj[i]) or c[i] == 0:
             continue
         f = adj[i] / c[i]                       # fully-adjusted factor
-        out.append((monday(ts[i]), o[i] * f, h[i] * f, l[i] * f, adj[i]))
+        out.append((nf(ts[i]), o[i] * f, h[i] * f, l[i] * f, adj[i]))
     # de-dup weeks (keep last), keep chronological
     seen = {}
     for row in out:
@@ -251,7 +256,7 @@ def simulate(symbols, data, master_dates, trail_fn,
                 exposure=sum(invested_frac) / len(invested_frac) if invested_frac else 0.0)
 
 # ----------------------------------------------------------------------------- metrics
-def metrics(curve):
+def metrics(curve, periods_per_year=52):
     if len(curve) < 2:
         return {}
     start_d, start_v = curve[0]
@@ -270,8 +275,8 @@ def metrics(curve):
         mu = sum(rets) / len(rets)
         sd = math.sqrt(sum((r - mu) ** 2 for r in rets) / len(rets))
         dd = math.sqrt(sum(min(r, 0.0) ** 2 for r in rets) / len(rets))
-        sharpe = mu / sd * math.sqrt(52) if sd > 0 else float("nan")
-        sortino = mu / dd * math.sqrt(52) if dd > 0 else float("nan")
+        sharpe = mu / sd * math.sqrt(periods_per_year) if sd > 0 else float("nan")
+        sortino = mu / dd * math.sqrt(periods_per_year) if dd > 0 else float("nan")
     return dict(start=start_d, end=end_d, years=years, start_v=start_v, end_v=end_v,
                 total=end_v / start_v - 1, cagr=cagr, maxdd=maxdd, calmar=calmar,
                 sharpe=sharpe, sortino=sortino)
