@@ -138,7 +138,7 @@ def simulate(symbols, data, master_dates, trail_fn,
              regime_ok=None, init_stop_pct=20.0, atr_mult=ATR_MULT, max_pos=MAX_POS,
              rank_by="strength", trail_type="atr", pct_trail=0.20,
              size_mode="fixed", vol_ref=0.06, vol_cap=0.04, equity_filter=None,
-             rs_entry=False, rs_exit=False, rs_thresh=0.0):
+             rs_entry=False, rs_exit=False, rs_thresh=0.0, rupee_size=50000):
     """regime_ok: optional {date: bool} gate — entries only allowed when True.
     rank_by: 'strength' (breakout distance) or 'mom' (26-week momentum) for priority.
     trail_type: 'atr' (ratcheting close-atr_mult*ATR) or 'pct' (ratcheting close*(1-pct_trail)).
@@ -190,7 +190,9 @@ def simulate(symbols, data, master_dates, trail_fn,
             bar = data[sym].get(d)
             if bar is None:
                 continue
-            if size_mode == "vol":                       # inverse-volatility sizing
+            if size_mode == "rupee":                     # fixed ₹ amount per position
+                target = rupee_size
+            elif size_mode == "vol":                     # inverse-volatility sizing
                 atrp = (bar["atr"] or bar["o"] * 0.05) / bar["o"]
                 scale = min(2.0, max(0.5, vol_ref / atrp)) if atrp > 0 else 1.0
                 target = min(POS_PCT * prev_equity * scale, vol_cap * prev_equity)
