@@ -134,6 +134,7 @@ backtest/rs_filter_test.py    # 20% trailing + Nifty 500 outperformance (relativ
 backtest/rs_multi_test.py     # outperformance over 3M / 6M / 1Y and combined
 backtest/monthly_test.py      # monthly-timeframe run (weekly->monthly settings)
 backtest/daily_test.py        # daily-timeframe run (weekly->daily settings)
+backtest/signals_backtest.py  # backtest of an external weekly signal list (RS vs Nifty 50)
 backtest/results/             # equity curves (.csv/.svg) and trades.csv
 docs/RULES.md                 # detailed rule specification & interpretation notes
 docs/BACKTEST.md              # backtest methodology, results & limitations
@@ -145,5 +146,6 @@ docs/OUTPERFORMANCE.md        # 20% trailing + Nifty 500 outperformance filter (
 docs/OUTPERF_MULTI.md         # outperformance over 3M / 6M / 1Y and combined (tested)
 docs/MONTHLY.md               # monthly-timeframe settings & results (tested)
 docs/DAILY.md                 # daily-timeframe settings & results (tested)
+docs/SIGNALS_BACKTEST.md      # backtest of the uploaded RS-vs-Nifty-50 signal list
 README.md                     # this file
 ```
