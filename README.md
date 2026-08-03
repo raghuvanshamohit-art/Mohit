@@ -139,7 +139,8 @@ backtest/user_spec_test.py    # breakout + N500 6M outperformance + 20% stop, Rs
 backtest/possize_test.py      # position-size sweep 2% / 4% / 5% (same rules)
 backtest/marketcap_test.py    # market-cap bucket sweep (point-in-time, ₹ crore)
 backtest/stops_drawdowns.py   # stop-loss-hit and drawdown-episode counts over the run
-backtest/results/             # equity curves (.csv/.svg) and trades.csv
+backtest/sip_backtest.py      # SIP (Rs20L + Rs20k/month): equity curve + Excel trade log
+backtest/results/             # equity curves (.csv/.svg), SIP workbook, trades.csv
 docs/RULES.md                 # detailed rule specification & interpretation notes
 docs/BACKTEST.md              # backtest methodology, results & limitations
 docs/CALMAR.md                # how to raise the Calmar ratio (tested)

@@ -139,7 +139,7 @@ def simulate(symbols, data, master_dates, trail_fn,
              rank_by="strength", trail_type="atr", pct_trail=0.20,
              size_mode="fixed", vol_ref=0.06, vol_cap=0.04, equity_filter=None,
              rs_entry=False, rs_exit=False, rs_thresh=0.0, rupee_size=50000,
-             mcap_lo=None, mcap_hi=None):
+             mcap_lo=None, mcap_hi=None, monthly_add=0):
     """regime_ok: optional {date: bool} gate — entries only allowed when True.
     rank_by: 'strength' (breakout distance) or 'mom' (26-week momentum) for priority.
     trail_type: 'atr' (ratcheting close-atr_mult*ATR) or 'pct' (ratcheting close*(1-pct_trail)).
@@ -157,8 +157,17 @@ def simulate(symbols, data, master_dates, trail_fn,
     trades = []
     last_close = {}      # sym -> last known close (for marking when a week is missing)
     prev_equity = INIT_CAPITAL
+    contributions = []   # (date, amount) — SIP cashflows
+    last_ym = None
 
     for d in master_dates:
+        # monthly SIP: add cash on the first processed week of each new month
+        if monthly_add:
+            ym = (d.year, d.month)
+            if last_ym is not None and ym != last_ym:
+                cash += monthly_add
+                contributions.append((d, monthly_add))
+            last_ym = ym
         # 1) execute EXITS queued for this open (sorted => deterministic)
         for sym in sorted(exit_queue):
             bar = data[sym].get(d)
@@ -170,8 +179,8 @@ def simulate(symbols, data, master_dates, trail_fn,
                 cash += proceeds
                 pnl = proceeds - pos["cost"]
                 trades.append(dict(sym=sym, entry_date=pos["entry_date"], exit_date=d,
-                                   entry=pos["entry"], exit=bar["o"],
-                                   ret=(bar["o"] / pos["entry"] - 1.0),
+                                   entry=pos["entry"], exit=bar["o"], shares=pos["shares"],
+                                   cost=pos["cost"], ret=(bar["o"] / pos["entry"] - 1.0),
                                    pnl=pnl, weeks=pos["weeks"]))
                 del held[sym]
             exit_queue.discard(sym)
@@ -260,7 +269,7 @@ def simulate(symbols, data, master_dates, trail_fn,
                             continue              # market-cap bucket filter
                     entry_queue.append((bar.get(rank_by, bar["strength"]), sym))
 
-    return dict(curve=equity_curve, trades=trades,
+    return dict(curve=equity_curve, trades=trades, contributions=contributions,
                 exposure=sum(invested_frac) / len(invested_frac) if invested_frac else 0.0)
 
 # ----------------------------------------------------------------------------- metrics
