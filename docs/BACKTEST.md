@@ -41,8 +41,8 @@
 
 | Benchmark | Final equity | CAGR | Max DD | Calmar |
 |---|--:|--:|--:|--:|
-| Nifty 50 (^NSEI) | ₹12,143,227 | 10.5% | 43.0% | 0.24 |
-| Nifty 500 (^CRSLDX) | ₹14,763,765 | 11.7% | 44.9% | 0.26 |
+| Nifty 50 (^NSEI) | ₹12,337,799 | 10.6% | 43.0% | 0.25 |
+| Nifty 500 (^CRSLDX) | ₹14,979,080 | 11.8% | 44.9% | 0.26 |
 
 ## Year-by-year (headline config)
 

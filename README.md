@@ -137,6 +137,7 @@ backtest/daily_test.py        # daily-timeframe run (weekly->daily settings)
 backtest/signals_backtest.py  # backtest of an external weekly signal list (RS vs Nifty 50)
 backtest/user_spec_test.py    # breakout + N500 6M outperformance + 20% stop, Rs50k/stock x 50
 backtest/possize_test.py      # position-size sweep 2% / 4% / 5% (same rules)
+backtest/marketcap_test.py    # market-cap bucket sweep (point-in-time, ₹ crore)
 backtest/results/             # equity curves (.csv/.svg) and trades.csv
 docs/RULES.md                 # detailed rule specification & interpretation notes
 docs/BACKTEST.md              # backtest methodology, results & limitations
@@ -151,5 +152,6 @@ docs/DAILY.md                 # daily-timeframe settings & results (tested)
 docs/SIGNALS_BACKTEST.md      # backtest of the uploaded RS-vs-Nifty-50 signal list
 docs/SPEC_BACKTEST.md         # breakout + N500 6M outperformance + 20% stop, Rs50k/stock
 docs/POSITION_SIZE.md         # position-size sweep 2% / 4% / 5% (CAGR & drawdown)
+docs/MARKETCAP.md             # market-cap bucket sweep (CAGR & drawdown by ₹cr band)
 README.md                     # this file
 ```

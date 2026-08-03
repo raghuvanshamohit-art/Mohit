@@ -138,7 +138,8 @@ def simulate(symbols, data, master_dates, trail_fn,
              regime_ok=None, init_stop_pct=20.0, atr_mult=ATR_MULT, max_pos=MAX_POS,
              rank_by="strength", trail_type="atr", pct_trail=0.20,
              size_mode="fixed", vol_ref=0.06, vol_cap=0.04, equity_filter=None,
-             rs_entry=False, rs_exit=False, rs_thresh=0.0, rupee_size=50000):
+             rs_entry=False, rs_exit=False, rs_thresh=0.0, rupee_size=50000,
+             mcap_lo=None, mcap_hi=None):
     """regime_ok: optional {date: bool} gate — entries only allowed when True.
     rank_by: 'strength' (breakout distance) or 'mom' (26-week momentum) for priority.
     trail_type: 'atr' (ratcheting close-atr_mult*ATR) or 'pct' (ratcheting close*(1-pct_trail)).
@@ -252,6 +253,11 @@ def simulate(symbols, data, master_dates, trail_fn,
                 if bar is not None and bar.get("signal"):
                     if rs_entry and not (bar.get("rs") is not None and bar["rs"] > rs_thresh):
                         continue                  # require Nifty 500 outperformance to enter
+                    if mcap_lo is not None or mcap_hi is not None:
+                        mc = bar.get("mcap")      # ₹ crore, point-in-time
+                        if mc is None or (mcap_lo is not None and mc < mcap_lo) \
+                           or (mcap_hi is not None and mc >= mcap_hi):
+                            continue              # market-cap bucket filter
                     entry_queue.append((bar.get(rank_by, bar["strength"]), sym))
 
     return dict(curve=equity_curve, trades=trades,
