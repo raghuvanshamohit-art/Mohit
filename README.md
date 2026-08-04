@@ -138,6 +138,7 @@ backtest/signals_backtest.py  # backtest of an external weekly signal list (RS v
 backtest/user_spec_test.py    # breakout + N500 6M outperformance + 20% stop, Rs50k/stock x 50
 backtest/possize_test.py      # position-size sweep 2% / 4% / 5% (same rules)
 backtest/marketcap_test.py    # market-cap bucket sweep (point-in-time, ₹ crore)
+backtest/mcap_band.py         # single market-cap band runner (LO/HI env, e.g. 1000-20000)
 backtest/stops_drawdowns.py   # stop-loss-hit and drawdown-episode counts over the run
 backtest/sip_backtest.py      # SIP (Rs20L + Rs20k/month): equity curve + Excel trade log
 backtest/results/             # equity curves (.csv/.svg), SIP workbook, trades.csv
