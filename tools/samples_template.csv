@@ -1,0 +1,16 @@
+ticker,name,cmp,rating,zone,exit_price,ath_profit,outperformer,above_exit,super_performer,risk,market_cap
+RELIANCE,Reliance Industries,1334.8,HOLD,Bull,1180,N,Y,Y,N,High,Large
+# ^ EXAMPLE ROW ONLY — delete it and paste your real ExitMantra readings below.
+# Columns:
+#   ticker         NSE symbol (no .NS needed), e.g. RELIANCE, TCS, INFY
+#   name           optional label
+#   cmp            ExitMantra's active/current price (number)
+#   rating         ADD / HOLD / REPLACE / EXIT
+#   zone           Bull / Pig / Bear
+#   exit_price     the Exit Price ExitMantra shows (leave BLANK if bear zone / hidden)
+#   ath_profit     Y/N  -> criterion 1 flag (ATH TTM profit 👍) as shown on ExitMantra
+#   outperformer   Y/N  -> criterion 2 flag (I also compute this myself to check)
+#   above_exit     Y/N  -> criterion 3 flag (price above exit)
+#   super_performer Y/N -> the 👑 badge
+#   risk           High / Moderate / Low   (optional)
+#   market_cap     Large / Mid / Small     (optional)
