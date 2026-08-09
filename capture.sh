@@ -50,4 +50,8 @@ awk -v d="$date" -v t="$title" -v b="$body" '
 ' "$file" > "$tmp"
 
 mv "$tmp" "$file"
+
+# keep the homepage (README.md) showing the exact current content
+./build_home.sh >/dev/null
+
 echo "Added to $file:  $date — $title"

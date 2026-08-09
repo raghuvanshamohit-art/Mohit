@@ -45,6 +45,9 @@ simplifying is part of the job.
   `<!-- ENTRIES -->` marker (newest first).
 - Remove the "_Nothing here yet…_" placeholder line the first time a file gets a
   real entry.
+- Run `./build_home.sh` so the homepage (`README.md`) shows the exact new
+  content. Never hand-edit the block between `<!-- HOME:START -->` and
+  `<!-- HOME:END -->` — it is generated.
 - If Mohit asked for a brand-new section, add a row to the table in `README.md`.
 - Commit with a short message like `kb: add <title>`.
 
