@@ -97,6 +97,9 @@ def parse_args(argv=None):
                    help="practice: fraction of equity risked per trade (default 0.0125)")
     p.add_argument("--practice-min-passed", type=int, default=12,
                    help="practice: only stocks passing >= N mandatory checks (default 12)")
+    p.add_argument("--fno", action="store_true",
+                   help="practice: add F&O suitability + sizing (futures lots at your risk "
+                        "budget + a defined-risk option spread; needs FO bhavcopy)")
     return p.parse_args(argv)
 
 
@@ -178,6 +181,33 @@ def main(argv=None) -> int:
         journal = os.path.join(args.output_dir, "vcp_practice_journal.csv")
         pr.write_journal_template(journal)
         print(f"  practice board -> {plan_csv}\n  {plan_html}\n  journal -> {journal}")
+
+        if args.fno:
+            import pandas as pd
+            from vcp_screener import fno as fno_mod, options as opt
+            from vcp_screener.fo_bhavcopy import FOBhavcopyProvider
+
+            print("\nFetching NSE options (FO bhavcopy) for F&O sizing ...")
+            fo = FOBhavcopyProvider(cache_dir=args.fo_cache_dir)
+            fo_day, fo_df = fo.latest_day()
+            if fo_df is None:
+                print("  ! no FO bhavcopy - skipping F&O sizing")
+            else:
+                by_sym = {s: g for s, g in fo_df.groupby("Symbol")}
+                today = pd.Timestamp(fo_day)
+                ocfg = opt.OptionsConfig()
+                rows = []
+                for r, v in setups:
+                    plan = pr.build_plan(r.symbol, r.price, v, pcfg)
+                    chain = by_sym.get(r.symbol)
+                    liquid = opt.option_metrics(chain, plan.price, today, ocfg)["liquid"] \
+                        if chain is not None else False
+                    rows.append(fno_mod.build_row(plan, chain, today, args.account,
+                                                  args.risk_pct, liquid))
+                fno_mod.print_board(rows, args.account, args.risk_pct)
+                fno_csv = os.path.join(args.output_dir, f"vcp_fno_sizing_{stamp}.csv")
+                fno_mod.to_frame(rows).to_csv(fno_csv, index=False)
+                print(f"  F&O sizing -> {fno_csv}")
 
     print(f"\nReports written:\n  {csv_path}\n  {html_path}")
     return 0

@@ -24,6 +24,7 @@ _KEEP = {
     "TckrSymb": "Symbol", "XpryDt": "Expiry", "StrkPric": "Strike",
     "OptnTp": "OptType", "SttlmPric": "Settle", "ClsPric": "Close",
     "OpnIntrst": "OI", "TtlTradgVol": "Volume", "UndrlygPric": "Underlying",
+    "NewBrdLotQty": "Lot",
 }
 
 
@@ -87,7 +88,7 @@ class FOBhavcopyProvider:
         df = raw[list(_KEEP)].rename(columns=_KEEP).copy()
         df["Symbol"] = df["Symbol"].astype(str).str.strip()
         df["OptType"] = df["OptType"].astype(str).str.strip()
-        for col in ("Strike", "Settle", "Close", "OI", "Volume", "Underlying"):
+        for col in ("Strike", "Settle", "Close", "OI", "Volume", "Underlying", "Lot"):
             df[col] = pd.to_numeric(df[col], errors="coerce")
         df["Expiry"] = pd.to_datetime(df["Expiry"], errors="coerce")
         df = df.dropna(subset=["Strike", "Expiry"])

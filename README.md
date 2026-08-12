@@ -123,6 +123,21 @@ blank **journal** (`vcp_practice_journal.csv`) to log every paper trade.
 This is decision support for practice — buy only on a real breakout above the
 pivot, respect the stop, and log the reps. Not investment advice.
 
+**Futures & options sizing** — add `--fno` to answer, per stock and in plain
+English, *should you take this in F&O and how much*:
+
+```bash
+python run_screener.py --practice --fno --account 500000
+```
+
+Using the lot size and option chain from the FO bhavcopy, for your capital it
+computes: how many **futures lots** you can take while risking only 1.25% (often
+**0** — the lot is too big, so skip), the margin needed, and a **defined-risk
+bull-call debit spread** (buy ~ATM / sell OTM) whose **max loss is the premium**,
+sized to your risk budget. The verdict is blunt: **CASH only** when the stop is
+too wide to leverage (>5%), else the futures/option numbers. It writes
+`vcp_fno_sizing_*.csv`. Margins are illustrative — confirm with your broker.
+
 ### Live scan — Yahoo Finance (alternative)
 
 Free, no account, but unofficial and prone to occasional gaps/rate-limits:
