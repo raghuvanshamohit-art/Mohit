@@ -1,0 +1,366 @@
+"""NSE Bhavcopy provider -- official, free End-Of-Day data.
+
+NSE publishes a daily "bhavcopy": one file per trading day containing OHLCV for
+every stock. This provider downloads those day-files, caches each one locally
+(so a backfill happens once and daily runs only fetch new days), then stacks
+them into the per-symbol OHLCV frames the screener needs.
+
+It understands both file layouts NSE has used:
+
+* the current **UDiFF** common bhavcopy
+  ``.../content/cm/BhavCopy_NSE_CM_0_0_0_<YYYYMMDD>_F_0000.csv.zip``
+* the **legacy** equities bhavcopy
+  ``.../content/historical/EQUITIES/<YYYY>/<MMM>/cm<DDMMMYYYY>bhav.csv.zip``
+
+The Nifty 50 index comes from the daily indices close file
+``.../content/indices/ind_close_all_<DDMMYYYY>.csv``.
+
+Bhavcopy prices are *unadjusted*. On an ex-date NSE reports an adjusted previous
+close, so splits/bonuses are back-adjusted here from that reported prev-close
+(see :func:`_back_adjust`) -- keeping traded value (price x volume) intact.
+"""
+
+from __future__ import annotations
+
+import io
+import os
+import zipfile
+from concurrent.futures import ThreadPoolExecutor
+from datetime import date, datetime, timedelta
+from typing import Dict, Iterable, List, Optional
+
+import numpy as np
+import pandas as pd
+
+ARCHIVE = "https://archives.nseindia.com"
+_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) VCP-Screener/0.1",
+    "Accept": "*/*",
+}
+
+# Column-name variants across the UDiFF / legacy layouts.
+_COLMAP = {
+    "symbol": ["TckrSymb", "SYMBOL"],
+    "series": ["SctySrs", "SERIES"],
+    "open": ["OpnPric", "OPEN"],
+    "high": ["HghPric", "HIGH"],
+    "low": ["LwPric", "LOW"],
+    "close": ["ClsPric", "CLOSE"],
+    "prevclose": ["PrvsClsgPric", "PREVCLOSE"],
+    "volume": ["TtlTradgVol", "TOTTRDQTY"],
+}
+
+
+def _pick(df: pd.DataFrame, names: List[str]) -> Optional[str]:
+    lookup = {c.strip().lower(): c for c in df.columns}
+    for name in names:
+        if name.strip().lower() in lookup:
+            return lookup[name.strip().lower()]
+    return None
+
+
+class BhavcopyProvider:
+    def __init__(
+        self,
+        cache_dir: str = "cache/bhav",
+        history_days: int = 900,
+        series: Iterable[str] = ("EQ", "BE"),
+        adjust_corporate_actions: bool = True,
+        ca_min_gap: float = 0.30,
+        workers: int = 6,
+        max_retries: int = 3,
+        session=None,
+    ):
+        self.cache_dir = cache_dir
+        self.history_days = history_days
+        self.series = tuple(series)
+        self.adjust = adjust_corporate_actions
+        self.ca_min_gap = ca_min_gap
+        self.workers = max(1, workers)
+        self.max_retries = max_retries
+        os.makedirs(cache_dir, exist_ok=True)
+        self._session = session  # lazily created requests.Session
+        self._cm_cache: Dict[date, Optional[pd.DataFrame]] = {}
+        self._idx_cache: Dict[date, Optional[pd.Series]] = {}
+
+    # -- HTTP --------------------------------------------------------------
+    def _get(self, url: str):
+        """Fetch a URL. Returns ``(content, absent)``.
+
+        ``content`` is bytes on success, else ``None``. ``absent`` is True only
+        on a definitive HTTP 404 (file not published -- e.g. a market holiday),
+        and False on success or on a network error. Callers use this to cache a
+        holiday marker while still retrying transient failures next run.
+        """
+        import requests
+
+        if self._session is None:
+            self._session = requests.Session()
+            self._session.headers.update(_HEADERS)
+        for attempt in range(1, self.max_retries + 1):
+            try:
+                resp = self._session.get(url, timeout=30)
+                if resp.status_code == 404:
+                    return None, True
+                resp.raise_for_status()
+                return resp.content, False
+            except Exception:
+                if attempt == self.max_retries:
+                    return None, False
+        return None, False
+
+    @staticmethod
+    def _read_zip_csv(blob: bytes) -> Optional[pd.DataFrame]:
+        try:
+            zf = zipfile.ZipFile(io.BytesIO(blob))
+        except zipfile.BadZipFile:
+            return None
+        name = next((n for n in zf.namelist() if n.lower().endswith(".csv")), None)
+        if not name:
+            return None
+        with zf.open(name) as fh:
+            return pd.read_csv(fh)
+
+    # -- URLs --------------------------------------------------------------
+    @staticmethod
+    def _cm_urls(d: date) -> List[str]:
+        # Current UDiFF common bhavcopy, tried first.
+        udiff = f"{ARCHIVE}/content/cm/BhavCopy_NSE_CM_0_0_0_{d:%Y%m%d}_F_0000.csv.zip"
+        # Legacy equities bhavcopy (e.g. .../2024/JUN/cm28JUN2024bhav.csv.zip).
+        legacy = (
+            f"{ARCHIVE}/content/historical/EQUITIES/"
+            f"{d.year}/{d.strftime('%b').upper()}/"
+            f"cm{d.strftime('%d%b%Y').upper()}bhav.csv.zip"
+        )
+        return [udiff, legacy]
+
+    @staticmethod
+    def _index_url(d: date) -> str:
+        return f"{ARCHIVE}/content/indices/ind_close_all_{d:%d%m%Y}.csv"
+
+    # -- per-day CM bhavcopy ----------------------------------------------
+    def _cm_cache_path(self, d: date) -> str:
+        return os.path.join(self.cache_dir, f"cm_{d:%Y%m%d}.csv")
+
+    _CM_COLS = ["Date", "Symbol", "Series", "Open", "High", "Low", "Close", "PrevClose", "Volume"]
+
+    def _fetch_cm_day(self, d: date) -> Optional[pd.DataFrame]:
+        """Return a normalized frame for one day, or None (holiday/no data)."""
+        path = self._cm_cache_path(d)
+        if os.path.exists(path):
+            try:
+                df = pd.read_csv(path)
+            except pd.errors.EmptyDataError:
+                return None
+            return df if len(df) else None
+
+        raw = None
+        got_error = False
+        for url in self._cm_urls(d):
+            blob, absent = self._get(url)
+            if blob is not None:
+                parsed = self._read_zip_csv(blob)
+                if parsed is not None and len(parsed):
+                    raw = parsed
+                    break
+            elif not absent:
+                got_error = True
+
+        norm = self._normalize_cm(raw, d)
+        if norm is not None:
+            norm.to_csv(path, index=False)
+            return norm
+        # Cache an empty marker only when the day is definitively absent
+        # (holiday); never after a network error, so blips get retried.
+        if not got_error:
+            pd.DataFrame(columns=self._CM_COLS).to_csv(path, index=False)
+        return None
+
+    def _normalize_cm(self, raw: Optional[pd.DataFrame], d: date) -> Optional[pd.DataFrame]:
+        if raw is None or len(raw) == 0:
+            return None
+        cols = {k: _pick(raw, v) for k, v in _COLMAP.items()}
+        if not all(cols[k] for k in ("symbol", "open", "high", "low", "close", "volume")):
+            return None
+        df = pd.DataFrame({
+            "Symbol": raw[cols["symbol"]].astype(str).str.strip(),
+            "Series": raw[cols["series"]].astype(str).str.strip() if cols["series"] else "EQ",
+            "Open": pd.to_numeric(raw[cols["open"]], errors="coerce"),
+            "High": pd.to_numeric(raw[cols["high"]], errors="coerce"),
+            "Low": pd.to_numeric(raw[cols["low"]], errors="coerce"),
+            "Close": pd.to_numeric(raw[cols["close"]], errors="coerce"),
+            "PrevClose": pd.to_numeric(raw[cols["prevclose"]], errors="coerce")
+            if cols["prevclose"] else np.nan,
+            "Volume": pd.to_numeric(raw[cols["volume"]], errors="coerce"),
+        })
+        df = df[df["Series"].isin(self.series)]
+        df = df.dropna(subset=["Close"])
+        df.insert(0, "Date", pd.Timestamp(d))
+        return df.reset_index(drop=True)
+
+    # -- per-day index -----------------------------------------------------
+    def _idx_cache_path(self, d: date) -> str:
+        return os.path.join(self.cache_dir, f"idx_{d:%Y%m%d}.csv")
+
+    _IDX_COLS = ["Date", "Open", "High", "Low", "Close", "Volume"]
+
+    def _fetch_index_day(self, d: date) -> Optional[pd.Series]:
+        path = self._idx_cache_path(d)
+        if os.path.exists(path):
+            try:
+                df = pd.read_csv(path)
+            except pd.errors.EmptyDataError:
+                return None
+            return df.iloc[0] if len(df) else None
+
+        blob, absent = self._get(self._index_url(d))
+        raw = None
+        if blob is not None:
+            try:
+                raw = pd.read_csv(io.BytesIO(blob))
+            except Exception:
+                raw = None
+        row = self._normalize_index(raw, d)
+        if row is not None:
+            pd.DataFrame([row]).to_csv(path, index=False)
+            return pd.Series(row)
+        if absent:  # definitively no file (holiday) -> cache a marker
+            pd.DataFrame(columns=self._IDX_COLS).to_csv(path, index=False)
+        return None
+
+    @staticmethod
+    def _normalize_index(raw: Optional[pd.DataFrame], d: date, index_name: str = "Nifty 50"):
+        if raw is None or len(raw) == 0:
+            return None
+        name_col = _pick(raw, ["Index Name", "IndexName"])
+        if name_col is None:
+            return None
+        mask = raw[name_col].astype(str).str.strip().str.lower() == index_name.lower()
+        sub = raw[mask]
+        if sub.empty:
+            return None
+        r = sub.iloc[0]
+
+        def num(names):
+            c = _pick(raw, names)
+            return float(pd.to_numeric(r[c], errors="coerce")) if c else np.nan
+
+        return {
+            "Date": pd.Timestamp(d),
+            "Open": num(["Open Index Value", "Open"]),
+            "High": num(["High Index Value", "High"]),
+            "Low": num(["Low Index Value", "Low"]),
+            "Close": num(["Closing Index Value", "Close"]),
+            "Volume": num(["Volume"]),
+        }
+
+    # -- trading calendar --------------------------------------------------
+    def _date_range(self) -> List[date]:
+        end = date.today()
+        start = end - timedelta(days=self.history_days)
+        days = pd.bdate_range(start=start, end=end)  # Mon-Fri; holidays 404 and are skipped
+        return [dt.date() for dt in days]
+
+    def _missing_days(self, days: List[date]) -> List[date]:
+        return [d for d in days if not os.path.exists(self._cm_cache_path(d))]
+
+    def _prefetch(self, days: List[date]) -> None:
+        missing = self._missing_days(days)
+        if not missing:
+            return
+        print(f"  bhavcopy: fetching {len(missing)} missing day(s) "
+              f"(cached: {len(days) - len(missing)}) ...")
+        with ThreadPoolExecutor(max_workers=self.workers) as pool:
+            list(pool.map(self._fetch_cm_day, missing))
+            list(pool.map(self._fetch_index_day, missing))
+
+    # -- public interface --------------------------------------------------
+    def get_index(self, symbol: str = "^NSEI") -> Optional[pd.DataFrame]:
+        days = self._date_range()
+        self._prefetch(days)
+        rows = []
+        for d in days:
+            s = self._fetch_index_day(d)
+            if s is not None and pd.notna(s.get("Close")):
+                rows.append(s)
+        if not rows:
+            return None
+        df = pd.DataFrame(rows)
+        df["Date"] = pd.to_datetime(df["Date"])
+        return df.set_index("Date").sort_index()[["Open", "High", "Low", "Close", "Volume"]]
+
+    def get_many(self, symbols: Iterable[str]) -> Dict[str, Optional[pd.DataFrame]]:
+        symbols = [s.upper() for s in symbols]
+        wanted = set(symbols)
+        days = self._date_range()
+        self._prefetch(days)
+
+        frames = []
+        for d in days:
+            day = self._fetch_cm_day(d)
+            if day is not None and len(day):
+                frames.append(day[day["Symbol"].isin(wanted)])
+        if not frames:
+            return {s: None for s in symbols}
+
+        allrows = pd.concat(frames, ignore_index=True)
+        allrows["Date"] = pd.to_datetime(allrows["Date"])
+
+        out: Dict[str, Optional[pd.DataFrame]] = {}
+        for sym, g in allrows.groupby("Symbol"):
+            g = g.sort_values("Date").set_index("Date")
+            g = g[["Open", "High", "Low", "Close", "PrevClose", "Volume"]]
+            g = g[~g.index.duplicated(keep="last")]
+            if self.adjust:
+                g = _back_adjust(g, self.ca_min_gap)
+            out[str(sym)] = g[["Open", "High", "Low", "Close", "Volume"]]
+        for s in symbols:
+            out.setdefault(s, None)
+        return out
+
+
+def _back_adjust(df: pd.DataFrame, min_gap: float) -> pd.DataFrame:
+    """Back-adjust prices/volume for splits & bonuses.
+
+    A split or bonus reprices the whole bar at the open, so it appears as a large
+    *overnight gap*: today's open vs yesterday's close. When that gap exceeds
+    ``min_gap`` (a 2:1 split ~ -50%, a 1:10 split ~ -90%), the bars before it are
+    scaled onto the current price basis and volumes scaled inversely, so traded
+    value (price x volume) is preserved.
+
+    The overnight gap is used rather than NSE's reported previous close, because
+    the UDiFF bhavcopy's ``PrvsClsgPric`` is not reliably split-adjusted on the
+    ex-date. Limitation: a genuine >``min_gap`` overnight move (rare for liquid
+    F&O names) would be mis-treated as a corporate action; a proper corporate-
+    actions feed (ex-date + ratio) is the robust fix.
+    """
+    df = df.copy()
+    close = df["Close"].to_numpy(dtype=float)
+    open_ = df["Open"].to_numpy(dtype=float) if "Open" in df.columns else close
+    n = len(df)
+    if n < 2:
+        return df
+
+    upper = 1.0 / (1.0 - min_gap)          # reverse-split / consolidation bound
+    factor = np.ones(n)
+    for i in range(1, n):
+        base = close[i - 1]
+        px = open_[i] if np.isfinite(open_[i]) and open_[i] > 0 else close[i]
+        if base > 0 and np.isfinite(px):
+            ratio = px / base
+            if ratio < (1.0 - min_gap) or ratio > upper:
+                factor[i] = ratio
+
+    adj = np.ones(n)
+    cum = 1.0
+    for i in range(n - 1, -1, -1):
+        adj[i] = cum
+        if factor[i] != 1.0:
+            cum *= factor[i]
+
+    for col in ("Open", "High", "Low", "Close"):
+        if col in df.columns:
+            df[col] = df[col].to_numpy(dtype=float) * adj
+    with np.errstate(divide="ignore", invalid="ignore"):
+        df["Volume"] = df["Volume"].to_numpy(dtype=float) / np.where(adj == 0, 1.0, adj)
+    return df
