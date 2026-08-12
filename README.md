@@ -90,6 +90,26 @@ python run.py      # backtest, stats, charts -> results/
 | `yearly_returns.csv` | calendar-year returns |
 | `holdings_history.csv` | the 10 names held at each monthly rebalance |
 
+## Forward-looking analysis
+
+Four scripts translate the backtest into what it means for a live portfolio
+(default lump sum ₹12 L). All deliberately discount the survivorship-biased 37%
+toward a realistic ~15–20% CAGR.
+
+| Script | Question it answers | Headline |
+|---|---|---|
+| `projection.py` | ₹12 L compounded at 15/20/25/37% | 20% base → ~₹30 L in 5y, ~₹74 L in 10y |
+| `bullrun.py` | If Nifty 50 does +35%, what does the strategy do? | up-capture 132%; strategy ~+46–60% that year |
+| `scenario.py` | A +37% / −17% saw-tooth market | alternating boom/bust compounds at only ~8–13%, not 37% |
+| `montecarlo.py` | Future path *with* the historical whipsaw | median ~18% CAGR → ~₹63 L in 10y; ~89% chance of a >30% drawdown |
+
+`montecarlo.py` block-bootstraps the real monthly returns (recentred to a
+realistic 18% CAGR, whipsaw shape kept) to produce a fan of future outcomes:
+`results/montecarlo.png`. The key lesson across all four: **CAGR is already the
+whipsaw-adjusted (geometric) number** — the historical whipsaw costs ~5 pts/yr
+of volatility drag versus the arithmetic average — and the realistic path
+carries 30–50% drawdowns you must sit through.
+
 ## Variants tested
 
 | Variant | CAGR | Max DD | Sharpe |
