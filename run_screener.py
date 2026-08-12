@@ -88,6 +88,15 @@ def parse_args(argv=None):
                    help="enrich with options: IV, IV/HV-rank, DTE, expected move, "
                         "OI/liquidity and a suggested structure (needs NSE FO bhavcopy)")
     p.add_argument("--fo-cache-dir", default="cache/fo", help="FO bhavcopy cache dir")
+    p.add_argument("--practice", action="store_true",
+                   help="VCP practice board: real pivot/contraction detection + a full "
+                        "Minervini trade plan (pivot, stop, size, targets) + a journal")
+    p.add_argument("--account", type=float, default=100_000.0,
+                   help="practice: account size for position sizing (default 100000)")
+    p.add_argument("--risk-pct", type=float, default=0.0125,
+                   help="practice: fraction of equity risked per trade (default 0.0125)")
+    p.add_argument("--practice-min-passed", type=int, default=12,
+                   help="practice: only stocks passing >= N mandatory checks (default 12)")
     return p.parse_args(argv)
 
 
@@ -152,6 +161,23 @@ def main(argv=None) -> int:
             opt_html = os.path.join(args.output_dir, f"vcp_fno_options_{stamp}.html")
             opt.write_html(ranked, metrics, config, opt_html, as_of=fo_day)
             print(f"  options data as of {fo_day}  ->  {opt_csv}\n  {opt_html}")
+
+    if args.practice:
+        from vcp_screener import practice as pr
+
+        as_of = None
+        if market.nifty_close is not None and len(market.nifty_close):
+            as_of = market.nifty_close.index[-1].date()
+        pcfg = pr.PracticeConfig(account=args.account, risk_pct=args.risk_pct)
+        setups = pr.select_setups(ranked, data, config, min_passed=args.practice_min_passed)
+        pr.print_board(setups, pcfg)
+        plan_csv = os.path.join(args.output_dir, f"vcp_practice_{stamp}.csv")
+        pr.plans_frame(setups, pcfg).to_csv(plan_csv, index=False)
+        plan_html = os.path.join(args.output_dir, f"vcp_practice_{stamp}.html")
+        pr.write_html(setups, pcfg, plan_html, as_of=as_of)
+        journal = os.path.join(args.output_dir, "vcp_practice_journal.csv")
+        pr.write_journal_template(journal)
+        print(f"  practice board -> {plan_csv}\n  {plan_html}\n  journal -> {journal}")
 
     print(f"\nReports written:\n  {csv_path}\n  {html_path}")
     return 0

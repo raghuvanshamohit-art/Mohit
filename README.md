@@ -101,6 +101,28 @@ stock" when options are thin. Writes `vcp_fno_options_<ts>.{csv,html}`.
 > long premium bleeds theta/IV on the many losers. The enrichment is decision
 > support (structure, timing, liquidity) — not a signal to buy calls blindly.
 
+### Practice the setup
+
+Add `--practice` to turn the scan into a **VCP practice board** aligned with
+*Think & Trade Like a Champion* (see [`docs/MINERVINI_SPEC.md`](docs/MINERVINI_SPEC.md)):
+
+```bash
+python run_screener.py --practice --account 500000 --risk-pct 0.0125
+```
+
+For every trend-template stock it runs **real VCP detection** ([`vcp.py`](vcp_screener/vcp.py))
+— finding the swing highs/lows, counting the **contractions** (each should shrink
+~½), checking the **final contraction is tight with volume drying up**, and
+marking the **pivot buy point** — then builds the full Minervini **trade plan**:
+buy the pivot on a volume breakout, an **initial stop** at the danger point
+(capped 8%), a **position size** risking 1.25% of your equity (with a 25%
+concentration cap), a **2:1 and a sell-into-strength target**, and the
+**breakeven** trigger. It writes a board (`vcp_practice_*.{csv,html}`) and a
+blank **journal** (`vcp_practice_journal.csv`) to log every paper trade.
+
+This is decision support for practice — buy only on a real breakout above the
+pivot, respect the stop, and log the reps. Not investment advice.
+
 ### Live scan — Yahoo Finance (alternative)
 
 Free, no account, but unofficial and prone to occasional gaps/rate-limits:
@@ -152,6 +174,8 @@ vcp_screener/
   bhavcopy.py              NSE Bhavcopy EOD provider (default; back-adjusts CA)
   fo_bhavcopy.py           NSE derivatives bhavcopy (option chains)
   options.py               Black-Scholes IV, ranks, expected move, suggestions
+  vcp.py                   real VCP pivot/contraction detection (Minervini footprint)
+  practice.py              trade-plan cards + paper-trade journal (practice mode)
   backtest.py              vectorized historical backtest of the setup
   data.py                  YFinanceProvider (live) & CSVProvider (offline)
   universe.py              the NSE F&O symbol list
