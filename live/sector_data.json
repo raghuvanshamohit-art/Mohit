@@ -1,0 +1,262 @@
+{
+  "asOf": "2026-08-17 08:01 IST",
+  "source": "Yahoo Finance (delayed)",
+  "weights": {
+    "product": 35,
+    "margin": 20,
+    "flow": 30,
+    "valuation": 15
+  },
+  "sectors": [
+    {
+      "id": "metal",
+      "name": "Metal",
+      "ticker": "^CNXMETAL",
+      "type": "producer",
+      "sign": 1,
+      "driver": "Steel / aluminium / copper",
+      "note": "Copper stands in for the metals complex \u2014 Yahoo has no liquid Indian steel price.",
+      "comm_label": "Copper (global metals proxy)",
+      "inputs": {
+        "product": 38,
+        "margin": 67,
+        "flow": 25,
+        "valuation": 44
+      },
+      "signals": {
+        "rel3": -5.4,
+        "rel6": 17.5,
+        "blend": 3.7,
+        "comm3": 7.5,
+        "comm1": 8.0,
+        "stretch": 6.7,
+        "price": 12436.95
+      }
+    },
+    {
+      "id": "energy",
+      "name": "Oil & Gas",
+      "ticker": "^CNXENERGY",
+      "type": "producer",
+      "sign": 1,
+      "driver": "Crude & natural gas",
+      "note": "Upstream sells crude; refiners buy it \u2014 treated producer-led.",
+      "comm_label": "WTI crude",
+      "inputs": {
+        "product": -100,
+        "margin": 3,
+        "flow": 50,
+        "valuation": 41
+      },
+      "signals": {
+        "rel3": -0.2,
+        "rel6": 18.9,
+        "blend": 7.4,
+        "comm3": -21.4,
+        "comm1": 0.4,
+        "stretch": 6.2,
+        "price": 39277.0
+      }
+    },
+    {
+      "id": "auto",
+      "name": "Auto",
+      "ticker": "^CNXAUTO",
+      "type": "consumer",
+      "sign": -1,
+      "driver": "Steel/rubber input costs",
+      "note": "Consumer of metals & fuel \u2014 rising inputs squeeze margins.",
+      "comm_label": "Crude + copper (input cost)",
+      "inputs": {
+        "product": -35,
+        "margin": -35,
+        "flow": 2,
+        "valuation": 6
+      },
+      "signals": {
+        "rel3": -0.3,
+        "rel6": 1.2,
+        "blend": 0.3,
+        "comm3": -7.0,
+        "comm1": 4.2,
+        "stretch": 1.0,
+        "price": 27099.75
+      }
+    },
+    {
+      "id": "it",
+      "name": "IT",
+      "ticker": "^CNXIT",
+      "type": "flow",
+      "sign": 1,
+      "driver": "Global tech spend \u00b7 USD/INR",
+      "note": "Not commodity-driven \u2014 a weaker rupee lifts reported margins.",
+      "comm_label": "USD/INR (weak rupee \u2191 = tailwind)",
+      "inputs": {
+        "product": -15,
+        "margin": -16,
+        "flow": 11,
+        "valuation": -27
+      },
+      "signals": {
+        "rel3": 8.0,
+        "rel6": -7.9,
+        "blend": 1.6,
+        "comm3": -1.2,
+        "comm1": -1.3,
+        "stretch": -4.0,
+        "price": 31357.75
+      }
+    },
+    {
+      "id": "bank",
+      "name": "Bank",
+      "ticker": "^NSEBANK",
+      "type": "flow",
+      "sign": 1,
+      "driver": "Credit demand \u00b7 NIMs \u00b7 rates",
+      "note": "Flow-led: no daily commodity driver. Score leans on relative strength.",
+      "comm_label": "\u2014",
+      "inputs": {
+        "product": 0,
+        "margin": -17,
+        "flow": 17,
+        "valuation": 0
+      },
+      "signals": {
+        "rel3": 4.0,
+        "rel6": 0.6,
+        "blend": 2.6,
+        "comm3": null,
+        "comm1": null,
+        "stretch": 0.0,
+        "price": 57491.1
+      }
+    },
+    {
+      "id": "fmcg",
+      "name": "FMCG",
+      "ticker": "^CNXFMCG",
+      "type": "consumer",
+      "sign": -1,
+      "driver": "Agri & packaging input costs",
+      "note": "Soft-commodity proxy \u2014 real FMCG inputs (palm oil, grains) aren't on Yahoo.",
+      "comm_label": "Sugar + crude (input proxy)",
+      "inputs": {
+        "product": -27,
+        "margin": -64,
+        "flow": -15,
+        "valuation": -40
+      },
+      "signals": {
+        "rel3": -2.3,
+        "rel6": -2.2,
+        "blend": -2.3,
+        "comm3": -5.3,
+        "comm1": 7.7,
+        "stretch": -6.0,
+        "price": 48748.7
+      }
+    },
+    {
+      "id": "pharma",
+      "name": "Pharma",
+      "ticker": "^CNXPHARMA",
+      "type": "flow",
+      "sign": 1,
+      "driver": "US generics pricing \u00b7 defensive",
+      "note": "Flow-led defensive: driven by US price cycles, not a tradable commodity.",
+      "comm_label": "\u2014",
+      "inputs": {
+        "product": 0,
+        "margin": 6,
+        "flow": 82,
+        "valuation": 84
+      },
+      "signals": {
+        "rel3": 4.3,
+        "rel6": 24.4,
+        "blend": 12.4,
+        "comm3": null,
+        "comm1": null,
+        "stretch": 12.6,
+        "price": 26445.55
+      }
+    },
+    {
+      "id": "realty",
+      "name": "Realty",
+      "ticker": "^CNXREALTY",
+      "type": "flow",
+      "sign": 1,
+      "driver": "Housing demand \u00b7 rates",
+      "note": "Flow-led: rate-sensitive. A live rate feed would sharpen this.",
+      "comm_label": "\u2014",
+      "inputs": {
+        "product": 0,
+        "margin": 100,
+        "flow": 82,
+        "valuation": 68
+      },
+      "signals": {
+        "rel3": 14.8,
+        "rel6": 8.5,
+        "blend": 12.3,
+        "comm3": null,
+        "comm1": null,
+        "stretch": 10.2,
+        "price": 918.7
+      }
+    },
+    {
+      "id": "infra",
+      "name": "Infra",
+      "ticker": "^CNXINFRA",
+      "type": "consumer",
+      "sign": -1,
+      "driver": "Capex cycle \u00b7 steel/cement costs",
+      "note": "Consumer of construction metals \u2014 copper as a rough input proxy.",
+      "comm_label": "Copper (construction-metal proxy)",
+      "inputs": {
+        "product": 38,
+        "margin": -67,
+        "flow": 9,
+        "valuation": 3
+      },
+      "signals": {
+        "rel3": -1.5,
+        "rel6": 5.7,
+        "blend": 1.4,
+        "comm3": 7.5,
+        "comm1": 8.0,
+        "stretch": 0.4,
+        "price": 9377.35
+      }
+    },
+    {
+      "id": "psu",
+      "name": "PSU Bank",
+      "ticker": "^CNXPSUBANK",
+      "type": "flow",
+      "sign": 1,
+      "driver": "Credit \u00b7 rates \u00b7 value",
+      "note": "Flow-led: rate- and value-sensitive, distinct from private banks.",
+      "comm_label": "\u2014",
+      "inputs": {
+        "product": 0,
+        "margin": -63,
+        "flow": -22,
+        "valuation": -7
+      },
+      "signals": {
+        "rel3": -7.8,
+        "rel6": 3.4,
+        "blend": -3.3,
+        "comm3": null,
+        "comm1": null,
+        "stretch": -1.0,
+        "price": 8381.75
+      }
+    }
+  ]
+}
