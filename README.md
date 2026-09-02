@@ -61,6 +61,23 @@ python -m dyncorr run --params gold us_treasury_10y sp500 \
 If you installed the package, use the `dyncorr` command instead of
 `python -m dyncorr`.
 
+## Interactive dashboard
+
+Generate a single self-contained HTML page that computes the correlations
+**in the browser** — the estimator, window/half-life, anchor and "as-of date"
+controls are all live, with a rolling-correlation chart, an as-of heatmap, and
+a swing-ranked stability table.
+
+```bash
+python -m dyncorr dashboard \
+    --params us_treasury_10y us_treasury_2y inflation bond_rate \
+             euro_treasury_10y yen_treasury_10y gold sp500 \
+    --out dashboard.html
+# then open dashboard.html in any browser (no server needed)
+```
+
+It works with `--csv` and `--source live` too, exactly like `run`.
+
 ## Use your own data (any parameter)
 
 Provide a wide CSV: a date column plus one numeric column per series (levels —

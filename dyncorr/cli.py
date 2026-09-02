@@ -68,6 +68,30 @@ def cmd_list_presets(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_dashboard(args: argparse.Namespace) -> int:
+    from .dashboard import DEFAULT_PARAMS, write_dashboard
+
+    params = args.params or (DEFAULT_PARAMS if not args.csv else [])
+    if not args.csv:
+        unknown = [p for p in params if resolve(p) is None]
+        if unknown:
+            raise SystemExit(
+                f"Unknown parameter(s): {unknown}. Run `list-presets`, "
+                f"or load them from a CSV with --csv."
+            )
+    out = write_dashboard(
+        args.out,
+        params=params,
+        source="csv" if args.csv else args.source,
+        start=args.start, end=args.end, transform=args.transform,
+        csv_path=args.csv, date_col=args.date_col, seed=args.seed,
+    )
+    print(f"dyncorr v{__version__}")
+    print(f"Wrote interactive dashboard to {out}")
+    print(f"Open it in a browser:  file://{os.path.abspath(out)}")
+    return 0
+
+
 def cmd_run(args: argparse.Namespace) -> int:
     params = args.params or []
     if not params and not args.csv:
@@ -189,6 +213,22 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("list-presets", help="list built-in parameters").set_defaults(
         func=cmd_list_presets
     )
+
+    dash = sub.add_parser("dashboard", help="generate an interactive HTML dashboard")
+    dash.add_argument("--params", nargs="+", default=[],
+                      help="parameter keys/aliases, or CSV columns (default: a mix)")
+    dash.add_argument("--source", choices=["synthetic", "live", "csv"],
+                      default="synthetic")
+    dash.add_argument("--csv", help="load level series from a wide CSV")
+    dash.add_argument("--date-col", help="date column name in the CSV")
+    dash.add_argument("--start", default="2019-01-01")
+    dash.add_argument("--end", default="2024-12-31")
+    dash.add_argument("--transform", default="auto",
+                      choices=["auto", *sorted(VALID_TRANSFORMS)])
+    dash.add_argument("--seed", type=int, default=7)
+    dash.add_argument("--out", default="dashboard.html",
+                      help="output HTML file (default: dashboard.html)")
+    dash.set_defaults(func=cmd_dashboard)
 
     run = sub.add_parser("run", help="compute dynamic correlations")
     run.add_argument("--params", nargs="+", default=[],
