@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dyncorr"
+version = "0.1.0"
+description = "Dynamic (time-varying) correlation tool for financial series"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+dependencies = [
+    "numpy>=1.23",
+    "pandas>=1.5",
+    "matplotlib>=3.6",
+]
+
+[project.optional-dependencies]
+live = [
+    "yfinance>=0.2",
+    "pandas-datareader>=0.10",
+]
+dev = [
+    "pytest>=7",
+]
+
+[project.scripts]
+dyncorr = "dyncorr.cli:main"
+
+[tool.setuptools]
+packages = ["dyncorr"]

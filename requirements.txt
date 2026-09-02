@@ -1,0 +1,8 @@
+# Core (required)
+numpy>=1.23
+pandas>=1.5
+matplotlib>=3.6
+
+# Optional — only needed for `--source live`
+# yfinance>=0.2
+# pandas-datareader>=0.10
