@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How Macro Works</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --page:#eef0f4; --surface:#ffffff; --surface-2:#f5f6fa; --inset:#eceef4;
+  --ink:#15171c; --ink-2:#4d525d; --muted:#878c98;
+  --line:#e3e5ec; --border:rgba(21,23,28,.10);
+  --accent:#3b49b0; --accent-soft:rgba(59,73,176,.10); --accent-ink:#fff;
+  --up:#0f9d63; --up-soft:rgba(15,157,99,.12);
+  --down:#d1443c; --down-soft:rgba(209,68,60,.12);
+  --mixed:#b9812a; --mixed-soft:rgba(185,129,42,.14);
+  --shadow:0 1px 2px rgba(21,23,28,.05),0 10px 30px rgba(21,23,28,.06);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --page:#0f1116; --surface:#171a21; --surface-2:#1c202a; --inset:#12151c;
+    --ink:#e9ebf1; --ink-2:#aab0bd; --muted:#727888;
+    --line:#262b36; --border:rgba(233,235,241,.10);
+    --accent:#8b97ec; --accent-soft:rgba(139,151,236,.15); --accent-ink:#0b0e18;
+    --up:#33b782; --up-soft:rgba(51,183,130,.16);
+    --down:#e5726a; --down-soft:rgba(229,114,106,.16);
+    --mixed:#e0aa46; --mixed-soft:rgba(224,170,70,.16);
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 34px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --page:#0f1116; --surface:#171a21; --surface-2:#1c202a; --inset:#12151c;
+  --ink:#e9ebf1; --ink-2:#aab0bd; --muted:#727888;
+  --line:#262b36; --border:rgba(233,235,241,.10);
+  --accent:#8b97ec; --accent-soft:rgba(139,151,236,.15); --accent-ink:#0b0e18;
+  --up:#33b782; --up-soft:rgba(51,183,130,.16);
+  --down:#e5726a; --down-soft:rgba(229,114,106,.16);
+  --mixed:#e0aa46; --mixed-soft:rgba(224,170,70,.16);
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 34px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;font-size:16px;line-height:1.62;
+  -webkit-font-smoothing:antialiased;}
+.wrap{max-width:900px;margin:0 auto;padding:0 20px 72px;}
+.col{max-width:680px;margin-left:auto;margin-right:auto;}
+h1,h2,h3{font-family:"Fraunces",Georgia,serif;letter-spacing:-.01em;text-wrap:balance;}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;}
+a{color:var(--accent);}
+
+/* hero */
+.hero{padding:52px 0 26px;text-align:center;}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--accent);font-weight:600;}
+.hero h1{font-size:46px;line-height:1.04;font-weight:600;margin:14px 0 0;}
+.hero p{font-size:18px;color:var(--ink-2);margin:16px auto 0;max-width:60ch;}
+.theme-row{display:flex;justify-content:center;margin-top:22px;}
+.tbtn{appearance:none;border:1px solid var(--border);background:var(--surface);color:var(--ink-2);
+  border-radius:999px;padding:7px 14px;cursor:pointer;font:inherit;font-size:13px;display:inline-flex;
+  gap:7px;align-items:center;}
+.tbtn:hover{color:var(--ink);}
+
+/* section rhythm */
+section{margin-top:46px;}
+.k{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);font-weight:600;margin-bottom:10px;}
+h2{font-size:29px;font-weight:600;margin:0 0 4px;}
+.lead{color:var(--ink-2);font-size:17px;margin:8px 0 0;}
+p{margin:14px 0;}
+strong{font-weight:600;}
+em{font-style:italic;}
+
+/* the one lever cards */
+.lever{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px;}
+.lcard{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 18px 16px;
+  box-shadow:var(--shadow);}
+.lcard h3{font-size:18px;margin:0 0 4px;}
+.lcard p{margin:6px 0 0;font-size:15px;color:var(--ink-2);}
+.pill{display:inline-flex;align-items:center;gap:6px;font-family:"IBM Plex Mono",monospace;font-size:12px;
+  font-weight:600;padding:4px 9px;border-radius:999px;background:var(--inset);color:var(--ink-2);}
+
+/* scenario explorer */
+.explorer{background:var(--surface);border:1px solid var(--border);border-radius:18px;
+  box-shadow:var(--shadow);padding:22px;margin-top:22px;}
+.scenpick{display:flex;flex-wrap:wrap;gap:9px;}
+.scenpick button{appearance:none;cursor:pointer;font:inherit;font-size:14.5px;font-weight:500;
+  border:1px solid var(--border);background:var(--surface-2);color:var(--ink-2);
+  border-radius:11px;padding:11px 15px;display:inline-flex;align-items:center;gap:9px;transition:.12s;}
+.scenpick button .ar{font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:15px;}
+.scenpick button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
+.scenpick button:not([aria-pressed="true"]):hover{color:var(--ink);border-color:var(--muted);}
+
+.trigger{margin-top:20px;padding:16px 18px;border-radius:13px;background:var(--accent-soft);
+  border:1px solid var(--border);}
+.trigger .t-lab{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--accent);font-weight:600;}
+.trigger .t-txt{font-size:17px;margin-top:5px;color:var(--ink);}
+.cause{font-size:14px;color:var(--ink-2);margin-top:8px;}
+
+.assets{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px;}
+.asset{background:var(--surface-2);border:1px solid var(--border);border-radius:13px;padding:14px;
+  border-top:3px solid var(--line);}
+.asset.up{border-top-color:var(--up);} .asset.down{border-top-color:var(--down);}
+.asset.mixed{border-top-color:var(--mixed);}
+.asset .a-top{display:flex;align-items:center;justify-content:space-between;}
+.asset .a-name{font-weight:600;font-size:15px;}
+.asset .a-arrow{font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:22px;line-height:1;}
+.asset.up .a-arrow{color:var(--up);} .asset.down .a-arrow{color:var(--down);}
+.asset.mixed .a-arrow{color:var(--mixed);}
+.asset .a-dir{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;letter-spacing:.04em;
+  text-transform:uppercase;margin-top:2px;}
+.asset.up .a-dir{color:var(--up);} .asset.down .a-dir{color:var(--down);} .asset.mixed .a-dir{color:var(--mixed);}
+.asset .a-why{font-size:13px;color:var(--ink-2);margin-top:9px;line-height:1.5;}
+
+.reaction{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}
+.rbox{border:1px solid var(--border);border-radius:13px;padding:15px 16px;background:var(--surface-2);}
+.rbox .r-lab{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;margin-bottom:6px;}
+.rbox .r-lab .ic{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font-size:13px;
+  background:var(--accent-soft);color:var(--accent);flex:none;}
+.rbox p{margin:0;font-size:14px;color:var(--ink-2);}
+.watch{margin-top:14px;font-size:13.5px;color:var(--ink-2);padding:12px 14px;border-left:3px solid var(--mixed);
+  background:var(--mixed-soft);border-radius:0 10px 10px 0;}
+.watch b{color:var(--ink);}
+.keyrow{display:flex;flex-wrap:wrap;gap:14px;margin-top:16px;font-size:12.5px;color:var(--muted);}
+.keyrow span{display:inline-flex;align-items:center;gap:6px;}
+.kdot{font-family:"IBM Plex Mono",monospace;font-weight:700;}
+.kdot.up{color:var(--up);} .kdot.down{color:var(--down);} .kdot.mixed{color:var(--mixed);}
+
+/* seesaw */
+.seesaw{background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);
+  padding:22px;margin-top:20px;display:grid;grid-template-columns:210px 1fr;gap:22px;align-items:center;}
+.seesaw svg{width:100%;height:auto;}
+.seesaw .s-note p{margin:0 0 10px;font-size:15px;color:var(--ink-2);}
+.seesaw .s-note p:first-child{color:var(--ink);font-size:16px;}
+
+/* table */
+.tablewrap{overflow-x:auto;margin-top:20px;border:1px solid var(--border);border-radius:14px;
+  box-shadow:var(--shadow);background:var(--surface);}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:620px;}
+th,td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--line);}
+thead th{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--muted);font-weight:600;background:var(--surface-2);}
+tbody tr:last-child td{border-bottom:0;}
+td.trig{font-weight:600;white-space:nowrap;}
+.cell{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:13px;display:inline-flex;gap:5px;align-items:center;}
+.cell.up{color:var(--up);} .cell.down{color:var(--down);} .cell.mixed{color:var(--mixed);}
+td .sub{display:block;font-family:"IBM Plex Sans",sans-serif;font-weight:400;font-size:12px;color:var(--muted);margin-top:1px;}
+
+/* cycle */
+.cycle{display:flex;flex-wrap:wrap;align-items:stretch;gap:10px;margin-top:20px;}
+.cystep{flex:1 1 150px;background:var(--surface);border:1px solid var(--border);border-radius:13px;
+  padding:14px;box-shadow:var(--shadow);position:relative;}
+.cystep .n{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--accent);font-weight:600;}
+.cystep .t{font-weight:600;font-size:14.5px;margin-top:4px;}
+.cystep .d{font-size:12.5px;color:var(--ink-2);margin-top:5px;line-height:1.45;}
+.cyarrow{align-self:center;color:var(--muted);font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:18px;}
+.cyloop{text-align:center;font-size:13px;color:var(--muted);margin-top:12px;font-style:italic;}
+
+.foot{margin-top:52px;padding-top:20px;border-top:1px solid var(--border);color:var(--muted);font-size:13px;
+  line-height:1.7;}
+.foot b{color:var(--ink-2);}
+
+@media (max-width:720px){
+  .hero h1{font-size:34px;} .lever{grid-template-columns:1fr;}
+  .assets{grid-template-columns:1fr 1fr;} .reaction{grid-template-columns:1fr;}
+  .seesaw{grid-template-columns:1fr;} h2{font-size:24px;}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;}}
+</style>
+
+
+</head>
+<body>
+<div class="wrap">
+  <header class="hero col">
+    <div class="eyebrow">A plain-language guide</div>
+    <h1>How Macro Works</h1>
+    <p>Inflation, interest rates, bonds, gold and the dollar are all links in one
+    chain. Pick a trigger below and follow what happens next — the market's first
+    move, what policymakers do to counter it, and where it leads over time.</p>
+    <div class="theme-row">
+      <button class="tbtn" id="theme-btn" type="button"><span id="theme-ico">◐</span> Theme</button>
+    </div>
+  </header>
+
+  <section class="col">
+    <div class="k">Start here — the one big lever</div>
+    <h2>Almost everything reacts to one thing</h2>
+    <p class="lead">A central bank (like the US Federal Reserve) has essentially one
+    job and one main tool: keep prices stable by moving the <strong>interest
+    rate</strong>. Most of macro is just the knock-on effects of that lever moving.</p>
+    <div class="lever">
+      <div class="lcard">
+        <span class="pill">🔥 Too hot</span>
+        <h3>Inflation runs high</h3>
+        <p>The economy is overheating — too much money chasing too few goods. The
+        central bank <strong>raises rates</strong> to cool it down.</p>
+      </div>
+      <div class="lcard">
+        <span class="pill">🧊 Too cold</span>
+        <h3>Growth stalls</h3>
+        <p>Demand is weak and jobs are at risk. The central bank <strong>cuts
+        rates</strong> to warm things up and get money moving again.</p>
+      </div>
+    </div>
+    <p>Bonds, stocks, gold and the dollar are mostly <em>reacting</em> to where that
+    rate is going. Once you can predict the lever, you can reason about the rest.</p>
+  </section>
+
+  <section>
+    <div class="col">
+      <div class="k">The core of it — try each one</div>
+      <h2>What happens if…</h2>
+      <p class="lead">Choose a trigger. Each asset shows the direction its
+      <em>price</em> usually moves, and why. Up and down mean <em>rises</em> and
+      <em>falls</em> — not good or bad.</p>
+    </div>
+
+    <div class="explorer">
+      <div class="scenpick" id="scenpick" role="group" aria-label="Choose a scenario"></div>
+
+      <div class="trigger">
+        <div class="t-lab">Trigger</div>
+        <div class="t-txt" id="t-txt"></div>
+        <div class="cause" id="t-cause"></div>
+      </div>
+
+      <div class="assets" id="assets"></div>
+
+      <div class="reaction">
+        <div class="rbox">
+          <div class="r-lab"><span class="ic">⚖️</span> The counter-action</div>
+          <p id="r-counter"></p>
+        </div>
+        <div class="rbox">
+          <div class="r-lab"><span class="ic">⏳</span> Long-term effect</div>
+          <p id="r-long"></p>
+        </div>
+      </div>
+
+      <div class="watch" id="r-watch"></div>
+
+      <div class="keyrow">
+        <span><b class="kdot up">▲</b> price rises</span>
+        <span><b class="kdot down">▼</b> price falls</span>
+        <span><b class="kdot mixed">◆</b> it depends</span>
+        <span style="color:var(--ink-2)">Remember: a bond's price and its yield move in <em>opposite</em> directions.</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="col">
+      <div class="k">The one rule people trip on</div>
+      <h2>Bond price and yield are a seesaw</h2>
+    </div>
+    <div class="seesaw">
+      <svg viewBox="0 0 200 150" role="img" aria-label="A seesaw: when yield goes up, price goes down">
+        <line x1="24" y1="118" x2="176" y2="60" stroke="var(--accent)" stroke-width="5" stroke-linecap="round"/>
+        <polygon points="100,150 84,150 100,96 116,150" fill="var(--ink-2)" opacity="0.85"/>
+        <circle cx="24" cy="118" r="12" fill="var(--down)"/>
+        <text x="24" y="122" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="14" font-weight="700" fill="#fff">▼</text>
+        <circle cx="176" cy="60" r="12" fill="var(--up)"/>
+        <text x="176" y="64" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="14" font-weight="700" fill="#fff">▲</text>
+        <text x="20" y="140" text-anchor="start" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-2)">PRICE</text>
+        <text x="182" y="44" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-2)">YIELD</text>
+      </svg>
+      <div class="s-note">
+        <p>A bond pays a fixed amount. If new bonds start paying <strong>higher
+        interest (yield)</strong>, nobody wants the old lower-paying one at full
+        price — so its <strong>price falls</strong> until the return matches. And
+        the reverse: when yields drop, existing bond prices rise.</p>
+        <p>So “bonds selling off” and “yields spiking” describe the <em>same</em>
+        event. “Bond rates higher” = bond prices lower.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="col">
+      <div class="k">One-glance summary</div>
+      <h2>The cheat sheet</h2>
+      <p class="lead">Typical <em>price</em> reactions. Real markets have exceptions —
+      the notes flag the big ones.</p>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr>
+          <th>If this happens…</th><th>Bonds</th><th>Stocks</th><th>Gold</th><th>Dollar</th><th>Central bank</th>
+        </tr></thead>
+        <tbody id="cheatbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="col">
+      <div class="k">Why it never really ends</div>
+      <h2>The cycle repeats</h2>
+      <p class="lead">These moves aren't one-offs — they loop. Today's cure becomes
+      tomorrow's cause.</p>
+    </div>
+    <div class="cycle">
+      <div class="cystep"><div class="n">01</div><div class="t">Easy money</div><div class="d">Low rates, cheap borrowing. Spending and investment pick up.</div></div>
+      <div class="cyarrow">→</div>
+      <div class="cystep"><div class="n">02</div><div class="t">Growth &amp; inflation build</div><div class="d">Demand runs hot; prices and wages start climbing.</div></div>
+      <div class="cyarrow">→</div>
+      <div class="cystep"><div class="n">03</div><div class="t">Central bank tightens</div><div class="d">Rates rise to cool inflation. Bonds &amp; stocks come under pressure.</div></div>
+      <div class="cyarrow">→</div>
+      <div class="cystep"><div class="n">04</div><div class="t">Slowdown</div><div class="d">Costlier money slows the economy — sometimes into recession.</div></div>
+    </div>
+    <div class="cyloop">↻ …which brings rate cuts and easy money again — back to step 01.</div>
+  </section>
+
+  <p class="foot col">
+    <b>How to read this.</b> These are <em>typical</em> tendencies, not laws —
+    markets price in expectations ahead of events, and any single day can defy the
+    pattern. The biggest swing factor is <b>real yields</b> (interest rate minus
+    inflation): gold and risky assets care about those more than headline rates.
+    This is an educational explainer, not investment advice.
+  </p>
+</div>
+
+<script>
+(function(){
+"use strict";
+var $=function(s){return document.querySelector(s);};
+var SCEN=[
+  {id:"inf_up",label:"Inflation",ar:"▲",
+   trigger:"Inflation rises — prices across the economy climb faster, so each unit of money buys less.",
+   cause:"Often from too much demand, cheap money, or supply shocks (energy, wars, shortages).",
+   assets:{
+     bonds:{d:"down",why:"Fixed coupons lose value as prices rise, and investors expect rate hikes — so prices fall (yields jump)."},
+     stocks:{d:"down",why:"Higher rates make future profits worth less today; costs squeeze margins. Growth/tech hit hardest."},
+     gold:{d:"up",why:"A classic inflation and currency-debasement hedge — especially while real rates stay low."},
+     dollar:{d:"mixed",why:"Expected hikes attract capital and lift it at first; but persistent inflation erodes it over time."}
+   },
+   counter:"The central bank raises interest rates and drains money from the system (quantitative tightening). Borrowing gets pricier, demand cools, and inflation eases.",
+   longterm:"If it works, inflation drifts back toward the ~2% target and rates can fall again. If not, expectations un-anchor into a wage-price spiral; over-tightening can force a recession.",
+   watch:"<b>Watch:</b> markets care about <b>real</b> rates. If the central bank hikes faster than inflation, gold can actually fall despite high inflation."},
+
+  {id:"inf_dn",label:"Inflation",ar:"▼",
+   trigger:"Inflation falls (disinflation) — prices are still rising, but more slowly. Money holds its value better.",
+   cause:"From weaker demand, past rate hikes biting, or falling energy/goods prices.",
+   assets:{
+     bonds:{d:"up",why:"Less inflation to offset, plus expected rate cuts → prices rise (yields fall)."},
+     stocks:{d:"up",why:"Lower rates lift valuations — a 'goldilocks' backdrop, as long as growth holds up."},
+     gold:{d:"mixed",why:"Falling real rates support it, but pure inflation-hedge demand fades. A toss-up."},
+     dollar:{d:"down",why:"Expected rate cuts reduce its yield advantage, tending to weaken it."}
+   },
+   counter:"The central bank cuts interest rates and may add money (quantitative easing) to support demand and avoid outright deflation.",
+   longterm:"Mild disinflation to target is healthy. But <em>deflation</em> — actually falling prices — is dangerous: debts get heavier and buyers wait for lower prices, so demand spirals down. Policymakers fight it hard.",
+   watch:"<b>Watch:</b> <em>why</em> inflation is falling matters. Gentle cooling lifts stocks; a demand collapse (recession) sends stocks down even as bonds rally."},
+
+  {id:"yld_up",label:"Bond yields",ar:"▲",
+   trigger:"Bond yields rise — interest rates on bonds climb, so existing bond prices fall (the seesaw).",
+   cause:"From higher inflation, central-bank hikes, strong growth, or heavy government borrowing (more bond supply).",
+   assets:{
+     bonds:{d:"down",why:"By definition — a higher yield means a lower price on bonds already issued."},
+     stocks:{d:"down",why:"Future profits are discounted harder, and safe bonds now pay more, competing with stocks."},
+     gold:{d:"down",why:"Gold pays no interest, so when real yields rise its opportunity cost climbs — a headwind."},
+     dollar:{d:"up",why:"Higher yields pull in foreign capital chasing the return, strengthening the currency."}
+   },
+   counter:"If yields rise on inflation, the bank keeps tightening. If they spike disorderly and threaten stability, it can step in and BUY bonds (QE / yield-curve control) to cap them; governments may slow new borrowing.",
+   longterm:"A higher cost of capital slows investment, housing and hiring. Demand eventually weakens, inflation cools, and yields fall back — while bigger government interest bills force hard budget choices.",
+   watch:"<b>Watch:</b> yields rising on <em>strong growth</em> is very different from yields rising on <em>debt/supply fears</em> — the second can hit stocks and the currency together."},
+
+  {id:"yld_dn",label:"Bond yields",ar:"▼",
+   trigger:"Bond yields fall — interest rates on bonds drop, so existing bond prices rise (the seesaw again).",
+   cause:"From rate cuts, low inflation, QE, or a 'flight to safety' when investors fear a recession.",
+   assets:{
+     bonds:{d:"up",why:"Lower yields mean higher prices on bonds already issued."},
+     stocks:{d:"mixed",why:"Cheaper money lifts valuations — unless yields are falling because of recession fear, in which case stocks fall too."},
+     gold:{d:"up",why:"Low or falling real yields cut the cost of holding gold — usually a tailwind."},
+     dollar:{d:"down",why:"Lower yields make the currency less rewarding to hold, tending to weaken it."}
+   },
+   counter:"In a slowdown the central bank cuts rates and eases further; governments may add fiscal stimulus (spending or tax cuts) to revive demand.",
+   longterm:"Cheap money supports recovery — but left too long it can inflate asset bubbles and eventually rekindle inflation, restarting the whole loop.",
+   watch:"<b>Watch:</b> if yields are diving on <em>panic</em>, that same fear pulls stocks down. Falling yields are only bullish for stocks when the economy is merely cooling, not cracking."}
+];
+var NAMES={bonds:"Bonds",stocks:"Stocks",gold:"Gold",dollar:"Dollar"};
+var ARROW={up:"▲",down:"▼",mixed:"◆"};
+var DIRTXT={up:"Rises",down:"Falls",mixed:"Depends"};
+
+// scenario buttons
+var pick=$("#scenpick");
+SCEN.forEach(function(s,i){
+  var b=document.createElement("button");
+  b.type="button"; b.dataset.i=i; b.setAttribute("aria-pressed", i===0?"true":"false");
+  b.innerHTML=s.label+' <span class="ar">'+s.ar+'</span>';
+  b.addEventListener("click",function(){select(i);});
+  pick.appendChild(b);
+});
+function select(i){
+  var s=SCEN[i];
+  [].forEach.call(pick.children,function(b,j){b.setAttribute("aria-pressed", j===i?"true":"false");});
+  $("#t-txt").textContent=s.trigger;
+  $("#t-cause").textContent="Usually caused by: "+s.cause;
+  var box=$("#assets"); box.innerHTML="";
+  ["bonds","stocks","gold","dollar"].forEach(function(k){
+    var a=s.assets[k];
+    var el=document.createElement("div");
+    el.className="asset "+a.d;
+    el.innerHTML='<div class="a-top"><span class="a-name">'+NAMES[k]+'</span>'+
+      '<span class="a-arrow">'+ARROW[a.d]+'</span></div>'+
+      '<div class="a-dir">'+DIRTXT[a.d]+'</div>'+
+      '<div class="a-why">'+a.why+'</div>';
+    box.appendChild(el);
+  });
+  $("#r-counter").textContent=s.counter;
+  $("#r-long").innerHTML=s.longterm;
+  $("#r-watch").innerHTML=s.watch;
+}
+
+// cheat sheet (compact)
+var CHEAT=[
+  {t:"Inflation rises",sub:"prices climb faster",b:["down"],s:["down"],g:["up"],d:["mixed"],cb:"Raises rates"},
+  {t:"Inflation falls",sub:"disinflation",b:["up"],s:["up"],g:["mixed"],d:["down"],cb:"Cuts rates"},
+  {t:"Bond yields rise",sub:"prices fall",b:["down"],s:["down"],g:["down"],d:["up"],cb:"Hikes / caps yields"},
+  {t:"Bond yields fall",sub:"prices rise",b:["up"],s:["mixed"],g:["up"],d:["down"],cb:"Cuts / eases"},
+  {t:"Recession fear",sub:"growth scare",b:["up"],s:["down"],g:["up"],d:["mixed"],cb:"Cuts rates"}
+];
+function cell(d){return '<span class="cell '+d+'">'+ARROW[d]+' '+DIRTXT[d]+'</span>';}
+var cb=$("#cheatbody");
+CHEAT.forEach(function(r){
+  var tr=document.createElement("tr");
+  tr.innerHTML='<td class="trig">'+r.t+'<span class="sub">'+r.sub+'</span></td>'+
+    '<td>'+cell(r.b[0])+'</td><td>'+cell(r.s[0])+'</td><td>'+cell(r.g[0])+'</td><td>'+cell(r.d[0])+'</td>'+
+    '<td><span class="sub" style="font-weight:600;color:var(--ink-2);margin:0;">'+r.cb+'</span></td>';
+  cb.appendChild(tr);
+});
+
+// theme toggle
+function ico(){
+  var dark=document.documentElement.getAttribute("data-theme")==="dark" ||
+    (!document.documentElement.getAttribute("data-theme") && matchMedia("(prefers-color-scheme:dark)").matches);
+  $("#theme-ico").textContent=dark?"☀":"☾";
+}
+$("#theme-btn").addEventListener("click",function(){
+  var cur=document.documentElement.getAttribute("data-theme");
+  var dark=cur==="dark" || (!cur && matchMedia("(prefers-color-scheme:dark)").matches);
+  document.documentElement.setAttribute("data-theme",dark?"light":"dark"); ico();
+});
+select(0); ico();
+})();
+</script>
+
+</body>
+</html>
