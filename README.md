@@ -206,5 +206,15 @@ Mohit/
 
 ---
 
+## Further reading
+
+- [**The Investor's Framework**](docs/investment-framework.md) — a mindset,
+  economics and behaviour framework (price vs value, the India case, asset
+  allocation, stocks-vs-funds behaviour, gold as insurance, caging the
+  behavioural "monkey"), distilled from a veteran investor's long-form talk.
+  The screener tells you *what moved*; this explains *how to think about it.*
+
+---
+
 *Data is for information only and is **not** investment advice. Figures depend on
 Yahoo Finance availability and reflect the moment the dataset was generated.*
