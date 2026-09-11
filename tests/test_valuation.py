@@ -12,7 +12,7 @@ import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from valuation import intrinsic, pyramid
+from valuation import fundamentals, intrinsic, pyramid
 from valuation.engine import value_stock
 
 
@@ -201,6 +201,20 @@ class TestEngine(unittest.TestCase):
         rep = value_stock(auto=False)  # no inputs at all
         self.assertTrue(any("No intrinsic-value model" in w for w in rep["warnings"]))
         self.assertIsNone(rep["pyramid"])
+
+
+class TestFundamentalsHelpers(unittest.TestCase):
+    def test_av_symbol_mapping(self):
+        self.assertEqual(fundamentals._to_av_symbol("RELIANCE.NS"), "RELIANCE.BSE")
+        self.assertEqual(fundamentals._to_av_symbol("TCS.BO"), "TCS.BSE")
+        self.assertEqual(fundamentals._to_av_symbol("AAPL"), "AAPL")
+
+    def test_avnum_parsing(self):
+        self.assertEqual(fundamentals._avnum("11.25"), 11.25)
+        # Alpha Vantage uses "None"/"-"/"0" for missing fields -> treat as None
+        for blank in ("None", "-", "", "0", "0.0"):
+            self.assertIsNone(fundamentals._avnum(blank))
+        self.assertIsNone(fundamentals._avnum("not-a-number"))
 
 
 if __name__ == "__main__":

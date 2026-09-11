@@ -57,7 +57,7 @@ def _reliable_price(yahoo_symbol: str):
         return None, "", ""
 
 
-def value_stock(symbol=None, *, auto=True, yahoo_symbol=None,
+def value_stock(symbol=None, *, auto=True, yahoo_symbol=None, av_key=None,
                 margin_of_safety=DEFAULT_MARGIN_OF_SAFETY,
                 # pyramid options
                 tranches=3, step=0.10, weighting="increasing", capital=None,
@@ -100,12 +100,17 @@ def value_stock(symbol=None, *, auto=True, yahoo_symbol=None,
     # 1. Best-effort fundamentals fetch.
     if resolved_symbol and auto:
         try:
-            from .fundamentals import FundamentalsError, fetch_fundamentals
-            fetched = fetch_fundamentals(resolved_symbol)
+            from .fundamentals import fetch_fundamentals
+            fetched = fetch_fundamentals(resolved_symbol, av_key=av_key)
         except Exception as exc:  # noqa: BLE001 - degrade gracefully
+            import os as _os
+            hint = (" Supply values manually (--eps, --bvps, --growth, ...)."
+                    if (av_key or _os.environ.get("ALPHAVANTAGE_API_KEY"))
+                    else " Add a free Alpha Vantage key (--av-key or "
+                         "ALPHAVANTAGE_API_KEY) to auto-fetch on this network, "
+                         "or supply values manually (--eps, --bvps, --growth).")
             warnings.append(
-                f"Could not auto-fetch fundamentals for {resolved_symbol}: {exc}. "
-                f"Supply values manually (--eps, --bvps, --growth, ...).")
+                f"Could not auto-fetch fundamentals for {resolved_symbol}: {exc}.{hint}")
 
     # 2. Start from fetched values (if any), then apply explicit overrides.
     f = fetched or Fundamentals(symbol=resolved_symbol or (symbol or ""))

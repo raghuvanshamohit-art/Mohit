@@ -98,9 +98,11 @@ def build_report(query: str) -> dict:
 
     yahoo_symbol = (params.get("yahoo_symbol", [""])[0] or "").strip() or None
     auto = (params.get("auto", ["1"])[0] or "1") != "0"
+    av_key = (params.get("av_key", [""])[0] or "").strip() or None
 
     try:
-        return value_stock(symbol=symbol, auto=auto, yahoo_symbol=yahoo_symbol, **kwargs)
+        return value_stock(symbol=symbol, auto=auto, yahoo_symbol=yahoo_symbol,
+                           av_key=av_key, **kwargs)
     except Exception as exc:  # noqa: BLE001 - report errors as JSON, don't 500
         return {"error": f"{type(exc).__name__}: {exc}"}
 

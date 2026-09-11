@@ -142,11 +142,13 @@ Pyramiding means entering in tranches instead of one lump. Two modes:
   add as it rises, each add **smaller** than the last, with a stop trailing up.
 
 Supply fundamentals as flags (rates are percentages); a bare symbol auto-fetches
-the **current price** from Yahoo's chart endpoint, and best-effort fetches
-fundamentals from Yahoo's `quoteSummary` where the exchange allows it (it often
-blocks cloud IPs, in which case pass `--eps`, `--bvps`, `--growth`, … yourself —
-the report labels every input `supplied` / `yahoo` / `chart` / `default`). Add
-`--json` for a machine-readable report, or `--no-fetch` to stay fully offline.
+the **current price** from Yahoo's chart endpoint and the **fundamentals** from a
+provider chain — Yahoo `quoteSummary` first, then Alpha Vantage when a free key
+is given (`--av-key` / `ALPHAVANTAGE_API_KEY`), which works even where Yahoo
+blocks cloud IPs. Anything no provider returns you can pass yourself (`--eps`,
+`--bvps`, `--growth`, …); the report labels every input `supplied` / `yahoo` /
+`alphavantage` / `chart` / `default`. Add `--json` for a machine-readable report,
+or `--no-fetch` to stay fully offline.
 
 ### Live web app — just type a symbol
 
@@ -156,13 +158,29 @@ python run.py serve            # opens http://127.0.0.1:8000/
 
 A local web page where you **type a ticker and it fetches live and values it** —
 no manual number entry. It runs on your machine (not a browser sandbox), so it
-reaches Yahoo directly: the **current price** comes from the reliable chart
-endpoint and the **fundamentals** (EPS, book value, growth, dividend) are
-auto-fetched from Yahoo where your network allows, with every input tagged by
-source (`chart` / `yahoo` / `supplied` / `default`). Anything Yahoo won't give,
-you can fill in the collapsible *Assumptions & manual overrides* panel. NSE
-symbols work bare (`TCS`); for other markets use the full Yahoo symbol (`AAPL`,
-`TATASTEEL.BO`). `-p 8000` sets the port; `--host 0.0.0.0` exposes it on your LAN.
+reaches the market directly. Fundamentals come from a **provider chain**, and
+every input is tagged by source (`chart` / `yahoo` / `alphavantage` / `supplied`
+/ `default`):
+
+- **Current price** — always live from Yahoo's reliable chart endpoint.
+- **Fundamentals** (EPS, book value, growth, dividend) — **Yahoo** first (free,
+  no key, best coverage; works from a home network but Yahoo blocks it from many
+  cloud/office IPs), then **Alpha Vantage** as a fallback that *does* work from
+  blocked networks. Get a free key at
+  [alphavantage.co](https://www.alphavantage.co/support/#api-key) and pass it
+  with `--av-key KEY` (or set `ALPHAVANTAGE_API_KEY`, or paste it into the page —
+  it's saved in your browser). With a key, a bare symbol values **fully
+  automatically** anywhere.
+
+Anything no provider returns, you can type in the collapsible *Assumptions &
+manual overrides* panel. NSE symbols work bare (`TCS`); for other markets use the
+full Yahoo symbol (`AAPL`, `TATASTEEL.BO`). `-p 8000` sets the port; `--host
+0.0.0.0` exposes it on your LAN.
+
+```bash
+python run.py serve --av-key YOUR_ALPHAVANTAGE_KEY   # fully automatic
+python run.py value AAPL --av-key YOUR_KEY           # same, on the CLI
+```
 
 > **Why not a claude.ai artifact?** A shared artifact runs in a locked-down
 > browser sandbox that blocks all network calls to outside sites (Yahoo

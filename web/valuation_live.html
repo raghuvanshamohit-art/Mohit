@@ -189,6 +189,11 @@
         <div class="fld"><label for="dividend">Dividend / share</label><input id="dividend" type="number" step="any" placeholder="auto"></div>
         <div class="fld"><label for="fair_pe">Exit P·E</label><input id="fair_pe" type="number" step="any" placeholder="auto / 20"></div>
         <div class="fld"><label for="price">Override price</label><input id="price" type="number" step="any" placeholder="live"></div>
+        <div class="hintline">Auto-fetch fundamentals with no typing — paste a free
+          <a href="https://www.alphavantage.co/support/#api-key" target="_blank" rel="noopener">Alpha Vantage key</a>
+          (used only for your own requests; saved in this browser). Yahoo is tried first and needs no key on a home network.</div>
+        <div class="fld" style="grid-column: 1 / -1;"><label for="av_key">Alpha Vantage API key (optional)</label>
+          <input id="av_key" type="text" autocomplete="off" placeholder="enables auto EPS / book value even on blocked networks"></div>
       </div>
     </details>
   </form>
@@ -272,14 +277,24 @@ function buildQuery() {
                     "eps", "bvps", "dividend", "fair_pe", "price"]) {
     const v = val(id); if (v !== null) p.set(id, v);
   }
+  const key = ($("av_key").value || "").trim();
+  if (key) p.set("av_key", key);
   p.set("mode", $("mode").value);
   return p.toString();
+}
+
+function saveKey() {
+  try { localStorage.setItem("av_key", ($("av_key").value || "").trim()); } catch (e) {}
+}
+function loadKey() {
+  try { const k = localStorage.getItem("av_key"); if (k) $("av_key").value = k; } catch (e) {}
 }
 
 async function run(ev) {
   if (ev) ev.preventDefault();
   const sym = ($("symbol").value || "").trim();
   if (!sym) { showStatus("Enter a stock symbol.", true); return; }
+  saveKey();
   showStatus('<span class="spinner"></span>Fetching live data for ' + sym.toUpperCase() + ' …', false);
   $("results").classList.add("hidden");
   $("goBtn").disabled = true;
@@ -360,8 +375,8 @@ function render(rep) {
     if (hasPrice) {
       showStatus(`✓ Live price ${money(rep.stock.current_price)} fetched for ` +
         `<b>${rep.stock.symbol}</b>. Couldn't auto-fetch fundamentals on this network — ` +
-        `enter <b>EPS</b> below (plus book value / growth for more models), then press ` +
-        `<b>Value stock</b>.`, false);
+        `either add a free <b>Alpha Vantage key</b> below to auto-fill, or enter <b>EPS</b> ` +
+        `(plus book value / growth) yourself, then press <b>Value stock</b>.`, false);
     } else {
       showStatus(`Couldn't fetch data for <b>${rep.stock.symbol}</b>. Check the symbol — ` +
         `NSE names work bare (TCS); other markets need the full Yahoo symbol (AAPL, TATASTEEL.BO).`, true);
@@ -418,6 +433,7 @@ $("themeBtn").addEventListener("click", () => {
   const root = document.documentElement, cur = root.getAttribute("data-theme");
   root.setAttribute("data-theme", cur === "dark" ? "light" : cur === "light" ? "auto" : "dark");
 });
+loadKey();
 </script>
 </body>
 </html>

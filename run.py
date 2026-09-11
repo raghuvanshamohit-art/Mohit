@@ -122,6 +122,7 @@ def cmd_value(args):
         symbol=args.symbol,
         auto=not args.no_fetch,
         yahoo_symbol=args.yahoo_symbol,
+        av_key=args.av_key,
         margin_of_safety=args.mos / 100.0,
         tranches=args.tranches,
         step=args.step / 100.0,
@@ -152,7 +153,10 @@ def cmd_value(args):
 
 def cmd_serve(args):
     """Run the live valuation web app (type a symbol -> live fetch -> value)."""
+    import os
     from valuation.server import serve
+    if args.av_key:
+        os.environ["ALPHAVANTAGE_API_KEY"] = args.av_key
     serve(host=args.host, port=args.port, open_browser=not args.no_browser)
 
 
@@ -187,7 +191,10 @@ def main(argv=None):
     v.add_argument("--yahoo-symbol", dest="yahoo_symbol",
                    help="force a Yahoo symbol (for non-NSE tickers, e.g. AAPL)")
     v.add_argument("--no-fetch", action="store_true",
-                   help="do not contact Yahoo; use only supplied inputs")
+                   help="do not contact the network; use only supplied inputs")
+    v.add_argument("--av-key", dest="av_key",
+                   help="Alpha Vantage API key to auto-fetch fundamentals when "
+                        "Yahoo is blocked (or set ALPHAVANTAGE_API_KEY)")
     v.add_argument("--json", action="store_true", help="emit the full report as JSON")
     # Fundamentals (per share).
     v.add_argument("--eps", type=float, help="trailing earnings per share")
@@ -237,6 +244,9 @@ def main(argv=None):
                     help="bind address (default 127.0.0.1; use 0.0.0.0 to expose on LAN)")
     sv.add_argument("--no-browser", action="store_true",
                     help="do not open a browser automatically")
+    sv.add_argument("--av-key", dest="av_key",
+                    help="Alpha Vantage API key for auto-fetching fundamentals "
+                         "(applies to every request; or set ALPHAVANTAGE_API_KEY)")
     sv.set_defaults(func=cmd_serve)
 
     args = p.parse_args(argv)
