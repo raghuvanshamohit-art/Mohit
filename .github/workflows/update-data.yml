@@ -1,7 +1,7 @@
 name: Update sector data
 
 # Refreshes output/sector_performance.json from Yahoo Finance every weekday
-# evening (after the NSE close at 15:30 IST) and commits the result.
+# at 7 PM IST (after the NSE close at 15:30 IST) and commits the result.
 #
 # NOTE: GitHub only runs `schedule` triggers from the repository's DEFAULT
 # branch, so this begins firing automatically once merged to `main`. Until
@@ -10,7 +10,7 @@ name: Update sector data
 
 on:
   schedule:
-    - cron: "30 12 * * 1-5"   # 12:30 UTC = 18:00 IST, Mon–Fri
+    - cron: "30 13 * * 1-5"   # 13:30 UTC = 19:00 IST (7 PM), Mon–Fri
   workflow_dispatch:
 
 permissions:

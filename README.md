@@ -138,7 +138,7 @@ Two mechanisms keep it fresh daily:
 1. **GitHub Actions** (`.github/workflows/update-data.yml`) regenerates
    `output/sector_performance.json`, rebuilds `web/screener.html`, sanity-checks
    coverage (≥ 80 % of stocks must fetch), and commits — every weekday at
-   **18:00 IST** (after the NSE close). GitHub only runs scheduled workflows from
+   **7 PM IST** (after the NSE close). GitHub only runs scheduled workflows from
    the **default branch**, so this begins firing once merged to `main`; until
    then, trigger it manually from the repo's **Actions → Update sector data →
    Run workflow**.
