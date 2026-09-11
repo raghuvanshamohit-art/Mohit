@@ -40,6 +40,13 @@ List the full sector → stock mapping (grouped by macro sector, no network):
 python run.py list
 ```
 
+Estimate a stock's **intrinsic (fair) value** and get a **pyramiding buy plan**:
+
+```bash
+python run.py value RELIANCE --eps 55 --bvps 668 --growth 10 --price 1257.5
+python run.py value INFY --eps 65 --growth 10 --capital 100000 --tranches 4
+```
+
 ---
 
 ## What you get
@@ -67,6 +74,86 @@ The web dashboard (`index.html`, and the shareable screener artifact) adds:
 - **Macro filter** (Financials, Energy & Utilities, …), **sort** by any period,
   and **search** across symbol / company / sector / macro.
 - Light / dark theme, responsive down to phone width.
+
+---
+
+## Intrinsic value & pyramiding
+
+Beyond screening *what* has moved, `python run.py value` answers *what a stock is
+worth* and *at which prices to build a position* — the classic value-investing
+pair of **intrinsic value** and a **pyramiding** (scale-in) plan.
+
+```bash
+python run.py value RELIANCE --eps 55 --bvps 668 --growth 10 --dividend 6 \
+    --fair-pe 20 --price 1257.5 --capital 100000 --tranches 4
+```
+
+```
+Intrinsic value estimates:
+  Graham Number                909.20
+  Graham Revised             1,567.50
+  Two-stage DCF              1,024.43
+  Earnings Power               918.63
+  Dividend Discount            330.00
+  ----------------------------------
+  COMPOSITE (median)           918.63     <- robust to any single wild model
+  Best buy price   : 643.04              <- composite discounted 30% (margin of safety)
+  Verdict          : EXPENSIVE — above intrinsic value
+
+Pyramiding plan — value_accumulate:
+  Lvl         Price   Weight   Disc%   Shares          Cost
+  1          643.04    10.0%     30%       15      9,645.60
+  2          551.18    20.0%     40%       36     19,842.48
+  3          459.31    30.0%     50%       65     29,855.15
+  4          367.45    40.0%     60%      108     39,684.60
+  Avg entry price      : 459.31    Effective MoS at avg : 50.0%
+  Stop-loss            : 330.70    Planned position     : 224 shares
+```
+
+### Intrinsic value — five models, blended
+
+Each model runs only when its inputs are present, and the **composite** is the
+**median** of whatever ran (so one runaway estimate can't dominate):
+
+| Model | Formula | Needs |
+|---|---|---|
+| **Graham Number** | √(22.5 × EPS × BVPS) | positive EPS + book value |
+| **Graham revised** | EPS × (8.5 + 2g) × 4.4 / Y | EPS + growth (+ bond yield Y) |
+| **Two-stage DCF** | discounted FCF/share (or EPS), then Gordon terminal | cash flow + growth + discount |
+| **Earnings power** | forward EPS × exit P/E, discounted back | EPS + growth + exit P/E |
+| **Gordon DDM** | D₁ / (r − g) | a dividend + growth < discount |
+
+The **best buy price** = composite × (1 − *margin of safety*), Graham's classic
+30 % discount by default (`--mos`).
+
+### Pyramiding — a laddered scale-in
+
+Pyramiding means entering in tranches instead of one lump. Two modes:
+
+- **`--mode value`** (default) — *accumulate below fair value*. Buy the first
+  tranche at the margin-of-safety discount and each further tranche `--step`
+  deeper, committing **more** the cheaper (and safer) it gets. The tool reports
+  the blended average entry, the effective margin of safety there, a stop-loss,
+  and — with `--capital` — whole-share sizing per tranche.
+- **`--mode trend`** — *classic add-to-winner*. Start at the current price and
+  add as it rises, each add **smaller** than the last, with a stop trailing up.
+
+Supply fundamentals as flags (rates are percentages); a bare symbol auto-fetches
+the **current price** from Yahoo's chart endpoint, and best-effort fetches
+fundamentals from Yahoo's `quoteSummary` where the exchange allows it (it often
+blocks cloud IPs, in which case pass `--eps`, `--bvps`, `--growth`, … yourself —
+the report labels every input `supplied` / `yahoo` / `chart` / `default`). Add
+`--json` for a machine-readable report, or `--no-fetch` to stay fully offline.
+
+### Browser calculator
+
+`web/valuation.html` is a **self-contained** version of the same maths — open it
+(or serve it with `python -m http.server`) and tweak inputs to watch the fair
+value, verdict and pyramid ladder update live. It runs entirely in the browser,
+matches the dashboard's light/dark theme, and sends nothing anywhere.
+
+*Intrinsic value is an estimate; it is only as good as the growth and
+discount-rate assumptions fed in. Nothing here is investment advice.*
 
 ---
 
@@ -160,13 +247,22 @@ the workflow refuses to commit a partial pull.
 
 ```
 Mohit/
-├── run.py                       # CLI: generate / show / list
+├── run.py                       # CLI: generate / show / list / value
 ├── index.html                   # web dashboard (reads output/sector_performance.json)
 ├── output/
 │   └── sector_performance.json  # generated dataset (a snapshot is committed)
+├── valuation/                   # intrinsic value + pyramiding engine
+│   ├── intrinsic.py             # 5 fair-value models + composite
+│   ├── pyramid.py               # value / trend pyramiding ladders
+│   ├── fundamentals.py          # best-effort Yahoo fundamentals fetch
+│   ├── engine.py                # orchestrates fetch → intrinsic → pyramid
+│   └── report.py                # terminal report formatter
+├── tests/
+│   └── test_valuation.py        # unittest suite (no network)
 ├── web/
 │   ├── screener_template.html   # artifact template (/*__DATA__*/ placeholder)
-│   └── screener.html            # standalone artifact page (data embedded)
+│   ├── screener.html            # standalone artifact page (data embedded)
+│   └── valuation.html           # self-contained intrinsic-value / pyramid calculator
 ├── scripts/
 │   └── build_artifact.py        # builds web/screener.html from template + data
 ├── .github/workflows/

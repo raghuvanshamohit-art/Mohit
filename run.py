@@ -7,6 +7,12 @@ Examples:
     python run.py show                      # print a summary table from the JSON
     python run.py show --sector it          # print one sector's stocks
     python run.py list                       # list all sectors and constituents
+
+    # Intrinsic value + pyramiding plan for a single stock:
+    python run.py value RELIANCE                       # auto-fetch what it can
+    python run.py value RELIANCE --eps 55 --bvps 668 --growth 10 --price 1257.5
+    python run.py value INFY --eps 65 --growth 10 --capital 100000 --tranches 4
+    python run.py value TCS --eps 130 --growth 8 --mode trend --price 3200
 """
 
 from __future__ import annotations
@@ -101,6 +107,49 @@ def cmd_show(args):
         print(f"{label:<28}" + "".join(_fmt(avg.get(k)) for k in PERIOD_KEYS))
 
 
+def cmd_value(args):
+    """Intrinsic value + pyramiding plan for one stock."""
+    from valuation.engine import value_stock
+    from valuation.report import format_report
+
+    # Classic trend pyramids taper each add (decreasing); value ladders widen
+    # as they get cheaper (increasing). Honor an explicit --weighting either way.
+    weighting = args.weighting
+    if weighting is None:
+        weighting = "decreasing" if args.mode == "trend" else "increasing"
+
+    rep = value_stock(
+        symbol=args.symbol,
+        auto=not args.no_fetch,
+        yahoo_symbol=args.yahoo_symbol,
+        margin_of_safety=args.mos / 100.0,
+        tranches=args.tranches,
+        step=args.step / 100.0,
+        weighting=weighting,
+        capital=args.capital,
+        stop_pct=args.stop / 100.0,
+        pyramid_mode=args.mode,
+        trend_entry=args.trend_entry,
+        # fundamental overrides (None means "not supplied")
+        eps=args.eps,
+        book_value_per_share=args.bvps,
+        fcf_per_share=args.fcf,
+        dividend_per_share=args.dividend,
+        growth_rate=None if args.growth is None else args.growth / 100.0,
+        terminal_growth=None if args.terminal_growth is None else args.terminal_growth / 100.0,
+        discount_rate=None if args.discount is None else args.discount / 100.0,
+        years=args.years,
+        fair_pe=args.fair_pe,
+        bond_yield=args.bond_yield,
+        current_price=args.price,
+    )
+
+    if args.json:
+        print(json.dumps(rep, indent=2))
+    else:
+        print(format_report(rep))
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description="Indian sector & stock performance")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -120,6 +169,55 @@ def main(argv=None):
     s.add_argument("--sort", default="12m", choices=PERIOD_KEYS,
                    help="period to sort by (default 12m)")
     s.set_defaults(func=cmd_show)
+
+    v = sub.add_parser(
+        "value",
+        help="intrinsic value + pyramiding plan for one stock",
+        description="Estimate a stock's intrinsic (fair) value and build a "
+                    "pyramiding buy plan. Supply fundamentals as flags; a symbol "
+                    "auto-fetches the current price (and fundamentals where Yahoo "
+                    "allows it). Rates are entered as percentages.")
+    v.add_argument("symbol", nargs="?", help="NSE symbol (RELIANCE) or Yahoo symbol")
+    v.add_argument("--yahoo-symbol", dest="yahoo_symbol",
+                   help="force a Yahoo symbol (for non-NSE tickers, e.g. AAPL)")
+    v.add_argument("--no-fetch", action="store_true",
+                   help="do not contact Yahoo; use only supplied inputs")
+    v.add_argument("--json", action="store_true", help="emit the full report as JSON")
+    # Fundamentals (per share).
+    v.add_argument("--eps", type=float, help="trailing earnings per share")
+    v.add_argument("--bvps", type=float, help="book value per share")
+    v.add_argument("--fcf", type=float, help="free cash flow per share")
+    v.add_argument("--dividend", type=float, help="trailing dividend per share")
+    v.add_argument("--price", type=float, help="override the current market price")
+    # Assumptions (percentages, except years / PE).
+    v.add_argument("--growth", type=float, help="expected annual growth %% (e.g. 10)")
+    v.add_argument("--terminal-growth", dest="terminal_growth", type=float,
+                   help="perpetual growth %% after the horizon (default 3)")
+    v.add_argument("--discount", type=float,
+                   help="discount / required-return %% (default 12)")
+    v.add_argument("--years", type=int, help="projection horizon in years (default 10)")
+    v.add_argument("--fair-pe", dest="fair_pe", type=float,
+                   help="exit P/E for the earnings-power model")
+    v.add_argument("--bond-yield", dest="bond_yield", type=float,
+                   help="AAA bond yield %% for Graham revised (default 4.4)")
+    v.add_argument("--mos", type=float, default=30.0,
+                   help="margin of safety %% (default 30)")
+    # Pyramid options.
+    v.add_argument("--mode", choices=["value", "trend"], default="value",
+                   help="value = accumulate below fair value; trend = add to a winner")
+    v.add_argument("--tranches", type=int, default=3, help="number of buy levels")
+    v.add_argument("--step", type=float, default=10.0,
+                   help="%% gap between tranches (default 10)")
+    v.add_argument("--weighting", choices=["increasing", "equal", "decreasing"],
+                   default=None,
+                   help="tranche size scheme (default: increasing for value, "
+                        "decreasing for trend)")
+    v.add_argument("--capital", type=float, help="budget to size whole-share tranches")
+    v.add_argument("--stop", type=float, default=10.0,
+                   help="stop-loss %% below the last tranche (default 10)")
+    v.add_argument("--trend-entry", dest="trend_entry", type=float,
+                   help="base entry for --mode trend (default current price)")
+    v.set_defaults(func=cmd_value)
 
     args = p.parse_args(argv)
     args.func(args)
