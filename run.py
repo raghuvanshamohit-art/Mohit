@@ -25,8 +25,8 @@ PERIOD_KEYS = ["3m", "6m", "9m", "12m"]
 
 def _fmt(v):
     if v is None:
-        return "    -  "
-    return f"{v:+7.2f}"
+        return f"{'-':>9}"
+    return f"{v:+9.2f}"
 
 
 def cmd_generate(args):
@@ -34,8 +34,12 @@ def cmd_generate(args):
 
 
 def cmd_list(args):
+    current_macro = None
     for sec in sectors_mod.all_sectors():
-        print(f"\n{sec.name}  ({sec.nse_index})  [{len(sec.stocks)} stocks]")
+        if sec.macro != current_macro:
+            current_macro = sec.macro
+            print(f"\n=== {current_macro.upper()} ===")
+        print(f"\n{sec.name}  [{len(sec.stocks)} stocks]")
         for st in sec.stocks:
             print(f"    {st.symbol:<12} {st.name}")
     total = len(sectors_mod.unique_symbols())
@@ -65,7 +69,7 @@ def cmd_show(args):
         if not sec:
             print(f"Unknown sector '{args.sector}'.", file=sys.stderr)
             sys.exit(1)
-        print(f"{sec['name']}  ({sec['nse_index']})")
+        print(f"{sec['name']}  ({sec['macro']})")
         print(header)
         print("-" * len(header))
         stocks = [s for s in sec["stocks"]]

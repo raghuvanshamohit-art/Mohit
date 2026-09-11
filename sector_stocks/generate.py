@@ -76,7 +76,7 @@ def build(max_workers: int = 8, progress=True) -> dict:
         out_sectors.append({
             "key": sec.key,
             "name": sec.name,
-            "nse_index": sec.nse_index,
+            "macro": sec.macro,
             "num_stocks": len(members),
             "num_ok": len(ok_members),
             "average_returns": average_returns(ok_members),
@@ -87,10 +87,11 @@ def build(max_workers: int = 8, progress=True) -> dict:
         "meta": {
             "generated_at": now.strftime("%Y-%m-%d %H:%M:%S UTC"),
             "price_source": "Yahoo Finance (adjusted close)",
-            "sector_source": "NSE sectoral indices",
+            "sector_source": "NSE industry classification (72 industry groups)",
             "periods_months": PERIODS,
             "return_type": "Adjusted-close price return (total return incl. splits & dividends)",
             "sector_aggregate": "Equal-weighted average of constituent returns",
+            "macros": sectors_mod.MACROS,
             "num_sectors": len(out_sectors),
             "num_unique_stocks": len(symbols),
             "num_ok": ok,
