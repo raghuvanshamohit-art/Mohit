@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Indian Sectors &amp; Stock Performance</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --panel: #ffffff; --border: #e3e6ea; --text: #1a1d21;
+    --muted: #667085; --accent: #2563eb;
+    --pos: #067647; --pos-bg: #ecfdf3; --neg: #b42318; --neg-bg: #fef3f2;
+    --row-alt: #fafbfc; --shadow: 0 1px 3px rgba(16,24,40,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root[data-theme="auto"] {
+      --bg: #0b0e14; --panel: #141922; --border: #232a36; --text: #e6e9ef;
+      --muted: #93a0b4; --accent: #6ea8ff;
+      --pos: #4ade80; --pos-bg: #0f2a1c; --neg: #f87171; --neg-bg: #2a1315;
+      --row-alt: #10151d; --shadow: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0b0e14; --panel: #141922; --border: #232a36; --text: #e6e9ef;
+    --muted: #93a0b4; --accent: #6ea8ff;
+    --pos: #4ade80; --pos-bg: #0f2a1c; --neg: #f87171; --neg-bg: #2a1315;
+    --row-alt: #10151d; --shadow: none;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 24px 18px 64px; }
+  header h1 { margin: 0 0 4px; font-size: 26px; letter-spacing: -.02em; }
+  header p { margin: 2px 0; color: var(--muted); font-size: 13.5px; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    margin: 20px 0 8px; position: sticky; top: 0; z-index: 5;
+    background: linear-gradient(var(--bg) 78%, transparent); padding: 8px 0; }
+  .toolbar input, .toolbar select {
+    background: var(--panel); color: var(--text); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 11px; font-size: 14px; }
+  .toolbar input { flex: 1 1 220px; min-width: 160px; }
+  .toolbar label { color: var(--muted); font-size: 13px; }
+  .spacer { flex: 1; }
+  button.theme { background: var(--panel); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px;
+    cursor: pointer; font-size: 14px; }
+  .macrohead { margin: 26px 2px 6px; font-size: 12px; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border);
+    padding-bottom: 6px; }
+  .panel { background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; box-shadow: var(--shadow); margin: 10px 0; overflow: hidden; }
+  .panel > h2 { margin: 0; padding: 13px 16px; font-size: 15.5px; cursor: pointer;
+    display: flex; align-items: center; gap: 10px; user-select: none; }
+  .panel > h2 .idx { color: var(--muted); font-weight: 500; font-size: 12px;
+    border: 1px solid var(--border); padding: 2px 8px; border-radius: 999px; }
+  .panel > h2 .caret { color: var(--muted); font-size: 12px; transition: transform .15s; }
+  .panel.collapsed > h2 .caret { transform: rotate(-90deg); }
+  .panel > h2 .lead { margin-left: auto; font-variant-numeric: tabular-nums; font-weight: 700; font-size: 13.5px; }
+  .panel .body { border-top: 1px solid var(--border); overflow-x: auto; }
+  .panel.collapsed .body { display: none; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: right; padding: 9px 12px; white-space: nowrap; }
+  th:nth-child(1), td:nth-child(1), th:nth-child(2), td:nth-child(2) { text-align: left; }
+  thead th { color: var(--muted); font-weight: 600; font-size: 12px;
+    text-transform: uppercase; letter-spacing: .04em; cursor: pointer;
+    border-bottom: 1px solid var(--border); background: var(--panel); }
+  thead th.sorted::after { content: " ▾"; color: var(--accent); }
+  tbody tr:nth-child(even) { background: var(--row-alt); }
+  td.sym { font-weight: 600; }
+  td.name { color: var(--muted); max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
+  .pct { font-variant-numeric: tabular-nums; font-weight: 600; border-radius: 6px;
+    padding: 2px 7px; display: inline-block; min-width: 62px; text-align: right; }
+  .pct.pos { color: var(--pos); background: var(--pos-bg); }
+  .pct.neg { color: var(--neg); background: var(--neg-bg); }
+  .pct.na { color: var(--muted); background: transparent; font-weight: 500; }
+  tr.avg td { border-top: 2px solid var(--border); font-weight: 700; background: transparent; }
+  tr.avg td.sym { text-transform: uppercase; letter-spacing: .03em; font-size: 12px; color: var(--muted); }
+  .flag { color: var(--muted); font-size: 11px; margin-left: 6px; }
+  .overview td.name { color: var(--text); font-weight: 600; cursor: pointer; }
+  .overview td.name:hover { color: var(--accent); }
+  .note { color: var(--muted); font-size: 12.5px; margin: 14px 2px; }
+  .err { background: var(--neg-bg); color: var(--neg); padding: 16px;
+    border-radius: 10px; border: 1px solid var(--border); }
+  code { background: var(--row-alt); border: 1px solid var(--border);
+    padding: 1px 6px; border-radius: 5px; font-size: 12.5px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Indian Sectors &amp; Stock Performance</h1>
+    <p id="meta">Loading…</p>
+    <p>72 industry groups (NSE macro → sector → industry classification); prices &amp; returns from
+       <strong>Yahoo Finance</strong> (adjusted close). Growth % over 3 / 6 / 9 / 12 months.</p>
+  </header>
+
+  <div class="toolbar">
+    <input id="search" type="search" placeholder="Filter stocks or sectors (e.g. HDFC, defence, cement)…" autocomplete="off">
+    <span class="spacer"></span>
+    <label for="macrosel">Macro</label>
+    <select id="macrosel"><option value="">All</option></select>
+    <label for="sortsel">Sort</label>
+    <select id="sortsel">
+      <option value="12m">12M</option><option value="9m">9M</option>
+      <option value="6m">6M</option><option value="3m">3M</option><option value="name">Name</option>
+    </select>
+    <button class="theme" id="themebtn" title="Toggle theme">◐ Theme</button>
+  </div>
+
+  <div id="root"></div>
+  <p class="note" id="disclaimer"></p>
+</div>
+
+<script>
+const PERIODS = ["3m","6m","9m","12m"];
+const state = { data: null, sort: "12m", q: "", macro: "", collapsed: new Set(), open: new Set() };
+
+const fmt = v => v==null ? '<span class="pct na">—</span>'
+  : `<span class="pct ${v>=0?'pos':'neg'}">${v>=0?'+':''}${v.toFixed(2)}%</span>`;
+
+function flag(st){
+  if(!st.ok) return "";
+  const h = st.history_days||0;
+  return h<340 ? `<span class="flag" title="Only ${Math.round(h)} days of history (recent listing/demerger) — long-period figures partial">⚠${Math.round(h)}d</span>` : "";
+}
+function sortStocks(list, key){
+  const a = list.slice();
+  if(key==="name") a.sort((x,y)=>(x.name||"").localeCompare(y.name||""));
+  else a.sort((x,y)=>{ const xv=x.returns?.[key], yv=y.returns?.[key];
+    if(xv==null) return 1; if(yv==null) return -1; return yv-xv; });
+  return a;
+}
+function stockRow(st){
+  const cells = PERIODS.map(p=>`<td>${fmt(st.returns?.[p])}</td>`).join("");
+  const price = st.ok && st.price!=null ? "₹"+st.price.toLocaleString("en-IN") : "—";
+  return `<tr><td class="sym">${st.symbol}${flag(st)}</td>
+    <td class="name" title="${st.long_name||st.name}">${st.name}</td>
+    <td>${price}</td>${cells}</tr>`;
+}
+function thead(){
+  return PERIODS.map(p=>`<th class="${state.sort===p?'sorted':''}" data-sort="${p}">${p.toUpperCase()}</th>`).join("");
+}
+function sectorPanel(sec){
+  const isOpen = state.open.has(sec.key);
+  let stocks = sortStocks(sec.stocks, state.sort);
+  if(state.q){ const q=state.q.toLowerCase();
+    if(!(sec.name.toLowerCase().includes(q) || sec.macro.toLowerCase().includes(q)))
+      stocks = stocks.filter(s=>s.symbol.toLowerCase().includes(q)||(s.name||"").toLowerCase().includes(q)); }
+  const rows = stocks.map(stockRow).join("") || `<tr><td colspan="7" class="name">No matches.</td></tr>`;
+  const avg = sec.average_returns||{};
+  const avgCells = PERIODS.map(p=>`<td>${fmt(avg[p])}</td>`).join("");
+  const lead = avg[state.sort==="name"?"12m":state.sort];
+  const leadHtml = lead==null?"":`<span class="lead" style="color:${lead>=0?'var(--pos)':'var(--neg)'}">${lead>=0?'+':''}${lead.toFixed(2)}%</span>`;
+  return `<section class="panel ${isOpen?'':'collapsed'}" data-key="${sec.key}">
+    <h2 data-toggle="${sec.key}"><span class="caret">▾</span>${sec.name}
+      <span class="idx">${sec.num_ok}/${sec.num_stocks}</span>${leadHtml}</h2>
+    <div class="body"><table>
+      <thead><tr><th data-sort="name">Symbol</th><th>Company</th><th>Price</th>${thead()}</tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr class="avg"><td class="sym">Avg</td><td class="name">Equal-weighted sector average</td><td></td>${avgCells}</tr></tfoot>
+    </table></div></section>`;
+}
+function overviewPanel(sectors){
+  const key = state.sort==="name"?"12m":state.sort;
+  const secs = sectors.slice().sort((a,b)=>{
+    if(state.sort==="name") return a.name.localeCompare(b.name);
+    const av=a.average_returns[key], bv=b.average_returns[key];
+    if(av==null) return 1; if(bv==null) return -1; return bv-av; });
+  const rows = secs.map((s,i)=>{
+    const cells = PERIODS.map(p=>`<td>${fmt(s.average_returns[p])}</td>`).join("");
+    return `<tr><td class="sym">${i+1}</td><td class="name" data-goto="${s.key}">${s.name}</td>
+      <td style="color:var(--muted)">${s.macro}</td>${cells}</tr>`;
+  }).join("");
+  const open = state.open.has("__ov");
+  return `<section class="panel overview ${open?'':'collapsed'}" data-key="__ov">
+    <h2 data-toggle="__ov"><span class="caret">▾</span>Sector Leaderboard
+      <span class="idx">${sectors.length} sectors · equal-weighted</span></h2>
+    <div class="body"><table>
+      <thead><tr><th>#</th><th>Sector</th><th>Macro</th>${thead()}</tr></thead>
+      <tbody>${rows}</tbody></table></div></section>`;
+}
+function render(){
+  const root = document.getElementById("root");
+  if(!state.data) return;
+  let secs = state.data.sectors;
+  if(state.macro) secs = secs.filter(s=>s.macro===state.macro);
+  if(state.q){ const q=state.q.toLowerCase();
+    secs = secs.filter(s=> s.name.toLowerCase().includes(q) || s.macro.toLowerCase().includes(q)
+      || s.stocks.some(st=>st.symbol.toLowerCase().includes(q)||(st.name||"").toLowerCase().includes(q))); }
+  let html = overviewPanel(secs);
+  let curMacro = null;
+  for(const s of secs){
+    if(s.macro!==curMacro){ curMacro=s.macro; html += `<div class="macrohead">${curMacro}</div>`; }
+    html += sectorPanel(s);
+  }
+  root.innerHTML = html || `<p class="note">No sectors match.</p>`;
+}
+function wire(){
+  document.getElementById("root").addEventListener("click", e=>{
+    const t=e.target.closest("[data-toggle]");
+    if(t){ const k=t.getAttribute("data-toggle");
+      state.open.has(k)?state.open.delete(k):state.open.add(k); render(); return; }
+    const g=e.target.closest("[data-goto]");
+    if(g){ const k=g.getAttribute("data-goto"); state.open.add(k); render();
+      const el=document.querySelector(`.panel[data-key="${k}"]`);
+      if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); return; }
+    const th=e.target.closest("th[data-sort]");
+    if(th){ state.sort=th.getAttribute("data-sort");
+      document.getElementById("sortsel").value=state.sort; render(); }
+  });
+  document.getElementById("search").addEventListener("input", e=>{ state.q=e.target.value.trim(); render(); });
+  document.getElementById("sortsel").addEventListener("change", e=>{ state.sort=e.target.value; render(); });
+  document.getElementById("macrosel").addEventListener("change", e=>{ state.macro=e.target.value; render(); });
+  document.getElementById("themebtn").addEventListener("click", ()=>{
+    const h=document.documentElement, c=h.getAttribute("data-theme");
+    h.setAttribute("data-theme", c==="dark"?"light":(c==="light"?"auto":"dark")); });
+}
+function applyMeta(m){
+  document.getElementById("meta").innerHTML =
+    `Generated <strong>${m.generated_at}</strong> · ${m.num_sectors} sectors · ${m.num_ok}/${m.num_unique_stocks} stocks with live data`;
+  document.getElementById("disclaimer").innerHTML =
+    `${m.return_type}. Sector figures are the ${m.sector_aggregate.toLowerCase()} (not an official free-float index return). `+
+    `Rows marked ⚠ have limited history (recent listing/merger/demerger) so longer-period figures are partial. Informational only — not investment advice.`;
+  const sel = document.getElementById("macrosel");
+  (m.macros||[]).forEach(mac=>{ const o=document.createElement("option"); o.value=mac; o.textContent=mac; sel.appendChild(o); });
+}
+async function load(){
+  try{
+    const res = await fetch("output/sector_performance.json", {cache:"no-store"});
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    state.data = await res.json();
+    state.open.add("__ov");
+    applyMeta(state.data.meta);
+    render();
+  }catch(err){
+    document.getElementById("root").innerHTML =
+      `<div class="err"><strong>Could not load data.</strong><br>
+       Generate it with <code>python run.py generate</code>, then serve this page
+       (browsers block <code>fetch</code> over <code>file://</code>):<br><br>
+       <code>python -m http.server 8000</code> → open <code>http://localhost:8000/</code><br><br>
+       <span style="color:var(--muted)">(${err.message})</span></div>`;
+    document.getElementById("meta").textContent = "No data loaded.";
+  }
+}
+wire(); load();
+</script>
+</body>
+</html>

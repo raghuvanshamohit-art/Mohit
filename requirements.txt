@@ -1,0 +1,8 @@
+# The core tool uses ONLY the Python standard library (urllib, json, concurrent
+# futures) — there is nothing to install to run `python run.py`.
+#
+# This file is kept for convenience / optional tooling only.
+#
+# Optional: if you prefer the `yfinance` library instead of the bundled
+# stdlib Yahoo client, install it and adapt sector_stocks/yahoo.py.
+# yfinance>=0.2.40
