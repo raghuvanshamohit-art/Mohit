@@ -288,7 +288,8 @@ async function run(ev) {
     const rep = await resp.json();
     if (rep.error) { showStatus(rep.error, true); return; }
     render(rep);
-    hideStatus();
+    // Keep the guidance banner visible when the valuation is incomplete.
+    if (rep.intrinsic && rep.intrinsic.composite != null) hideStatus();
   } catch (e) {
     showStatus("Request failed: " + e.message + ". Is the local server running?", true);
   } finally {
@@ -354,6 +355,19 @@ function render(rep) {
     ["oComposite","oBest","oUpside"].forEach(x => $(x).textContent = "—");
     ["oRange","oMos"].forEach(x => $(x).textContent = "");
     $("oVerdict").textContent = "";
+    // Actionable guidance: got a price but couldn't auto-fetch fundamentals here.
+    const hasPrice = rep.stock.current_price != null;
+    if (hasPrice) {
+      showStatus(`✓ Live price ${money(rep.stock.current_price)} fetched for ` +
+        `<b>${rep.stock.symbol}</b>. Couldn't auto-fetch fundamentals on this network — ` +
+        `enter <b>EPS</b> below (plus book value / growth for more models), then press ` +
+        `<b>Value stock</b>.`, false);
+    } else {
+      showStatus(`Couldn't fetch data for <b>${rep.stock.symbol}</b>. Check the symbol — ` +
+        `NSE names work bare (TCS); other markets need the full Yahoo symbol (AAPL, TATASTEEL.BO).`, true);
+    }
+    const det = document.querySelector("details.assumptions");
+    if (det && hasPrice) { det.open = true; setTimeout(() => $("eps").focus(), 50); }
   }
 
   renderPyramid(rep.pyramid);

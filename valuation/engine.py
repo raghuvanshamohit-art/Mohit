@@ -50,7 +50,8 @@ def _reliable_price(yahoo_symbol: str):
     """Latest adjusted close from the reliable chart endpoint, or None."""
     try:
         from sector_stocks.yahoo import fetch_series
-        series = fetch_series(yahoo_symbol, rng="1mo")
+        # Snappy: 2 attempts / short timeout so a typo doesn't hang the request.
+        series = fetch_series(yahoo_symbol, rng="1mo", retries=2, timeout=10)
         return round(series.closes[-1], 2), series.currency, series.long_name
     except Exception:  # noqa: BLE001 - price is best-effort too
         return None, "", ""

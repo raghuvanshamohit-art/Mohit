@@ -37,6 +37,11 @@ _HEADERS = {
 _HOSTS = ["https://query1.finance.yahoo.com", "https://query2.finance.yahoo.com"]
 _MODULES = "defaultKeyStatistics,financialData,summaryDetail,earningsTrend,price"
 
+# Keep the fetch snappy: fundamentals are best-effort and Yahoo returns 401
+# instantly when it blocks (cloud IPs), so a short, low-backoff loop fails fast
+# instead of hanging the request for ~20 s before falling back to manual inputs.
+_RETRY_SLEEP = 0.5  # seconds between attempts (× the 1-based attempt number)
+
 
 class FundamentalsError(Exception):
     """Raised when Yahoo fundamentals cannot be fetched (blocked, missing, etc.)."""
@@ -108,20 +113,20 @@ def _raw_quote_summary(symbol: str, retries: int, timeout: int) -> dict:
         except urllib.error.HTTPError as exc:
             last_err = exc
             if exc.code in (401, 429, 500, 502, 503, 504):
-                time.sleep(1.5 * (attempt + 1))
+                time.sleep(_RETRY_SLEEP * (attempt + 1))
                 continue
             raise FundamentalsError(f"{symbol}: HTTP {exc.code}") from exc
         except (urllib.error.URLError, TimeoutError, ConnectionError,
                 json.JSONDecodeError, FundamentalsError) as exc:
             last_err = exc
-            time.sleep(1.5 * (attempt + 1))
+            time.sleep(_RETRY_SLEEP * (attempt + 1))
             continue
     raise FundamentalsError(
         f"{symbol}: fundamentals unavailable after {retries} attempts "
         f"(Yahoo often blocks quoteSummary from cloud IPs) — last error: {last_err}")
 
 
-def fetch_fundamentals(symbol: str, retries: int = 4, timeout: int = 20) -> Fundamentals:
+def fetch_fundamentals(symbol: str, retries: int = 2, timeout: int = 8) -> Fundamentals:
     """Return a :class:`Fundamentals` populated from Yahoo, or raise on failure.
 
     ``symbol`` is a Yahoo symbol (e.g. ``RELIANCE.NS``). Each field is tagged in
