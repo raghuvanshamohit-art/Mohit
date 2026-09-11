@@ -1,0 +1,4617 @@
+{
+  "meta": {
+    "generated_at": "2026-09-11 02:20:31 UTC",
+    "price_source": "Yahoo Finance (adjusted close)",
+    "sector_source": "NSE sectoral indices",
+    "periods_months": [
+      3,
+      6,
+      9,
+      12
+    ],
+    "return_type": "Adjusted-close price return (total return incl. splits & dividends)",
+    "sector_aggregate": "Equal-weighted average of constituent returns",
+    "num_sectors": 15,
+    "num_unique_stocks": 160,
+    "num_ok": 160,
+    "num_failed": 0,
+    "failed_symbols": []
+  },
+  "sectors": [
+    {
+      "key": "bank",
+      "name": "Bank",
+      "nse_index": "NIFTY BANK",
+      "num_stocks": 12,
+      "num_ok": 12,
+      "average_returns": {
+        "3m": 4.7,
+        "6m": 3.2,
+        "9m": 1.78,
+        "12m": 19.25
+      },
+      "stocks": [
+        {
+          "price": 693.8,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -5.57,
+            "6m": -16.97,
+            "9m": -28.75,
+            "12m": -26.98
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "HDFCBANK",
+          "yahoo_symbol": "HDFCBANK.NS",
+          "name": "HDFC Bank",
+          "long_name": "HDFC Bank Limited",
+          "ok": true
+        },
+        {
+          "price": 1384.5,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 7.95,
+            "6m": 6.42,
+            "9m": 2.39,
+            "12m": -0.55
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "ICICIBANK",
+          "yahoo_symbol": "ICICIBANK.NS",
+          "name": "ICICI Bank",
+          "long_name": "ICICI Bank Limited",
+          "ok": true
+        },
+        {
+          "price": 1009.7,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 0.64,
+            "6m": -7.58,
+            "9m": 7.1,
+            "12m": 25.63
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "SBIN",
+          "yahoo_symbol": "SBIN.NS",
+          "name": "State Bank of India",
+          "long_name": "State Bank of India",
+          "ok": true
+        },
+        {
+          "price": 416.55,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 7.52,
+            "6m": 6.49,
+            "9m": -2.03,
+            "12m": 5.73
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "KOTAKBANK",
+          "yahoo_symbol": "KOTAKBANK.NS",
+          "name": "Kotak Mahindra Bank",
+          "long_name": "Kotak Mahindra Bank Limited",
+          "ok": true
+        },
+        {
+          "price": 1246.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -5.14,
+            "6m": -5.15,
+            "9m": -2.47,
+            "12m": 16.53
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "AXISBANK",
+          "yahoo_symbol": "AXISBANK.NS",
+          "name": "Axis Bank",
+          "long_name": "Axis Bank Limited",
+          "ok": true
+        },
+        {
+          "price": 993.3,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 12.55,
+            "6m": 10.71,
+            "9m": 19.32,
+            "12m": 32.43
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "INDUSINDBK",
+          "yahoo_symbol": "INDUSINDBK.NS",
+          "name": "IndusInd Bank",
+          "long_name": "IndusInd Bank Limited",
+          "ok": true
+        },
+        {
+          "price": 237.62,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -11.76,
+            "6m": -16.68,
+            "9m": -14.26,
+            "12m": 3.07
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "BANKBARODA",
+          "yahoo_symbol": "BANKBARODA.NS",
+          "name": "Bank of Baroda",
+          "long_name": "Bank of Baroda Limited",
+          "ok": true
+        },
+        {
+          "price": 116.85,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 12.2,
+            "6m": 2.31,
+            "9m": 2.64,
+            "12m": 13.16
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "PNB",
+          "yahoo_symbol": "PNB.NS",
+          "name": "Punjab National Bank",
+          "long_name": "Punjab National Bank",
+          "ok": true
+        },
+        {
+          "price": 86.84,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 19.32,
+            "6m": 29.47,
+            "9m": 8.44,
+            "12m": 19.82
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "IDFCFIRSTB",
+          "yahoo_symbol": "IDFCFIRSTB.NS",
+          "name": "IDFC First Bank",
+          "long_name": "IDFC First Bank Limited",
+          "ok": true
+        },
+        {
+          "price": 1060.5,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 10.67,
+            "6m": 13.11,
+            "9m": 6.83,
+            "12m": 48.72
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "AUBANK",
+          "yahoo_symbol": "AUBANK.NS",
+          "name": "AU Small Finance Bank",
+          "long_name": "AU Small Finance Bank Limited",
+          "ok": true
+        },
+        {
+          "price": 346.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 11.6,
+            "6m": 25.79,
+            "9m": 33.74,
+            "12m": 77.06
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "FEDERALBNK",
+          "yahoo_symbol": "FEDERALBNK.NS",
+          "name": "Federal Bank",
+          "long_name": "The Federal Bank Limited",
+          "ok": true
+        },
+        {
+          "price": 124.6,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -3.56,
+            "6m": -9.53,
+            "9m": -11.58,
+            "12m": 16.33
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "CANBK",
+          "yahoo_symbol": "CANBK.NS",
+          "name": "Canara Bank",
+          "long_name": "Canara Bank",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "key": "it",
+      "name": "Information Technology",
+      "nse_index": "NIFTY IT",
+      "num_stocks": 10,
+      "num_ok": 10,
+      "average_returns": {
+        "3m": 8.15,
+        "6m": 12.5,
+        "9m": -11.89,
+        "12m": -9.68
+      },
+      "stocks": [
+        {
+          "price": 2204.1,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 2.89,
+            "6m": -10.62,
+            "9m": -28.29,
+            "12m": -26.19
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "TCS",
+          "yahoo_symbol": "TCS.NS",
+          "name": "Tata Consultancy Services",
+          "long_name": "Tata Consultancy Services Limited",
+          "ok": true
+        },
+        {
+          "price": 1036.5,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -9.5,
+            "6m": -18.27,
+            "9m": -33.18,
+            "12m": -29.85
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "INFY",
+          "yahoo_symbol": "INFY.NS",
+          "name": "Infosys",
+          "long_name": "Infosys Limited",
+          "ok": true
+        },
+        {
+          "price": 1207.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 7.7,
+            "6m": -8.73,
+            "9m": -24.87,
+            "12m": -13.82
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "HCLTECH",
+          "yahoo_symbol": "HCLTECH.NS",
+          "name": "HCL Technologies",
+          "long_name": "HCL Technologies Limited",
+          "ok": true
+        },
+        {
+          "price": 166.3,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -6.0,
+            "6m": -16.29,
+            "9m": -33.12,
+            "12m": -32.53
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "WIPRO",
+          "yahoo_symbol": "WIPRO.NS",
+          "name": "Wipro",
+          "long_name": "Wipro Limited",
+          "ok": true
+        },
+        {
+          "price": 1525.8,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 5.85,
+            "6m": 17.12,
+            "9m": 0.94,
+            "12m": 3.66
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "TECHM",
+          "yahoo_symbol": "TECHM.NS",
+          "name": "Tech Mahindra",
+          "long_name": "Tech Mahindra Limited",
+          "ok": true
+        },
+        {
+          "price": 4412.0,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 11.86,
+            "6m": 3.42,
+            "9m": -28.12,
+            "12m": -15.42
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "LTM",
+          "yahoo_symbol": "LTM.NS",
+          "name": "LTM (formerly LTIMindtree)",
+          "long_name": "LTM Limited",
+          "ok": true
+        },
+        {
+          "price": 5509.5,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 12.19,
+            "6m": 14.51,
+            "9m": -8.04,
+            "12m": 2.39
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "PERSISTENT",
+          "yahoo_symbol": "PERSISTENT.NS",
+          "name": "Persistent Systems",
+          "long_name": "Persistent Systems Limited",
+          "ok": true
+        },
+        {
+          "price": 1833.1,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 31.29,
+            "6m": 61.66,
+            "9m": 1.42,
+            "12m": 4.61
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "COFORGE",
+          "yahoo_symbol": "COFORGE.NS",
+          "name": "Coforge",
+          "long_name": "Coforge Limited",
+          "ok": true
+        },
+        {
+          "price": 2291.7,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 2.41,
+            "6m": 6.85,
+            "9m": -17.65,
+            "12m": -20.73
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "MPHASIS",
+          "yahoo_symbol": "MPHASIS.NS",
+          "name": "Mphasis",
+          "long_name": "Mphasis Limited",
+          "ok": true
+        },
+        {
+          "price": 11630.0,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 22.81,
+            "6m": 75.31,
+            "9m": 52.01,
+            "12m": 31.13
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "OFSS",
+          "yahoo_symbol": "OFSS.NS",
+          "name": "Oracle Financial Services Software",
+          "long_name": "Oracle Financial Services Software Limited",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "key": "auto",
+      "name": "Automobile",
+      "nse_index": "NIFTY AUTO",
+      "num_stocks": 16,
+      "num_ok": 16,
+      "average_returns": {
+        "3m": 8.64,
+        "6m": 7.09,
+        "9m": 9.07,
+        "12m": 9.72
+      },
+      "stocks": [
+        {
+          "price": 12618.0,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": -2.51,
+            "6m": -8.09,
+            "9m": -20.44,
+            "12m": -15.64
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "MARUTI",
+          "yahoo_symbol": "MARUTI.NS",
+          "name": "Maruti Suzuki India",
+          "long_name": "Maruti Suzuki India Limited",
+          "ok": true
+        },
+        {
+          "price": 3123.8,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 6.91,
+            "6m": -4.16,
+            "9m": -13.04,
+            "12m": -12.42
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "M&M",
+          "yahoo_symbol": "M&M.NS",
+          "name": "Mahindra & Mahindra",
+          "long_name": "Mahindra & Mahindra Limited",
+          "ok": true
+        },
+        {
+          "price": 300.5,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -20.47,
+            "6m": -12.23,
+            "9m": -11.77,
+            "12m": -57.27
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "TMPV",
+          "yahoo_symbol": "TMPV.NS",
+          "name": "Tata Motors Passenger Vehicles",
+          "long_name": "Tata Motors Passenger Vehicles Limited",
+          "ok": true
+        },
+        {
+          "price": 439.25,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 21.73,
+            "6m": -3.25,
+            "9m": 17.58,
+            "12m": 34.83
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 302.0
+          },
+          "history_days": 302.0,
+          "symbol": "TMCV",
+          "yahoo_symbol": "TMCV.NS",
+          "name": "Tata Motors (Commercial Vehicles)",
+          "long_name": "Tata Motors Limited",
+          "ok": true
+        },
+        {
+          "price": 11790.0,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 16.23,
+            "6m": 24.41,
+            "9m": 32.98,
+            "12m": 29.34
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "BAJAJ-AUTO",
+          "yahoo_symbol": "BAJAJ-AUTO.NS",
+          "name": "Bajaj Auto",
+          "long_name": "Bajaj Auto Limited",
+          "ok": true
+        },
+        {
+          "price": 7697.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 7.73,
+            "6m": 3.2,
+            "9m": 7.6,
+            "12m": 13.77
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "EICHERMOT",
+          "yahoo_symbol": "EICHERMOT.NS",
+          "name": "Eicher Motors",
+          "long_name": "Eicher Motors Limited",
+          "ok": true
+        },
+        {
+          "price": 5280.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 10.31,
+            "6m": -6.2,
+            "9m": -8.13,
+            "12m": 2.09
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "HEROMOTOCO",
+          "yahoo_symbol": "HEROMOTOCO.NS",
+          "name": "Hero MotoCorp",
+          "long_name": "Hero MotoCorp Limited",
+          "ok": true
+        },
+        {
+          "price": 4151.1,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 24.47,
+            "6m": 10.05,
+            "9m": 15.5,
+            "12m": 19.18
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "TVSMOTOR",
+          "yahoo_symbol": "TVSMOTOR.NS",
+          "name": "TVS Motor Company",
+          "long_name": "TVS Motor Company Limited",
+          "ok": true
+        },
+        {
+          "price": 167.0,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 17.99,
+            "6m": -12.25,
+            "9m": 7.49,
+            "12m": 27.6
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "ASHOKLEY",
+          "yahoo_symbol": "ASHOKLEY.NS",
+          "name": "Ashok Leyland",
+          "long_name": "Ashok Leyland Limited",
+          "ok": true
+        },
+        {
+          "price": 1979.6,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 1.87,
+            "6m": 7.78,
+            "9m": 43.65,
+            "12m": 65.67
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "BHARATFORG",
+          "yahoo_symbol": "BHARATFORG.NS",
+          "name": "Bharat Forge",
+          "long_name": "Bharat Forge Limited",
+          "ok": true
+        },
+        {
+          "price": 49100.0,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 30.78,
+            "6m": 54.06,
+            "9m": 35.78,
+            "12m": 20.53
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "BOSCHLTD",
+          "yahoo_symbol": "BOSCHLTD.NS",
+          "name": "Bosch",
+          "long_name": "Bosch Limited",
+          "ok": true
+        },
+        {
+          "price": 128315.0,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 4.85,
+            "6m": -6.37,
+            "9m": -15.25,
+            "12m": -11.5
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "MRF",
+          "yahoo_symbol": "MRF.NS",
+          "name": "MRF",
+          "long_name": "MRF Limited",
+          "ok": true
+        },
+        {
+          "price": 2208.6,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 6.39,
+            "6m": -1.16,
+            "9m": -4.09,
+            "12m": -6.69
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "BALKRISIND",
+          "yahoo_symbol": "BALKRISIND.NS",
+          "name": "Balkrishna Industries",
+          "long_name": "Balkrishna Industries Limited",
+          "ok": true
+        },
+        {
+          "price": 163.2,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 14.96,
+            "6m": 32.88,
+            "9m": 41.03,
+            "12m": 63.01
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "MOTHERSON",
+          "yahoo_symbol": "MOTHERSON.NS",
+          "name": "Samvardhana Motherson International",
+          "long_name": "Samvardhana Motherson International Limited",
+          "ok": true
+        },
+        {
+          "price": 2678.3,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": -12.49,
+            "6m": 1.35,
+            "9m": 2.06,
+            "12m": -17.1
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "TIINDIA",
+          "yahoo_symbol": "TIINDIA.NS",
+          "name": "Tube Investments of India",
+          "long_name": "Tube Investments of India Limited",
+          "ok": true
+        },
+        {
+          "price": 420.85,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 9.45,
+            "6m": 33.38,
+            "9m": 14.16,
+            "12m": 0.15
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "EXIDEIND",
+          "yahoo_symbol": "EXIDEIND.NS",
+          "name": "Exide Industries",
+          "long_name": "Exide Industries Limited",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "key": "pharma",
+      "name": "Pharmaceuticals",
+      "nse_index": "NIFTY PHARMA",
+      "num_stocks": 11,
+      "num_ok": 11,
+      "average_returns": {
+        "3m": 5.89,
+        "6m": 8.86,
+        "9m": 14.55,
+        "12m": 16.76
+      },
+      "stocks": [
+        {
+          "price": 1864.9,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 4.67,
+            "6m": 3.14,
+            "9m": 5.4,
+            "12m": 18.11
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "SUNPHARMA",
+          "yahoo_symbol": "SUNPHARMA.NS",
+          "name": "Sun Pharmaceutical Industries",
+          "long_name": "Sun Pharmaceutical Industries Limited",
+          "ok": true
+        },
+        {
+          "price": 1143.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -9.55,
+            "6m": -12.5,
+            "9m": -8.04,
+            "12m": -11.8
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "DRREDDY",
+          "yahoo_symbol": "DRREDDY.NS",
+          "name": "Dr. Reddy's Laboratories",
+          "long_name": "Dr. Reddy's Laboratories Limited",
+          "ok": true
+        },
+        {
+          "price": 1373.3,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -0.27,
+            "6m": 3.95,
+            "9m": -7.02,
+            "12m": -11.36
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "CIPLA",
+          "yahoo_symbol": "CIPLA.NS",
+          "name": "Cipla",
+          "long_name": "Cipla Limited",
+          "ok": true
+        },
+        {
+          "price": 9488.0,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 43.51,
+            "6m": 49.52,
+            "9m": 51.36,
+            "12m": 57.96
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "DIVISLAB",
+          "yahoo_symbol": "DIVISLAB.NS",
+          "name": "Divi's Laboratories",
+          "long_name": "Divi's Laboratories Limited",
+          "ok": true
+        },
+        {
+          "price": 2077.8,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -6.87,
+            "6m": -10.46,
+            "9m": 1.82,
+            "12m": 5.72
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "LUPIN",
+          "yahoo_symbol": "LUPIN.NS",
+          "name": "Lupin",
+          "long_name": "Lupin Limited",
+          "ok": true
+        },
+        {
+          "price": 1668.4,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 14.78,
+            "6m": 29.75,
+            "9m": 42.28,
+            "12m": 58.85
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "AUROPHARMA",
+          "yahoo_symbol": "AUROPHARMA.NS",
+          "name": "Aurobindo Pharma",
+          "long_name": "Aurobindo Pharma Limited",
+          "ok": true
+        },
+        {
+          "price": 1127.4,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 2.74,
+            "6m": 22.24,
+            "9m": 22.18,
+            "12m": 8.54
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "ZYDUSLIFE",
+          "yahoo_symbol": "ZYDUSLIFE.NS",
+          "name": "Zydus Lifesciences",
+          "long_name": "Zydus Lifesciences Limited",
+          "ok": true
+        },
+        {
+          "price": 4930.0,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 10.45,
+            "6m": 11.56,
+            "9m": 31.08,
+            "12m": 38.48
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "TORNTPHARM",
+          "yahoo_symbol": "TORNTPHARM.NS",
+          "name": "Torrent Pharmaceuticals",
+          "long_name": "Torrent Pharmaceuticals Limited",
+          "ok": true
+        },
+        {
+          "price": 5138.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -2.87,
+            "6m": -8.36,
+            "9m": -7.32,
+            "12m": -2.48
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "ALKEM",
+          "yahoo_symbol": "ALKEM.NS",
+          "name": "Alkem Laboratories",
+          "long_name": "Alkem Laboratories Limited",
+          "ok": true
+        },
+        {
+          "price": 2435.0,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 13.66,
+            "6m": 9.51,
+            "9m": 24.94,
+            "12m": 14.67
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "GLENMARK",
+          "yahoo_symbol": "GLENMARK.NS",
+          "name": "Glenmark Pharmaceuticals",
+          "long_name": "Glenmark Pharmaceuticals Limited",
+          "ok": true
+        },
+        {
+          "price": 391.65,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -5.42,
+            "6m": -0.93,
+            "9m": 3.42,
+            "12m": 7.67
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "BIOCON",
+          "yahoo_symbol": "BIOCON.NS",
+          "name": "Biocon",
+          "long_name": "Biocon Limited",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "key": "fmcg",
+      "name": "FMCG",
+      "nse_index": "NIFTY FMCG",
+      "num_stocks": 15,
+      "num_ok": 15,
+      "average_returns": {
+        "3m": -3.96,
+        "6m": -4.47,
+        "9m": -7.5,
+        "12m": -11.35
+      },
+      "stocks": [
+        {
+          "price": 1942.3,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -9.56,
+            "6m": -10.42,
+            "9m": -14.76,
+            "12m": -25.19
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "HINDUNILVR",
+          "yahoo_symbol": "HINDUNILVR.NS",
+          "name": "Hindustan Unilever",
+          "long_name": "Hindustan Unilever Limited",
+          "ok": true
+        },
+        {
+          "price": 259.3,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -8.58,
+            "6m": -13.81,
+            "9m": -32.54,
+            "12m": -34.16
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "ITC",
+          "yahoo_symbol": "ITC.NS",
+          "name": "ITC",
+          "long_name": "ITC Limited",
+          "ok": true
+        },
+        {
+          "price": 1386.2,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -3.16,
+            "6m": 12.22,
+            "9m": 15.8,
+            "12m": 15.02
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "NESTLEIND",
+          "yahoo_symbol": "NESTLEIND.NS",
+          "name": "Nestle India",
+          "long_name": "Nestl\u00e9 India Limited",
+          "ok": true
+        },
+        {
+          "price": 410.5,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -21.91,
+            "6m": -5.64,
+            "9m": -12.92,
+            "12m": -13.44
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "VBL",
+          "yahoo_symbol": "VBL.NS",
+          "name": "Varun Beverages",
+          "long_name": "Varun Beverages Limited",
+          "ok": true
+        },
+        {
+          "price": 5009.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -1.52,
+            "6m": -14.67,
+            "9m": -12.63,
+            "12m": -17.85
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "BRITANNIA",
+          "yahoo_symbol": "BRITANNIA.NS",
+          "name": "Britannia Industries",
+          "long_name": "Britannia Industries Limited",
+          "ok": true
+        },
+        {
+          "price": 999.6,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -9.78,
+            "6m": -8.32,
+            "9m": -11.58,
+            "12m": -8.44
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "TATACONSUM",
+          "yahoo_symbol": "TATACONSUM.NS",
+          "name": "Tata Consumer Products",
+          "long_name": "Tata Consumer Products Limited",
+          "ok": true
+        },
+        {
+          "price": 376.45,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -10.88,
+            "6m": -20.7,
+            "9m": -24.12,
+            "12m": -29.98
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "DABUR",
+          "yahoo_symbol": "DABUR.NS",
+          "name": "Dabur India",
+          "long_name": "Dabur India Limited",
+          "ok": true
+        },
+        {
+          "price": 869.9,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -14.88,
+            "6m": -20.92,
+            "9m": -21.9,
+            "12m": -29.41
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "GODREJCP",
+          "yahoo_symbol": "GODREJCP.NS",
+          "name": "Godrej Consumer Products",
+          "long_name": "Godrej Consumer Products Limited",
+          "ok": true
+        },
+        {
+          "price": 813.9,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": -0.28,
+            "6m": 3.51,
+            "9m": 12.81,
+            "12m": 11.31
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "MARICO",
+          "yahoo_symbol": "MARICO.NS",
+          "name": "Marico",
+          "long_name": "Marico Limited",
+          "ok": true
+        },
+        {
+          "price": 1800.0,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": -12.46,
+            "6m": -17.15,
+            "9m": -15.02,
+            "12m": -23.53
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "COLPAL",
+          "yahoo_symbol": "COLPAL.NS",
+          "name": "Colgate-Palmolive (India)",
+          "long_name": "Colgate-Palmolive (India) Limited",
+          "ok": true
+        },
+        {
+          "price": 1266.7,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": -3.89,
+            "6m": -24.85,
+            "9m": -23.18,
+            "12m": -29.07
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "UBL",
+          "yahoo_symbol": "UBL.NS",
+          "name": "United Breweries",
+          "long_name": "United Breweries Limited",
+          "ok": true
+        },
+        {
+          "price": 7615.0,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": -15.04,
+            "6m": -29.01,
+            "9m": -38.1,
+            "12m": -41.16
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "PGHH",
+          "yahoo_symbol": "PGHH.NS",
+          "name": "Procter & Gamble Hygiene",
+          "long_name": "Procter & Gamble Hygiene and Health Care Limited",
+          "ok": true
+        },
+        {
+          "price": 370.85,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -6.08,
+            "6m": -16.61,
+            "9m": -28.64,
+            "12m": -36.95
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "EMAMILTD",
+          "yahoo_symbol": "EMAMILTD.NS",
+          "name": "Emami",
+          "long_name": "Emami Limited",
+          "ok": true
+        },
+        {
+          "price": 4414.0,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 27.23,
+            "6m": 60.14,
+            "9m": 36.85,
+            "12m": 57.43
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "RADICO",
+          "yahoo_symbol": "RADICO.NS",
+          "name": "Radico Khaitan",
+          "long_name": "Radico Khaitan Limited",
+          "ok": true
+        },
+        {
+          "price": 705.15,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 31.42,
+            "6m": 39.23,
+            "9m": 57.49,
+            "12m": 35.22
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "BALRAMCHIN",
+          "yahoo_symbol": "BALRAMCHIN.NS",
+          "name": "Balrampur Chini Mills",
+          "long_name": "Balrampur Chini Mills Limited",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "key": "metal",
+      "name": "Metal",
+      "nse_index": "NIFTY METAL",
+      "num_stocks": 15,
+      "num_ok": 15,
+      "average_returns": {
+        "3m": 10.77,
+        "6m": 20.41,
+        "9m": 35.17,
+        "12m": 42.73
+      },
+      "stocks": [
+        {
+          "price": 186.78,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -4.35,
+            "6m": -2.24,
+            "9m": 17.51,
+            "12m": 12.51
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "TATASTEEL",
+          "yahoo_symbol": "TATASTEEL.NS",
+          "name": "Tata Steel",
+          "long_name": "Tata Steel Limited",
+          "ok": true
+        },
+        {
+          "price": 1014.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -1.93,
+            "6m": 6.55,
+            "9m": 24.04,
+            "12m": 37.16
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "HINDALCO",
+          "yahoo_symbol": "HINDALCO.NS",
+          "name": "Hindalco Industries",
+          "long_name": "Hindalco Industries Limited",
+          "ok": true
+        },
+        {
+          "price": 1304.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 3.28,
+            "6m": 8.0,
+            "9m": 19.57,
+            "12m": 19.1
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "JSWSTEEL",
+          "yahoo_symbol": "JSWSTEEL.NS",
+          "name": "JSW Steel",
+          "long_name": "JSW Steel Limited",
+          "ok": true
+        },
+        {
+          "price": 272.5,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": -8.95,
+            "6m": -61.63,
+            "9m": -47.15,
+            "12m": -36.12
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "VEDL",
+          "yahoo_symbol": "VEDL.NS",
+          "name": "Vedanta",
+          "long_name": "Vedanta Limited",
+          "ok": true
+        },
+        {
+          "price": 3077.2,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 5.03,
+            "6m": 54.2,
+            "9m": 39.2,
+            "12m": 31.55
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "ADANIENT",
+          "yahoo_symbol": "ADANIENT.NS",
+          "name": "Adani Enterprises",
+          "long_name": "Adani Enterprises Limited",
+          "ok": true
+        },
+        {
+          "price": 1146.5,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 2.45,
+            "6m": -3.26,
+            "9m": 13.84,
+            "12m": 10.48
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "JINDALSTEL",
+          "yahoo_symbol": "JINDALSTEL.NS",
+          "name": "Jindal Steel & Power",
+          "long_name": "Jindal Steel Limited",
+          "ok": true
+        },
+        {
+          "price": 593.6,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 8.41,
+            "6m": 2.46,
+            "9m": 17.91,
+            "12m": 39.64
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "HINDZINC",
+          "yahoo_symbol": "HINDZINC.NS",
+          "name": "Hindustan Zinc",
+          "long_name": "Hindustan Zinc Limited",
+          "ok": true
+        },
+        {
+          "price": 183.75,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 1.12,
+            "6m": 22.63,
+            "9m": 42.97,
+            "12m": 41.65
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "SAIL",
+          "yahoo_symbol": "SAIL.NS",
+          "name": "Steel Authority of India",
+          "long_name": "Steel Authority of India Limited",
+          "ok": true
+        },
+        {
+          "price": 84.6,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -4.35,
+            "6m": 6.19,
+            "9m": 17.15,
+            "12m": 15.8
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "NMDC",
+          "yahoo_symbol": "NMDC.NS",
+          "name": "NMDC",
+          "long_name": "NMDC Limited",
+          "ok": true
+        },
+        {
+          "price": 2194.8,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 25.01,
+            "6m": 4.89,
+            "9m": 26.92,
+            "12m": 29.93
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "APLAPOLLO",
+          "yahoo_symbol": "APLAPOLLO.NS",
+          "name": "APL Apollo Tubes",
+          "long_name": "APL Apollo Tubes Limited",
+          "ok": true
+        },
+        {
+          "price": 373.35,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -0.49,
+            "6m": -3.24,
+            "9m": 44.82,
+            "12m": 87.06
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "NATIONALUM",
+          "yahoo_symbol": "NATIONALUM.NS",
+          "name": "National Aluminium",
+          "long_name": "National Aluminium Company Limited",
+          "ok": true
+        },
+        {
+          "price": 762.15,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 15.63,
+            "6m": 6.08,
+            "9m": -2.36,
+            "12m": -1.54
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "JSL",
+          "yahoo_symbol": "JSL.NS",
+          "name": "Jindal Stainless",
+          "long_name": "Jindal Stainless Limited",
+          "ok": true
+        },
+        {
+          "price": 2776.9,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 103.31,
+            "6m": 243.41,
+            "9m": 248.2,
+            "12m": 215.4
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "WELCORP",
+          "yahoo_symbol": "WELCORP.NS",
+          "name": "Welspun Corp",
+          "long_name": "Welspun Corp Limited",
+          "ok": true
+        },
+        {
+          "price": 527.3,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 3.25,
+            "6m": -3.94,
+            "9m": 46.95,
+            "12m": 116.73
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "HINDCOPPER",
+          "yahoo_symbol": "HINDCOPPER.NS",
+          "name": "Hindustan Copper",
+          "long_name": "Hindustan Copper Limited",
+          "ok": true
+        },
+        {
+          "price": 2859.2,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 14.11,
+            "6m": 26.05,
+            "9m": 17.91,
+            "12m": 21.62
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "RATNAMANI",
+          "yahoo_symbol": "RATNAMANI.NS",
+          "name": "Ratnamani Metals & Tubes",
+          "long_name": "Ratnamani Metals & Tubes Limited",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "key": "realty",
+      "name": "Realty",
+      "nse_index": "NIFTY REALTY",
+      "num_stocks": 10,
+      "num_ok": 10,
+      "average_returns": {
+        "3m": 20.74,
+        "6m": 28.97,
+        "9m": 11.12,
+        "12m": 4.16
+      },
+      "stocks": [
+        {
+          "price": 655.85,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 17.91,
+            "6m": 13.61,
+            "9m": -3.03,
+            "12m": -11.96
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "DLF",
+          "yahoo_symbol": "DLF.NS",
+          "name": "DLF",
+          "long_name": "DLF Limited",
+          "ok": true
+        },
+        {
+          "price": 1166.0,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 35.74,
+            "6m": 29.73,
+            "9m": 9.12,
+            "12m": -0.97
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "LODHA",
+          "yahoo_symbol": "LODHA.NS",
+          "name": "Macrotech Developers (Lodha)",
+          "long_name": "Lodha Developers Limited",
+          "ok": true
+        },
+        {
+          "price": 1857.1,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 13.68,
+            "6m": 11.38,
+            "9m": -7.36,
+            "12m": -6.18
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "GODREJPROP",
+          "yahoo_symbol": "GODREJPROP.NS",
+          "name": "Godrej Properties",
+          "long_name": "Godrej Properties Limited",
+          "ok": true
+        },
+        {
+          "price": 1800.0,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 13.22,
+            "6m": 20.76,
+            "9m": 11.08,
+            "12m": 12.23
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "OBEROIRLTY",
+          "yahoo_symbol": "OBEROIRLTY.NS",
+          "name": "Oberoi Realty",
+          "long_name": "Oberoi Realty Limited",
+          "ok": true
+        },
+        {
+          "price": 1885.3,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 6.77,
+            "6m": 17.43,
+            "9m": 8.49,
+            "12m": 20.95
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "PHOENIXLTD",
+          "yahoo_symbol": "PHOENIXLTD.NS",
+          "name": "The Phoenix Mills",
+          "long_name": "The Phoenix Mills Limited",
+          "ok": true
+        },
+        {
+          "price": 1540.4,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 16.14,
+            "6m": 17.98,
+            "9m": -4.7,
+            "12m": -1.25
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "PRESTIGE",
+          "yahoo_symbol": "PRESTIGE.NS",
+          "name": "Prestige Estates Projects",
+          "long_name": "Prestige Estates Projects Limited",
+          "ok": true
+        },
+        {
+          "price": 662.9,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 36.83,
+            "6m": 32.09,
+            "9m": 1.3,
+            "12m": -5.23
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "BRIGADE",
+          "yahoo_symbol": "BRIGADE.NS",
+          "name": "Brigade Enterprises",
+          "long_name": "Brigade Enterprises Limited",
+          "ok": true
+        },
+        {
+          "price": 1229.5,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": -4.8,
+            "6m": -6.89,
+            "9m": -14.71,
+            "12m": -17.48
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "SOBHA",
+          "yahoo_symbol": "SOBHA.NS",
+          "name": "Sobha",
+          "long_name": "Sobha Limited",
+          "ok": true
+        },
+        {
+          "price": 608.85,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 17.43,
+            "6m": 25.65,
+            "9m": 19.84,
+            "12m": 14.45
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "ANANTRAJ",
+          "yahoo_symbol": "ANANTRAJ.NS",
+          "name": "Anant Raj",
+          "long_name": "Anant Raj Limited",
+          "ok": true
+        },
+        {
+          "price": 853.85,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 54.43,
+            "6m": 127.91,
+            "9m": 91.15,
+            "12m": 37.07
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "RAYMOND",
+          "yahoo_symbol": "RAYMOND.NS",
+          "name": "Raymond",
+          "long_name": "Raymond Limited",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "key": "energy",
+      "name": "Energy",
+      "nse_index": "NIFTY ENERGY",
+      "num_stocks": 10,
+      "num_ok": 10,
+      "average_returns": {
+        "3m": -3.25,
+        "6m": 4.12,
+        "9m": 6.67,
+        "12m": 12.21
+      },
+      "stocks": [
+        {
+          "price": 1274.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 1.21,
+            "6m": -9.15,
+            "9m": -16.72,
+            "12m": -7.05
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "RELIANCE",
+          "yahoo_symbol": "RELIANCE.NS",
+          "name": "Reliance Industries",
+          "long_name": "Reliance Industries Limited",
+          "ok": true
+        },
+        {
+          "price": 334.5,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": -3.85,
+            "6m": -10.39,
+            "9m": 5.93,
+            "12m": 5.5
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "NTPC",
+          "yahoo_symbol": "NTPC.NS",
+          "name": "NTPC",
+          "long_name": "NTPC Limited",
+          "ok": true
+        },
+        {
+          "price": 271.75,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -5.38,
+            "6m": -9.01,
+            "9m": 3.5,
+            "12m": -1.25
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "POWERGRID",
+          "yahoo_symbol": "POWERGRID.NS",
+          "name": "Power Grid Corporation of India",
+          "long_name": "Power Grid Corporation of India Limited",
+          "ok": true
+        },
+        {
+          "price": 237.27,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -5.41,
+            "6m": -11.49,
+            "9m": 1.92,
+            "12m": 7.82
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "ONGC",
+          "yahoo_symbol": "ONGC.NS",
+          "name": "Oil & Natural Gas Corporation",
+          "long_name": "Oil and Natural Gas Corporation Limited",
+          "ok": true
+        },
+        {
+          "price": 432.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -1.7,
+            "6m": -0.05,
+            "9m": 17.54,
+            "12m": 17.72
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "COALINDIA",
+          "yahoo_symbol": "COALINDIA.NS",
+          "name": "Coal India",
+          "long_name": "Coal India Limited",
+          "ok": true
+        },
+        {
+          "price": 134.94,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -0.54,
+            "6m": -13.81,
+            "9m": -12.87,
+            "12m": 0.67
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "IOC",
+          "yahoo_symbol": "IOC.NS",
+          "name": "Indian Oil Corporation",
+          "long_name": "Indian Oil Corporation Limited",
+          "ok": true
+        },
+        {
+          "price": 303.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 5.21,
+            "6m": -7.03,
+            "9m": -12.28,
+            "12m": 0.03
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "BPCL",
+          "yahoo_symbol": "BPCL.NS",
+          "name": "Bharat Petroleum Corporation",
+          "long_name": "Bharat Petroleum Corporation Limited",
+          "ok": true
+        },
+        {
+          "price": 1299.1,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -12.4,
+            "6m": 51.6,
+            "9m": 31.25,
+            "12m": 34.85
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "ADANIGREEN",
+          "yahoo_symbol": "ADANIGREEN.NS",
+          "name": "Adani Green Energy",
+          "long_name": "Adani Green Energy Limited",
+          "ok": true
+        },
+        {
+          "price": 367.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -6.45,
+            "6m": -3.15,
+            "9m": -2.78,
+            "12m": -4.46
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "TATAPOWER",
+          "yahoo_symbol": "TATAPOWER.NS",
+          "name": "Tata Power Company",
+          "long_name": "The Tata Power Company Limited",
+          "ok": true
+        },
+        {
+          "price": 213.5,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -3.21,
+            "6m": 53.66,
+            "9m": 51.23,
+            "12m": 68.26
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "ADANIPOWER",
+          "yahoo_symbol": "ADANIPOWER.NS",
+          "name": "Adani Power",
+          "long_name": "Adani Power Limited",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "key": "media",
+      "name": "Media & Entertainment",
+      "nse_index": "NIFTY MEDIA",
+      "num_stocks": 8,
+      "num_ok": 8,
+      "average_returns": {
+        "3m": 1.05,
+        "6m": 9.36,
+        "9m": -1.66,
+        "12m": -17.16
+      },
+      "stocks": [
+        {
+          "price": 80.95,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -19.48,
+            "6m": 3.09,
+            "9m": -11.22,
+            "12m": -27.52
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "ZEEL",
+          "yahoo_symbol": "ZEEL.NS",
+          "name": "Zee Entertainment Enterprises",
+          "long_name": "Zee Entertainment Enterprises Limited",
+          "ok": true
+        },
+        {
+          "price": 449.3,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": -10.3,
+            "6m": -21.49,
+            "9m": -17.37,
+            "12m": -17.24
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "SUNTV",
+          "yahoo_symbol": "SUNTV.NS",
+          "name": "Sun TV Network",
+          "long_name": "Sun TV Network Limited",
+          "ok": true
+        },
+        {
+          "price": 1169.2,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 22.08,
+            "6m": 11.84,
+            "9m": 10.34,
+            "12m": 4.28
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "PVRINOX",
+          "yahoo_symbol": "PVRINOX.NS",
+          "name": "PVR INOX",
+          "long_name": "PVR INOX Limited",
+          "ok": true
+        },
+        {
+          "price": 374.65,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 33.83,
+            "6m": 52.58,
+            "9m": 64.97,
+            "12m": 39.0
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "NAZARA",
+          "yahoo_symbol": "NAZARA.NS",
+          "name": "Nazara Technologies",
+          "long_name": "Nazara Technologies Limited",
+          "ok": true
+        },
+        {
+          "price": 26.83,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -11.74,
+            "6m": -18.25,
+            "9m": -37.05,
+            "12m": -50.74
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "NETWORK18",
+          "yahoo_symbol": "NETWORK18.NS",
+          "name": "Network18 Media & Investments",
+          "long_name": "Network18 Media & Investments Limited",
+          "ok": true
+        },
+        {
+          "price": 505.15,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 15.32,
+            "6m": 54.69,
+            "9m": 37.46,
+            "12m": 2.19
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "SAREGAMA",
+          "yahoo_symbol": "SAREGAMA.NS",
+          "name": "Saregama India",
+          "long_name": "Saregama India Limited",
+          "ok": true
+        },
+        {
+          "price": 2.39,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -16.72,
+            "6m": -8.08,
+            "9m": -39.65,
+            "12m": -55.66
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "DISHTV",
+          "yahoo_symbol": "DISHTV.NS",
+          "name": "Dish TV India",
+          "long_name": "Dish TV India Limited",
+          "ok": true
+        },
+        {
+          "price": 10.17,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -4.6,
+            "6m": 0.49,
+            "9m": -20.79,
+            "12m": -31.61
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "HATHWAY",
+          "yahoo_symbol": "HATHWAY.NS",
+          "name": "Hathway Cable & Datacom",
+          "long_name": "Hathway Cable and Datacom Limited",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "key": "psu_bank",
+      "name": "PSU Bank",
+      "nse_index": "NIFTY PSU BANK",
+      "num_stocks": 12,
+      "num_ok": 12,
+      "average_returns": {
+        "3m": -0.19,
+        "6m": -4.47,
+        "9m": 2.01,
+        "12m": 11.79
+      },
+      "stocks": [
+        {
+          "price": 1009.7,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 0.64,
+            "6m": -7.58,
+            "9m": 7.1,
+            "12m": 25.63
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "SBIN",
+          "yahoo_symbol": "SBIN.NS",
+          "name": "State Bank of India",
+          "long_name": "State Bank of India",
+          "ok": true
+        },
+        {
+          "price": 237.62,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -11.76,
+            "6m": -16.68,
+            "9m": -14.26,
+            "12m": 3.07
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "BANKBARODA",
+          "yahoo_symbol": "BANKBARODA.NS",
+          "name": "Bank of Baroda",
+          "long_name": "Bank of Baroda Limited",
+          "ok": true
+        },
+        {
+          "price": 116.85,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 12.2,
+            "6m": 2.31,
+            "9m": 2.64,
+            "12m": 13.16
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "PNB",
+          "yahoo_symbol": "PNB.NS",
+          "name": "Punjab National Bank",
+          "long_name": "Punjab National Bank",
+          "ok": true
+        },
+        {
+          "price": 124.6,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -3.56,
+            "6m": -9.53,
+            "9m": -11.58,
+            "12m": 16.33
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "CANBK",
+          "yahoo_symbol": "CANBK.NS",
+          "name": "Canara Bank",
+          "long_name": "Canara Bank",
+          "ok": true
+        },
+        {
+          "price": 179.2,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 10.84,
+            "6m": -0.97,
+            "9m": 24.61,
+            "12m": 39.23
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "UNIONBANK",
+          "yahoo_symbol": "UNIONBANK.NS",
+          "name": "Union Bank of India",
+          "long_name": "Union Bank of India",
+          "ok": true
+        },
+        {
+          "price": 856.5,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 2.77,
+            "6m": -5.92,
+            "9m": 11.75,
+            "12m": 26.34
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "INDIANB",
+          "yahoo_symbol": "INDIANB.NS",
+          "name": "Indian Bank",
+          "long_name": "Indian Bank",
+          "ok": true
+        },
+        {
+          "price": 141.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -2.66,
+            "6m": -6.76,
+            "9m": 5.39,
+            "12m": 23.93
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "BANKINDIA",
+          "yahoo_symbol": "BANKINDIA.NS",
+          "name": "Bank of India",
+          "long_name": "Bank of India",
+          "ok": true
+        },
+        {
+          "price": 84.35,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 0.2,
+            "6m": 24.53,
+            "9m": 53.28,
+            "12m": 60.64
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "MAHABANK",
+          "yahoo_symbol": "MAHABANK.NS",
+          "name": "Bank of Maharashtra",
+          "long_name": "Bank of Maharashtra",
+          "ok": true
+        },
+        {
+          "price": 30.82,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 0.2,
+            "6m": -14.74,
+            "9m": -13.0,
+            "12m": -12.55
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "CENTRALBK",
+          "yahoo_symbol": "CENTRALBK.NS",
+          "name": "Central Bank of India",
+          "long_name": "Central Bank of India",
+          "ok": true
+        },
+        {
+          "price": 32.98,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": -0.84,
+            "6m": -2.4,
+            "9m": -9.99,
+            "12m": -16.68
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "IOB",
+          "yahoo_symbol": "IOB.NS",
+          "name": "Indian Overseas Bank",
+          "long_name": "Indian Overseas Bank",
+          "ok": true
+        },
+        {
+          "price": 23.93,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -7.07,
+            "6m": -9.35,
+            "9m": -15.7,
+            "12m": -16.25
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "UCOBANK",
+          "yahoo_symbol": "UCOBANK.NS",
+          "name": "UCO Bank",
+          "long_name": "UCO Bank",
+          "ok": true
+        },
+        {
+          "price": 22.6,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -3.28,
+            "6m": -6.55,
+            "9m": -16.11,
+            "12m": -21.34
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "PSB",
+          "yahoo_symbol": "PSB.NS",
+          "name": "Punjab & Sind Bank",
+          "long_name": "Punjab & Sind Bank",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "key": "private_bank",
+      "name": "Private Bank",
+      "nse_index": "NIFTY PRIVATE BANK",
+      "num_stocks": 10,
+      "num_ok": 10,
+      "average_returns": {
+        "3m": 7.19,
+        "6m": 10.78,
+        "9m": 10.63,
+        "12m": 23.09
+      },
+      "stocks": [
+        {
+          "price": 693.8,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -5.57,
+            "6m": -16.97,
+            "9m": -28.75,
+            "12m": -26.98
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "HDFCBANK",
+          "yahoo_symbol": "HDFCBANK.NS",
+          "name": "HDFC Bank",
+          "long_name": "HDFC Bank Limited",
+          "ok": true
+        },
+        {
+          "price": 1384.5,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 7.95,
+            "6m": 6.42,
+            "9m": 2.39,
+            "12m": -0.55
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "ICICIBANK",
+          "yahoo_symbol": "ICICIBANK.NS",
+          "name": "ICICI Bank",
+          "long_name": "ICICI Bank Limited",
+          "ok": true
+        },
+        {
+          "price": 416.55,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 7.52,
+            "6m": 6.49,
+            "9m": -2.03,
+            "12m": 5.73
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "KOTAKBANK",
+          "yahoo_symbol": "KOTAKBANK.NS",
+          "name": "Kotak Mahindra Bank",
+          "long_name": "Kotak Mahindra Bank Limited",
+          "ok": true
+        },
+        {
+          "price": 1246.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -5.14,
+            "6m": -5.15,
+            "9m": -2.47,
+            "12m": 16.53
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "AXISBANK",
+          "yahoo_symbol": "AXISBANK.NS",
+          "name": "Axis Bank",
+          "long_name": "Axis Bank Limited",
+          "ok": true
+        },
+        {
+          "price": 993.3,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 12.55,
+            "6m": 10.71,
+            "9m": 19.32,
+            "12m": 32.43
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "INDUSINDBK",
+          "yahoo_symbol": "INDUSINDBK.NS",
+          "name": "IndusInd Bank",
+          "long_name": "IndusInd Bank Limited",
+          "ok": true
+        },
+        {
+          "price": 86.84,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 19.32,
+            "6m": 29.47,
+            "9m": 8.44,
+            "12m": 19.82
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "IDFCFIRSTB",
+          "yahoo_symbol": "IDFCFIRSTB.NS",
+          "name": "IDFC First Bank",
+          "long_name": "IDFC First Bank Limited",
+          "ok": true
+        },
+        {
+          "price": 346.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 11.6,
+            "6m": 25.79,
+            "9m": 33.74,
+            "12m": 77.06
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "FEDERALBNK",
+          "yahoo_symbol": "FEDERALBNK.NS",
+          "name": "Federal Bank",
+          "long_name": "The Federal Bank Limited",
+          "ok": true
+        },
+        {
+          "price": 174.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -12.14,
+            "6m": -3.7,
+            "9m": 24.17,
+            "12m": 5.22
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "BANDHANBNK",
+          "yahoo_symbol": "BANDHANBNK.NS",
+          "name": "Bandhan Bank",
+          "long_name": "Bandhan Bank Limited",
+          "ok": true
+        },
+        {
+          "price": 410.8,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 15.38,
+            "6m": 33.55,
+            "9m": 36.38,
+            "12m": 51.2
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "RBLBANK",
+          "yahoo_symbol": "RBLBANK.NS",
+          "name": "RBL Bank",
+          "long_name": "RBL Bank Limited",
+          "ok": true
+        },
+        {
+          "price": 226.45,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 20.39,
+            "6m": 21.23,
+            "9m": 15.11,
+            "12m": 50.4
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "CUB",
+          "yahoo_symbol": "CUB.NS",
+          "name": "City Union Bank",
+          "long_name": "City Union Bank Limited",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "key": "financial_services",
+      "name": "Financial Services",
+      "nse_index": "NIFTY FINANCIAL SERVICES",
+      "num_stocks": 18,
+      "num_ok": 18,
+      "average_returns": {
+        "3m": 3.55,
+        "6m": -4.67,
+        "9m": -7.77,
+        "12m": -1.33
+      },
+      "stocks": [
+        {
+          "price": 693.8,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -5.57,
+            "6m": -16.97,
+            "9m": -28.75,
+            "12m": -26.98
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "HDFCBANK",
+          "yahoo_symbol": "HDFCBANK.NS",
+          "name": "HDFC Bank",
+          "long_name": "HDFC Bank Limited",
+          "ok": true
+        },
+        {
+          "price": 1384.5,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 7.95,
+            "6m": 6.42,
+            "9m": 2.39,
+            "12m": -0.55
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "ICICIBANK",
+          "yahoo_symbol": "ICICIBANK.NS",
+          "name": "ICICI Bank",
+          "long_name": "ICICI Bank Limited",
+          "ok": true
+        },
+        {
+          "price": 1246.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -5.14,
+            "6m": -5.15,
+            "9m": -2.47,
+            "12m": 16.53
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "AXISBANK",
+          "yahoo_symbol": "AXISBANK.NS",
+          "name": "Axis Bank",
+          "long_name": "Axis Bank Limited",
+          "ok": true
+        },
+        {
+          "price": 416.55,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 7.52,
+            "6m": 6.49,
+            "9m": -2.03,
+            "12m": 5.73
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "KOTAKBANK",
+          "yahoo_symbol": "KOTAKBANK.NS",
+          "name": "Kotak Mahindra Bank",
+          "long_name": "Kotak Mahindra Bank Limited",
+          "ok": true
+        },
+        {
+          "price": 1009.7,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 0.64,
+            "6m": -7.58,
+            "9m": 7.1,
+            "12m": 25.63
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "SBIN",
+          "yahoo_symbol": "SBIN.NS",
+          "name": "State Bank of India",
+          "long_name": "State Bank of India",
+          "ok": true
+        },
+        {
+          "price": 1043.5,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 18.76,
+            "6m": 11.72,
+            "9m": 3.92,
+            "12m": 8.47
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "BAJFINANCE",
+          "yahoo_symbol": "BAJFINANCE.NS",
+          "name": "Bajaj Finance",
+          "long_name": "Bajaj Finance Limited",
+          "ok": true
+        },
+        {
+          "price": 1927.0,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 15.89,
+            "6m": 3.26,
+            "9m": -6.64,
+            "12m": -5.38
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "BAJAJFINSV",
+          "yahoo_symbol": "BAJAJFINSV.NS",
+          "name": "Bajaj Finserv",
+          "long_name": "Bajaj Finserv Ltd.",
+          "ok": true
+        },
+        {
+          "price": 230.25,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 0.27,
+            "6m": -2.21,
+            "9m": -20.65,
+            "12m": -25.56
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "JIOFIN",
+          "yahoo_symbol": "JIOFIN.NS",
+          "name": "Jio Financial Services",
+          "long_name": "Jio Financial Services Limited",
+          "ok": true
+        },
+        {
+          "price": 526.15,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -3.92,
+            "6m": -19.52,
+            "9m": -31.52,
+            "12m": -32.1
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "HDFCLIFE",
+          "yahoo_symbol": "HDFCLIFE.NS",
+          "name": "HDFC Life Insurance",
+          "long_name": "HDFC Life Insurance Company Limited",
+          "ok": true
+        },
+        {
+          "price": 1700.6,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -1.63,
+            "6m": -13.4,
+            "9m": -15.46,
+            "12m": -7.13
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "SBILIFE",
+          "yahoo_symbol": "SBILIFE.NS",
+          "name": "SBI Life Insurance",
+          "long_name": "SBI Life Insurance Company Limited",
+          "ok": true
+        },
+        {
+          "price": 471.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 1.12,
+            "6m": -21.44,
+            "9m": -26.48,
+            "12m": -21.52
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "ICICIPRULI",
+          "yahoo_symbol": "ICICIPRULI.NS",
+          "name": "ICICI Prudential Life Insurance",
+          "long_name": "ICICI Prudential Life Insurance Company Limited",
+          "ok": true
+        },
+        {
+          "price": 1038.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 16.33,
+            "6m": -1.79,
+            "9m": 24.68,
+            "12m": 73.65
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "SHRIRAMFIN",
+          "yahoo_symbol": "SHRIRAMFIN.NS",
+          "name": "Shriram Finance",
+          "long_name": "Shriram Finance Limited",
+          "ok": true
+        },
+        {
+          "price": 1829.0,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 24.25,
+            "6m": 12.81,
+            "9m": 4.99,
+            "12m": 20.28
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "CHOLAFIN",
+          "yahoo_symbol": "CHOLAFIN.NS",
+          "name": "Cholamandalam Investment & Finance",
+          "long_name": "Cholamandalam Investment and Finance Company Limited",
+          "ok": true
+        },
+        {
+          "price": 2433.8,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -0.57,
+            "6m": -1.88,
+            "9m": -4.69,
+            "12m": -14.31
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "HDFCAMC",
+          "yahoo_symbol": "HDFCAMC.NS",
+          "name": "HDFC Asset Management",
+          "long_name": "HDFC Asset Management Company Limited",
+          "ok": true
+        },
+        {
+          "price": 668.4,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 15.1,
+            "6m": -6.33,
+            "9m": -22.49,
+            "12m": -21.5
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "SBICARD",
+          "yahoo_symbol": "SBICARD.NS",
+          "name": "SBI Cards & Payment Services",
+          "long_name": "SBI Cards and Payment Services Limited",
+          "ok": true
+        },
+        {
+          "price": 352.8,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -16.54,
+            "6m": -11.97,
+            "9m": 6.56,
+            "12m": -7.0
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "PFC",
+          "yahoo_symbol": "PFC.NS",
+          "name": "Power Finance Corporation",
+          "long_name": "Power Finance Corporation Limited",
+          "ok": true
+        },
+        {
+          "price": 313.8,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -8.59,
+            "6m": -3.73,
+            "9m": -4.89,
+            "12m": -11.06
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "RECLTD",
+          "yahoo_symbol": "RECLTD.NS",
+          "name": "REC",
+          "long_name": "REC Limited",
+          "ok": true
+        },
+        {
+          "price": 2841.5,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -1.98,
+            "6m": -12.72,
+            "9m": -23.5,
+            "12m": -1.12
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "MUTHOOTFIN",
+          "yahoo_symbol": "MUTHOOTFIN.NS",
+          "name": "Muthoot Finance",
+          "long_name": "Muthoot Finance Limited",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "key": "healthcare",
+      "name": "Healthcare",
+      "nse_index": "NIFTY HEALTHCARE",
+      "num_stocks": 16,
+      "num_ok": 16,
+      "average_returns": {
+        "3m": 3.36,
+        "6m": 8.75,
+        "9m": 10.38,
+        "12m": 8.13
+      },
+      "stocks": [
+        {
+          "price": 1864.9,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 4.67,
+            "6m": 3.14,
+            "9m": 5.4,
+            "12m": 18.11
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "SUNPHARMA",
+          "yahoo_symbol": "SUNPHARMA.NS",
+          "name": "Sun Pharmaceutical Industries",
+          "long_name": "Sun Pharmaceutical Industries Limited",
+          "ok": true
+        },
+        {
+          "price": 1373.3,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -0.27,
+            "6m": 3.95,
+            "9m": -7.02,
+            "12m": -11.36
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "CIPLA",
+          "yahoo_symbol": "CIPLA.NS",
+          "name": "Cipla",
+          "long_name": "Cipla Limited",
+          "ok": true
+        },
+        {
+          "price": 1143.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -9.55,
+            "6m": -12.5,
+            "9m": -8.04,
+            "12m": -11.8
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "DRREDDY",
+          "yahoo_symbol": "DRREDDY.NS",
+          "name": "Dr. Reddy's Laboratories",
+          "long_name": "Dr. Reddy's Laboratories Limited",
+          "ok": true
+        },
+        {
+          "price": 9488.0,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 43.51,
+            "6m": 49.52,
+            "9m": 51.36,
+            "12m": 57.96
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "DIVISLAB",
+          "yahoo_symbol": "DIVISLAB.NS",
+          "name": "Divi's Laboratories",
+          "long_name": "Divi's Laboratories Limited",
+          "ok": true
+        },
+        {
+          "price": 8967.0,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 5.76,
+            "6m": 15.05,
+            "9m": 28.08,
+            "12m": 13.37
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "APOLLOHOSP",
+          "yahoo_symbol": "APOLLOHOSP.NS",
+          "name": "Apollo Hospitals Enterprise",
+          "long_name": "Apollo Hospitals Enterprise Limited",
+          "ok": true
+        },
+        {
+          "price": 1038.6,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 3.0,
+            "6m": -0.25,
+            "9m": -3.4,
+            "12m": -11.88
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "MAXHEALTH",
+          "yahoo_symbol": "MAXHEALTH.NS",
+          "name": "Max Healthcare Institute",
+          "long_name": "Max Healthcare Institute Limited",
+          "ok": true
+        },
+        {
+          "price": 902.45,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -8.65,
+            "6m": 2.45,
+            "9m": 5.92,
+            "12m": -6.59
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "FORTIS",
+          "yahoo_symbol": "FORTIS.NS",
+          "name": "Fortis Healthcare",
+          "long_name": "Fortis Healthcare Limited",
+          "ok": true
+        },
+        {
+          "price": 2077.8,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -6.87,
+            "6m": -10.46,
+            "9m": 1.82,
+            "12m": 5.72
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "LUPIN",
+          "yahoo_symbol": "LUPIN.NS",
+          "name": "Lupin",
+          "long_name": "Lupin Limited",
+          "ok": true
+        },
+        {
+          "price": 1127.4,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 2.74,
+            "6m": 22.24,
+            "9m": 22.18,
+            "12m": 8.54
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "ZYDUSLIFE",
+          "yahoo_symbol": "ZYDUSLIFE.NS",
+          "name": "Zydus Lifesciences",
+          "long_name": "Zydus Lifesciences Limited",
+          "ok": true
+        },
+        {
+          "price": 4930.0,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 10.45,
+            "6m": 11.56,
+            "9m": 31.08,
+            "12m": 38.48
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "TORNTPHARM",
+          "yahoo_symbol": "TORNTPHARM.NS",
+          "name": "Torrent Pharmaceuticals",
+          "long_name": "Torrent Pharmaceuticals Limited",
+          "ok": true
+        },
+        {
+          "price": 5138.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -2.87,
+            "6m": -8.36,
+            "9m": -7.32,
+            "12m": -2.48
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "ALKEM",
+          "yahoo_symbol": "ALKEM.NS",
+          "name": "Alkem Laboratories",
+          "long_name": "Alkem Laboratories Limited",
+          "ok": true
+        },
+        {
+          "price": 1668.4,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 14.78,
+            "6m": 29.75,
+            "9m": 42.28,
+            "12m": 58.85
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "AUROPHARMA",
+          "yahoo_symbol": "AUROPHARMA.NS",
+          "name": "Aurobindo Pharma",
+          "long_name": "Aurobindo Pharma Limited",
+          "ok": true
+        },
+        {
+          "price": 391.65,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -5.42,
+            "6m": -0.93,
+            "9m": 3.42,
+            "12m": 7.67
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "BIOCON",
+          "yahoo_symbol": "BIOCON.NS",
+          "name": "Biocon",
+          "long_name": "Biocon Limited",
+          "ok": true
+        },
+        {
+          "price": 1919.7,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 23.0,
+            "6m": 40.0,
+            "9m": 34.59,
+            "12m": 20.27
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "LALPATHLAB",
+          "yahoo_symbol": "LALPATHLAB.NS",
+          "name": "Dr. Lal PathLabs",
+          "long_name": "Dr. Lal PathLabs Limited",
+          "ok": true
+        },
+        {
+          "price": 386.8,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": -14.68,
+            "6m": -5.23,
+            "9m": -38.37,
+            "12m": -40.56
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "SYNGENE",
+          "yahoo_symbol": "SYNGENE.NS",
+          "name": "Syngene International",
+          "long_name": "Syngene International Limited",
+          "ok": true
+        },
+        {
+          "price": 2238.4,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -5.8,
+            "6m": 0.03,
+            "9m": 4.16,
+            "12m": -14.19
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "MANKIND",
+          "yahoo_symbol": "MANKIND.NS",
+          "name": "Mankind Pharma",
+          "long_name": "Mankind Pharma Limited",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "key": "consumer_durables",
+      "name": "Consumer Durables",
+      "nse_index": "NIFTY CONSUMER DURABLES",
+      "num_stocks": 13,
+      "num_ok": 13,
+      "average_returns": {
+        "3m": 3.22,
+        "6m": 2.88,
+        "9m": -2.51,
+        "12m": -16.13
+      },
+      "stocks": [
+        {
+          "price": 5005.0,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 24.23,
+            "6m": 18.99,
+            "9m": 30.57,
+            "12m": 38.69
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "TITAN",
+          "yahoo_symbol": "TITAN.NS",
+          "name": "Titan Company",
+          "long_name": "Titan Company Limited",
+          "ok": true
+        },
+        {
+          "price": 1120.4,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": -3.04,
+            "6m": -17.09,
+            "9m": -18.74,
+            "12m": -28.31
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "HAVELLS",
+          "yahoo_symbol": "HAVELLS.NS",
+          "name": "Havells India",
+          "long_name": "Havells India Limited",
+          "ok": true
+        },
+        {
+          "price": 1143.8,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": -11.05,
+            "6m": -20.81,
+            "9m": -14.43,
+            "12m": -17.74
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "VOLTAS",
+          "yahoo_symbol": "VOLTAS.NS",
+          "name": "Voltas",
+          "long_name": "Voltas Limited",
+          "ok": true
+        },
+        {
+          "price": 230.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -8.59,
+            "6m": -5.09,
+            "9m": -6.86,
+            "12m": -26.76
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "CROMPTON",
+          "yahoo_symbol": "CROMPTON.NS",
+          "name": "Crompton Greaves Consumer Electricals",
+          "long_name": "Crompton Greaves Consumer Electricals Limited",
+          "ok": true
+        },
+        {
+          "price": 13500.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 17.52,
+            "6m": 23.76,
+            "9m": 9.3,
+            "12m": -24.53
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "DIXON",
+          "yahoo_symbol": "DIXON.NS",
+          "name": "Dixon Technologies (India)",
+          "long_name": "Dixon Technologies (India) Limited",
+          "ok": true
+        },
+        {
+          "price": 1514.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -3.81,
+            "6m": -19.41,
+            "9m": -12.03,
+            "12m": -19.49
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "BLUESTARCO",
+          "yahoo_symbol": "BLUESTARCO.NS",
+          "name": "Blue Star",
+          "long_name": "Blue Star Limited",
+          "ok": true
+        },
+        {
+          "price": 1243.9,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 16.54,
+            "6m": 30.94,
+            "9m": 19.12,
+            "12m": 1.01
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "KAJARIACER",
+          "yahoo_symbol": "KAJARIACER.NS",
+          "name": "Kajaria Ceramics",
+          "long_name": "Kajaria Ceramics Limited",
+          "ok": true
+        },
+        {
+          "price": 795.0,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 2.39,
+            "6m": -8.88,
+            "9m": -13.35,
+            "12m": -41.62
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "WHIRLPOOL",
+          "yahoo_symbol": "WHIRLPOOL.NS",
+          "name": "Whirlpool of India",
+          "long_name": "Whirlpool of India Limited",
+          "ok": true
+        },
+        {
+          "price": 653.25,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 3.08,
+            "6m": -4.52,
+            "9m": -29.62,
+            "12m": -44.79
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "BATAINDIA",
+          "yahoo_symbol": "BATAINDIA.NS",
+          "name": "Bata India",
+          "long_name": "Bata India Limited",
+          "ok": true
+        },
+        {
+          "price": 326.95,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 10.46,
+            "6m": 3.91,
+            "9m": -1.23,
+            "12m": -10.0
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "VGUARD",
+          "yahoo_symbol": "VGUARD.NS",
+          "name": "V-Guard Industries",
+          "long_name": "V-Guard Industries Limited",
+          "ok": true
+        },
+        {
+          "price": 7280.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -4.52,
+            "6m": -3.03,
+            "9m": 10.87,
+            "12m": -7.49
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "AMBER",
+          "yahoo_symbol": "AMBER.NS",
+          "name": "Amber Enterprises India",
+          "long_name": "Amber Enterprises India Limited",
+          "ok": true
+        },
+        {
+          "price": 541.35,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 0.46,
+            "6m": 12.94,
+            "9m": -13.89,
+            "12m": -19.13
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "TTKPRESTIG",
+          "yahoo_symbol": "TTKPRESTIG.NS",
+          "name": "TTK Prestige",
+          "long_name": "TTK Prestige Limited",
+          "ok": true
+        },
+        {
+          "price": 5698.5,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": -1.79,
+            "6m": 25.75,
+            "9m": 7.63,
+            "12m": -9.57
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "CERA",
+          "yahoo_symbol": "CERA.NS",
+          "name": "Cera Sanitaryware",
+          "long_name": "Cera Sanitaryware Limited",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "key": "oil_gas",
+      "name": "Oil & Gas",
+      "nse_index": "NIFTY OIL & GAS",
+      "num_stocks": 14,
+      "num_ok": 14,
+      "average_returns": {
+        "3m": -1.22,
+        "6m": -1.06,
+        "9m": -3.94,
+        "12m": -2.68
+      },
+      "stocks": [
+        {
+          "price": 1274.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 1.21,
+            "6m": -9.15,
+            "9m": -16.72,
+            "12m": -7.05
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "RELIANCE",
+          "yahoo_symbol": "RELIANCE.NS",
+          "name": "Reliance Industries",
+          "long_name": "Reliance Industries Limited",
+          "ok": true
+        },
+        {
+          "price": 237.27,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -5.41,
+            "6m": -11.49,
+            "9m": 1.92,
+            "12m": 7.82
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "ONGC",
+          "yahoo_symbol": "ONGC.NS",
+          "name": "Oil & Natural Gas Corporation",
+          "long_name": "Oil and Natural Gas Corporation Limited",
+          "ok": true
+        },
+        {
+          "price": 134.94,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -0.54,
+            "6m": -13.81,
+            "9m": -12.87,
+            "12m": 0.67
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "IOC",
+          "yahoo_symbol": "IOC.NS",
+          "name": "Indian Oil Corporation",
+          "long_name": "Indian Oil Corporation Limited",
+          "ok": true
+        },
+        {
+          "price": 303.0,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": 5.21,
+            "6m": -7.03,
+            "9m": -12.28,
+            "12m": 0.03
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "BPCL",
+          "yahoo_symbol": "BPCL.NS",
+          "name": "Bharat Petroleum Corporation",
+          "long_name": "Bharat Petroleum Corporation Limited",
+          "ok": true
+        },
+        {
+          "price": 174.9,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 4.4,
+            "6m": 16.71,
+            "9m": 7.65,
+            "12m": 4.01
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "GAIL",
+          "yahoo_symbol": "GAIL.NS",
+          "name": "GAIL (India)",
+          "long_name": "GAIL (India) Limited",
+          "ok": true
+        },
+        {
+          "price": 352.65,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -0.96,
+            "6m": -4.27,
+            "9m": -17.5,
+            "12m": -4.53
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "HINDPETRO",
+          "yahoo_symbol": "HINDPETRO.NS",
+          "name": "Hindustan Petroleum Corporation",
+          "long_name": "Hindustan Petroleum Corporation Limited",
+          "ok": true
+        },
+        {
+          "price": 612.3,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": -15.91,
+            "6m": 29.65,
+            "9m": 4.01,
+            "12m": 2.45
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "ATGL",
+          "yahoo_symbol": "ATGL.NS",
+          "name": "Adani Total Gas",
+          "long_name": "Adani Total Gas Limited",
+          "ok": true
+        },
+        {
+          "price": 152.92,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": -5.7,
+            "6m": -3.01,
+            "9m": -15.64,
+            "12m": -25.73
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "IGL",
+          "yahoo_symbol": "IGL.NS",
+          "name": "Indraprastha Gas",
+          "long_name": "Indraprastha Gas Limited",
+          "ok": true
+        },
+        {
+          "price": 285.9,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 7.79,
+            "6m": -0.31,
+            "9m": 7.15,
+            "12m": 7.6
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "PETRONET",
+          "yahoo_symbol": "PETRONET.NS",
+          "name": "Petronet LNG",
+          "long_name": "Petronet LNG Limited",
+          "ok": true
+        },
+        {
+          "price": 245.9,
+          "currency": "INR",
+          "as_of": "2026-09-10",
+          "returns": {
+            "3m": -33.18,
+            "6m": -32.08,
+            "9m": -35.42,
+            "12m": -41.36
+          },
+          "coverage_days": {
+            "3m": 92.0,
+            "6m": 184.0,
+            "9m": 274.0,
+            "12m": 365.0
+          },
+          "history_days": 395.0,
+          "symbol": "GUJENERGY",
+          "yahoo_symbol": "GUJENERGY.NS",
+          "name": "Gujarat Energy (formerly Gujarat Gas)",
+          "long_name": "Gujarat Energy Limited",
+          "ok": true
+        },
+        {
+          "price": 498.95,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 16.99,
+            "6m": 6.25,
+            "9m": 26.95,
+            "12m": 30.98
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "OIL",
+          "yahoo_symbol": "OIL.NS",
+          "name": "Oil India",
+          "long_name": "Oil India Limited",
+          "ok": true
+        },
+        {
+          "price": 1084.3,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 1.98,
+            "6m": 5.55,
+            "9m": -0.17,
+            "12m": -13.48
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "MGL",
+          "yahoo_symbol": "MGL.NS",
+          "name": "Mahanagar Gas",
+          "long_name": "Mahanagar Gas Limited",
+          "ok": true
+        },
+        {
+          "price": 189.16,
+          "currency": "INR",
+          "as_of": "2026-09-09",
+          "returns": {
+            "3m": 7.06,
+            "6m": 8.15,
+            "9m": 7.76,
+            "12m": 1.13
+          },
+          "coverage_days": {
+            "3m": 91.0,
+            "6m": 183.0,
+            "9m": 273.0,
+            "12m": 364.0
+          },
+          "history_days": 394.0,
+          "symbol": "CASTROLIND",
+          "yahoo_symbol": "CASTROLIND.NS",
+          "name": "Castrol India",
+          "long_name": "Castrol India Limited",
+          "ok": true
+        },
+        {
+          "price": 277.0,
+          "currency": "INR",
+          "as_of": "2026-05-11",
+          "returns": {
+            "3m": 0.0,
+            "6m": 0.0,
+            "9m": 0.0,
+            "12m": 0.0
+          },
+          "coverage_days": {
+            "3m": 0.0,
+            "6m": 0.0,
+            "9m": 0.0,
+            "12m": 0.0
+          },
+          "history_days": 0.0,
+          "symbol": "GSPL",
+          "yahoo_symbol": "GSPL.NS",
+          "name": "Gujarat State Petronet",
+          "long_name": "Gujarat State Petronet Limited",
+          "ok": true
+        }
+      ]
+    }
+  ]
+}
