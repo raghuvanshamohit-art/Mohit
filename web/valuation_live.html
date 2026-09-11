@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live Stock Valuation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --bg: #f7f8fa; --panel: #ffffff; --panel2: #fbfcfd; --border: #e4e7ec;
+    --text: #101828; --muted: #667085; --faint: #98a2b3;
+    --accent: #3538cd; --accent-soft: #eef0ff;
+    --pos: #067647; --pos-bg: #ecfdf3; --neg: #b42318; --neg-bg: #fef3f2;
+    --warn: #b54708; --warn-bg: #fffaeb;
+    --shadow: 0 1px 2px rgba(16,24,40,.05), 0 1px 3px rgba(16,24,40,.04);
+    --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    --sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root[data-theme="auto"], :root:not([data-theme="light"]) {
+      --bg: #0a0e17; --panel: #121824; --panel2: #0f1420; --border: #222b3a;
+      --text: #e7eaf1; --muted: #8b98ad; --faint: #5b6678;
+      --accent: #8098ff; --accent-soft: #1a2036;
+      --pos: #5ee29a; --pos-bg: #0e2a1c; --neg: #f98a80; --neg-bg: #2a1416;
+      --warn: #fdb022; --warn-bg: #2a1f0a; --shadow: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0a0e17; --panel: #121824; --panel2: #0f1420; --border: #222b3a;
+    --text: #e7eaf1; --muted: #8b98ad; --faint: #5b6678;
+    --accent: #8098ff; --accent-soft: #1a2036;
+    --pos: #5ee29a; --pos-bg: #0e2a1c; --neg: #f98a80; --neg-bg: #2a1416;
+    --warn: #fdb022; --warn-bg: #2a1f0a; --shadow: none;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans);
+    font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 28px 18px 72px; }
+
+  header { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 20px; }
+  .brand { flex: 1 1 auto; min-width: 260px; }
+  .eyebrow { font-family: var(--mono); font-size: 11.5px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--accent); margin: 0 0 6px; }
+  h1 { margin: 0; font-size: 29px; font-weight: 700; letter-spacing: -.025em; }
+  .sub { margin: 8px 0 0; color: var(--muted); font-size: 13.5px; max-width: 70ch; }
+  button.theme { height: 38px; padding: 0 14px; background: var(--panel); color: var(--text);
+    border: 1px solid var(--border); border-radius: 9px; cursor: pointer;
+    font-family: var(--mono); font-size: 12.5px; box-shadow: var(--shadow); }
+  button.theme:hover { border-color: var(--accent); color: var(--accent); }
+
+  .searchbar { display: flex; gap: 10px; margin: 22px 0 6px; flex-wrap: wrap; }
+  .searchbar .symwrap { flex: 1 1 240px; display: flex; align-items: center; gap: 10px;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 11px;
+    padding: 0 16px; height: 54px; box-shadow: var(--shadow); }
+  .searchbar .symwrap:focus-within { border-color: var(--accent); }
+  .searchbar input#symbol { flex: 1; border: 0; background: transparent; color: var(--text);
+    font-family: var(--mono); font-size: 20px; font-weight: 600; letter-spacing: .04em;
+    text-transform: uppercase; outline: none; }
+  .searchbar input#symbol::placeholder { color: var(--faint); font-weight: 500; letter-spacing: 0; text-transform: none; }
+  button.go { height: 54px; padding: 0 26px; background: var(--accent); color: #fff; border: 0;
+    border-radius: 11px; cursor: pointer; font-family: var(--sans); font-weight: 600; font-size: 15px; }
+  button.go:hover { filter: brightness(1.08); }
+  button.go:disabled { opacity: .6; cursor: default; }
+  .examples { font-family: var(--mono); font-size: 12px; color: var(--muted); margin: 2px 2px 0; }
+  .examples a { color: var(--accent); cursor: pointer; text-decoration: none; margin-right: 12px; }
+  .examples a:hover { text-decoration: underline; }
+
+  details.assumptions { margin: 14px 0 0; border: 1px solid var(--border); border-radius: 11px;
+    background: var(--panel); box-shadow: var(--shadow); }
+  details.assumptions > summary { cursor: pointer; padding: 12px 16px; font-family: var(--mono);
+    font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .fieldgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px 16px; padding: 4px 16px 16px; }
+  .fld { display: flex; flex-direction: column; gap: 4px; }
+  .fld label { font-size: 11.5px; color: var(--muted); font-family: var(--mono); }
+  .fld input, .fld select { font-family: var(--mono); font-size: 13px; background: var(--panel2);
+    color: var(--text); border: 1px solid var(--border); border-radius: 7px; padding: 7px 9px; outline: none; }
+  .fld input:focus, .fld select:focus { border-color: var(--accent); }
+  .hintline { grid-column: 1 / -1; font-size: 11.5px; color: var(--faint); font-family: var(--mono); margin-top: 2px; }
+
+  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 13px;
+    box-shadow: var(--shadow); overflow: hidden; margin-top: 20px; }
+  .panel > h2 { margin: 0; font-size: 13px; font-weight: 600; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--muted); font-family: var(--mono);
+    padding: 14px 16px; border-bottom: 1px solid var(--border); }
+  .panel .body { padding: 16px; }
+
+  .stockhead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; }
+  .stockhead .nm { font-size: 20px; font-weight: 700; letter-spacing: -.01em; }
+  .stockhead .sy { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  .stockhead .px { margin-left: auto; font-family: var(--mono); font-size: 22px; font-weight: 600; }
+  .stockhead .pxsrc { font-family: var(--mono); font-size: 11px; color: var(--faint); }
+
+  .hero { display: flex; flex-wrap: wrap; gap: 14px; }
+  .stat { flex: 1 1 150px; background: var(--panel2); border: 1px solid var(--border);
+    border-radius: 11px; padding: 14px 16px; }
+  .stat .k { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--faint); margin-bottom: 6px; }
+  .stat .v { font-family: var(--mono); font-size: 23px; font-weight: 600; letter-spacing: -.01em; }
+  .stat .v.small { font-size: 17px; }
+  .stat .cap { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .verdict { display: inline-block; font-family: var(--mono); font-size: 12px; font-weight: 600;
+    padding: 5px 11px; border-radius: 999px; margin-top: 2px; }
+  .verdict.buy { color: var(--pos); background: var(--pos-bg); }
+  .verdict.fair { color: var(--accent); background: var(--accent-soft); }
+  .verdict.exp { color: var(--neg); background: var(--neg-bg); }
+
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 9px 12px; text-align: right; white-space: nowrap; font-size: 13.5px;
+    font-variant-numeric: tabular-nums; }
+  th:first-child, td:first-child { text-align: left; }
+  thead th { font-family: var(--mono); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--muted); font-weight: 500; border-bottom: 1px solid var(--border); }
+  tbody td { border-bottom: 1px solid var(--border); font-family: var(--mono); }
+  tbody tr:last-child td { border-bottom: 0; }
+  tbody tr.trig td:first-child::after { content: " ● at/under"; color: var(--pos); font-size: 10px; }
+
+  .methods { list-style: none; margin: 0; padding: 0; }
+  .methods li { display: flex; justify-content: space-between; padding: 7px 0;
+    border-bottom: 1px dashed var(--border); font-family: var(--mono); font-size: 13px; }
+  .methods li:last-child { border-bottom: 0; }
+  .methods .name { color: var(--muted); }
+  .sectionlabel { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--faint); margin: 18px 0 8px; }
+  .prov { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .chip { font-family: var(--mono); font-size: 11px; color: var(--muted); background: var(--panel2);
+    border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; }
+  .chip b { color: var(--text); font-weight: 600; }
+  .chip .src { color: var(--faint); }
+  .chip .src.chart, .chip .src.yahoo { color: var(--pos); }
+  .chip .src.supplied { color: var(--accent); }
+
+  .warnbox { background: var(--warn-bg); border: 1px solid var(--border); border-left: 3px solid var(--warn);
+    border-radius: 8px; padding: 10px 13px; margin-top: 14px; font-size: 12.5px; color: var(--text); }
+  .msg { font-family: var(--mono); font-size: 13px; color: var(--muted); padding: 8px 2px; }
+  .msg.err { color: var(--neg); }
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--border);
+    border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; vertical-align: -2px; margin-right: 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+  .hidden { display: none; }
+  .note { color: var(--muted); font-size: 12.5px; line-height: 1.6; margin: 20px 2px 0; max-width: 92ch; }
+  .note b { color: var(--text); }
+  footer { margin-top: 26px; color: var(--faint); font-size: 12px; font-family: var(--mono); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <p class="eyebrow">Live from Yahoo Finance · Intrinsic Value · Pyramiding</p>
+      <h1>Live Stock Valuation</h1>
+      <p class="sub">Type a ticker and get its fair value and a pyramiding buy plan from live
+        market data. NSE symbols work bare (<code>TCS</code>); for other markets use the full
+        Yahoo symbol (<code>AAPL</code>, <code>TATASTEEL.BO</code>).</p>
+    </div>
+    <button class="theme" id="themeBtn" title="Toggle theme">◐ Theme</button>
+  </header>
+
+  <form id="searchForm">
+    <div class="searchbar">
+      <div class="symwrap">
+        <input id="symbol" name="symbol" placeholder="Enter a stock symbol — e.g. RELIANCE, TCS, AAPL" autocomplete="off" autofocus>
+      </div>
+      <button class="go" id="goBtn" type="submit">Value stock</button>
+    </div>
+    <p class="examples">Try:
+      <a data-sym="RELIANCE">RELIANCE</a><a data-sym="TCS">TCS</a><a data-sym="INFY">INFY</a>
+      <a data-sym="HDFCBANK">HDFCBANK</a><a data-sym="AAPL">AAPL</a><a data-sym="MSFT">MSFT</a>
+    </p>
+
+    <details class="assumptions">
+      <summary>Assumptions &amp; manual overrides</summary>
+      <div class="fieldgrid">
+        <div class="fld"><label for="growth">Growth rate %</label><input id="growth" type="number" step="any" value="10"></div>
+        <div class="fld"><label for="discount">Discount / req. return %</label><input id="discount" type="number" step="any" value="12"></div>
+        <div class="fld"><label for="mos">Margin of safety %</label><input id="mos" type="number" step="any" value="30"></div>
+        <div class="fld"><label for="mode">Pyramid mode</label>
+          <select id="mode"><option value="value">Value — below fair value</option><option value="trend">Trend — add to winner</option></select></div>
+        <div class="fld"><label for="tranches">Tranches</label><input id="tranches" type="number" step="1" value="4"></div>
+        <div class="fld"><label for="step">Step between tranches %</label><input id="step" type="number" step="any" value="10"></div>
+        <div class="fld"><label for="capital">Capital (optional)</label><input id="capital" type="number" step="any" placeholder="e.g. 100000"></div>
+        <div class="fld"><label for="stop">Stop-loss %</label><input id="stop" type="number" step="any" value="10"></div>
+        <div class="hintline">Manual fundamentals — fill these if the auto-fetch can't get them (leave blank to use live values):</div>
+        <div class="fld"><label for="eps">EPS</label><input id="eps" type="number" step="any" placeholder="auto"></div>
+        <div class="fld"><label for="bvps">Book value / share</label><input id="bvps" type="number" step="any" placeholder="auto"></div>
+        <div class="fld"><label for="dividend">Dividend / share</label><input id="dividend" type="number" step="any" placeholder="auto"></div>
+        <div class="fld"><label for="fair_pe">Exit P·E</label><input id="fair_pe" type="number" step="any" placeholder="auto / 20"></div>
+        <div class="fld"><label for="price">Override price</label><input id="price" type="number" step="any" placeholder="live"></div>
+      </div>
+    </details>
+  </form>
+
+  <div id="status" class="msg hidden"></div>
+
+  <div id="results" class="hidden">
+    <div class="panel">
+      <h2>Snapshot</h2>
+      <div class="body">
+        <div class="stockhead">
+          <span class="nm" id="oName">—</span><span class="sy" id="oSym"></span>
+          <span class="px" id="oPx"></span>
+        </div>
+        <div class="pxsrc" id="oPxSrc"></div>
+        <div class="prov" id="oProv" style="margin-top:12px"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Intrinsic value</h2>
+      <div class="body">
+        <div class="hero">
+          <div class="stat"><div class="k">Composite (median)</div><div class="v" id="oComposite">—</div><div class="cap" id="oRange"></div></div>
+          <div class="stat"><div class="k">Best buy price</div><div class="v" id="oBest">—</div><div class="cap" id="oMos"></div></div>
+          <div class="stat"><div class="k">Vs. current price</div><div class="v small" id="oUpside">—</div><div class="cap"><span id="oVerdict"></span></div></div>
+        </div>
+        <div class="sectionlabel">Per-model estimates</div>
+        <ul class="methods" id="oMethods"></ul>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2 id="pyrTitle">Pyramiding plan</h2>
+      <div class="body">
+        <p class="sub" id="pyrDesc" style="margin-top:0"></p>
+        <table>
+          <thead><tr>
+            <th>Lvl</th><th>Price</th><th id="colGap">Disc %</th><th>Weight</th>
+            <th class="capcol">Shares</th><th class="capcol">Cost</th>
+          </tr></thead>
+          <tbody id="pyrBody"></tbody>
+        </table>
+        <div class="hero" style="margin-top:16px">
+          <div class="stat"><div class="k">Avg entry price</div><div class="v small" id="oAvg">—</div><div class="cap" id="oAvgCap"></div></div>
+          <div class="stat"><div class="k">Stop-loss</div><div class="v small" id="oStop">—</div><div class="cap" id="oRisk"></div></div>
+          <div class="stat capcol"><div class="k">Planned position</div><div class="v small" id="oPos">—</div><div class="cap" id="oPosCap"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="warnbox hidden" id="warnBox"></div>
+  </div>
+
+  <p class="note"><b>How it works.</b> The current price is fetched live from Yahoo's chart endpoint;
+    fundamentals (EPS, book value, growth, dividend) are auto-fetched where Yahoo allows it — anything
+    it won't give is taken from the overrides above, and each input below the snapshot is tagged
+    <span class="chip"><span class="src chart">chart</span></span>
+    <span class="chip"><span class="src yahoo">yahoo</span></span>
+    <span class="chip"><span class="src supplied">supplied</span></span>
+    <span class="chip"><span class="src">default</span></span> by source.</p>
+  <footer id="foot">For information / education only — not investment advice.</footer>
+</div>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const val = id => { const v = $(id).value; return v === "" ? null : v; };
+const CURSYM = { INR: "₹", USD: "$", EUR: "€", GBP: "£", JPY: "¥" };
+let CUR = "";
+const money = v => v === null || v === undefined ? "—"
+  : (CURSYM[CUR] || "") + Number(v).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const METHOD_LABELS = { graham_number: "Graham Number", graham_revised: "Graham Revised",
+  dcf: "Two-stage DCF", earnings_power: "Earnings Power", ddm: "Dividend Discount" };
+
+function buildQuery() {
+  const p = new URLSearchParams();
+  const sym = ($("symbol").value || "").trim();
+  if (sym) p.set("symbol", sym);
+  for (const id of ["growth", "discount", "mos", "tranches", "step", "capital", "stop",
+                    "eps", "bvps", "dividend", "fair_pe", "price"]) {
+    const v = val(id); if (v !== null) p.set(id, v);
+  }
+  p.set("mode", $("mode").value);
+  return p.toString();
+}
+
+async function run(ev) {
+  if (ev) ev.preventDefault();
+  const sym = ($("symbol").value || "").trim();
+  if (!sym) { showStatus("Enter a stock symbol.", true); return; }
+  showStatus('<span class="spinner"></span>Fetching live data for ' + sym.toUpperCase() + ' …', false);
+  $("results").classList.add("hidden");
+  $("goBtn").disabled = true;
+  try {
+    const resp = await fetch("/api/value?" + buildQuery());
+    const rep = await resp.json();
+    if (rep.error) { showStatus(rep.error, true); return; }
+    render(rep);
+    hideStatus();
+  } catch (e) {
+    showStatus("Request failed: " + e.message + ". Is the local server running?", true);
+  } finally {
+    $("goBtn").disabled = false;
+  }
+}
+
+function showStatus(html, isErr) { const s = $("status"); s.innerHTML = html;
+  s.className = "msg" + (isErr ? " err" : ""); s.classList.remove("hidden"); }
+function hideStatus() { $("status").classList.add("hidden"); }
+
+function render(rep) {
+  CUR = (rep.stock && rep.stock.currency) || "";
+  $("results").classList.remove("hidden");
+
+  // snapshot
+  $("oName").textContent = rep.stock.name || rep.stock.symbol || "—";
+  $("oSym").textContent = rep.stock.symbol || "";
+  $("oPx").textContent = rep.stock.current_price != null ? money(rep.stock.current_price) : "—";
+  const priceSrc = rep.inputs.current_price ? rep.inputs.current_price.source : "—";
+  $("oPxSrc").textContent = rep.stock.current_price != null ? "current price · source: " + priceSrc : "no live price";
+
+  // provenance chips
+  const prov = $("oProv"); prov.innerHTML = "";
+  const order = ["eps", "book_value_per_share", "fcf_per_share", "dividend_per_share",
+    "growth_rate", "fair_pe", "discount_rate", "terminal_growth", "years", "current_price"];
+  const LBL = { eps: "EPS", book_value_per_share: "BVPS", fcf_per_share: "FCF/sh",
+    dividend_per_share: "Div", growth_rate: "Growth", fair_pe: "P·E", discount_rate: "Discount",
+    terminal_growth: "Term.g", years: "Years", current_price: "Price" };
+  for (const k of order) {
+    const node = rep.inputs[k]; if (!node) continue;
+    let v = node.value;
+    if (["growth_rate", "discount_rate", "terminal_growth"].includes(k)) v = (v * 100).toFixed(1) + "%";
+    else if (typeof v === "number") v = v.toLocaleString();
+    const chip = document.createElement("span"); chip.className = "chip";
+    chip.innerHTML = `${LBL[k] || k} <b>${v}</b> <span class="src ${node.source}">${node.source}</span>`;
+    prov.appendChild(chip);
+  }
+
+  // intrinsic
+  const iv = rep.intrinsic;
+  const ul = $("oMethods"); ul.innerHTML = "";
+  for (const k of Object.keys(METHOD_LABELS)) {
+    const on = iv.methods && k in iv.methods;
+    const li = document.createElement("li");
+    li.innerHTML = `<span class="name">${METHOD_LABELS[k]}</span>` +
+      (on ? `<span>${money(iv.methods[k])}</span>` : `<span class="name">n/a</span>`);
+    ul.appendChild(li);
+  }
+  if (iv.composite != null) {
+    $("oComposite").textContent = money(iv.composite);
+    $("oRange").textContent = `range ${money(iv.low)} – ${money(iv.high)} · ${iv.num_methods} models`;
+    $("oBest").textContent = money(iv.best_buy_price);
+    $("oMos").textContent = `${(iv.margin_of_safety * 100).toFixed(0)}% margin of safety`;
+    if (iv.upside != null) {
+      $("oUpside").textContent = (iv.upside >= 0 ? "+" : "") + iv.upside.toFixed(1) + "%";
+      const vEl = $("oVerdict"); const verdict = iv.verdict || "";
+      vEl.textContent = verdict.split(" —")[0];
+      vEl.className = "verdict " + (verdict.startsWith("BUY") ? "buy"
+        : verdict.startsWith("EXPENSIVE") ? "exp" : "fair");
+    } else { $("oUpside").textContent = "—"; $("oVerdict").textContent = ""; }
+  } else {
+    ["oComposite","oBest","oUpside"].forEach(x => $(x).textContent = "—");
+    ["oRange","oMos"].forEach(x => $(x).textContent = "");
+    $("oVerdict").textContent = "";
+  }
+
+  renderPyramid(rep.pyramid);
+  const warn = $("warnBox");
+  if (rep.warnings && rep.warnings.length) {
+    warn.classList.remove("hidden");
+    warn.innerHTML = rep.warnings.map(w => "⚠ " + w).join("<br>");
+  } else warn.classList.add("hidden");
+}
+
+function renderPyramid(pyr) {
+  const body = $("pyrBody"); body.innerHTML = "";
+  if (!pyr) { $("pyrTitle").textContent = "Pyramiding plan"; $("pyrDesc").textContent = "Needs a positive intrinsic value."; return; }
+  const isValue = pyr.mode === "value_accumulate";
+  $("pyrTitle").textContent = "Pyramiding plan — " + (isValue ? "value (accumulate below fair value)" : "trend (add to a winner)");
+  $("pyrDesc").textContent = pyr.description || "";
+  $("colGap").textContent = isValue ? "Disc %" : "Above %";
+  const capOn = pyr.tranches.some(t => "shares" in t);
+  document.querySelectorAll(".capcol").forEach(el => el.classList.toggle("hidden", !capOn));
+  for (const t of pyr.tranches) {
+    const tr = document.createElement("tr");
+    if (t.triggered) tr.className = "trig";
+    const gap = isValue ? t.discount_to_intrinsic : t.above_entry_pct;
+    tr.innerHTML = `<td>${t.level}</td><td>${money(t.price)}</td><td>${gap.toFixed(0)}%</td>` +
+      `<td>${t.weight_pct.toFixed(1)}%</td>` +
+      (capOn ? `<td>${t.shares}</td><td>${money(t.cost)}</td>` : "");
+    body.appendChild(tr);
+  }
+  const s = pyr.summary;
+  $("oAvg").textContent = money(s.avg_entry_price);
+  $("oAvgCap").textContent = s.effective_margin_of_safety != null
+    ? `${s.effective_margin_of_safety.toFixed(1)}% below fair · +${(s.upside_to_intrinsic_at_avg||0).toFixed(0)}% upside`
+    : "blended across tranches";
+  const stop = s.stop_loss != null ? s.stop_loss : s.final_trailing_stop;
+  $("oStop").textContent = money(stop);
+  $("oRisk").textContent = s.risk_per_share_from_avg != null ? `risk ${money(s.risk_per_share_from_avg)}/share` : "";
+  if (s.planned_shares) {
+    $("oPos").textContent = s.planned_shares + " sh";
+    $("oPosCap").textContent = `cost ${money(s.planned_cost)}` + (s.realized_avg_entry ? ` · avg ${money(s.realized_avg_entry)}` : "");
+  } else { $("oPos").textContent = "—"; $("oPosCap").textContent = "add capital to size"; }
+}
+
+// wiring
+$("searchForm").addEventListener("submit", run);
+document.querySelectorAll(".examples a").forEach(a =>
+  a.addEventListener("click", () => { $("symbol").value = a.dataset.sym; run(); }));
+$("themeBtn").addEventListener("click", () => {
+  const root = document.documentElement, cur = root.getAttribute("data-theme");
+  root.setAttribute("data-theme", cur === "dark" ? "light" : cur === "light" ? "auto" : "dark");
+});
+</script>
+</body>
+</html>

@@ -45,6 +45,9 @@ Estimate a stock's **intrinsic (fair) value** and get a **pyramiding buy plan**:
 ```bash
 python run.py value RELIANCE --eps 55 --bvps 668 --growth 10 --price 1257.5
 python run.py value INFY --eps 65 --growth 10 --capital 100000 --tranches 4
+
+# …or just type a symbol in the browser and let it fetch live:
+python run.py serve                       # opens http://127.0.0.1:8000/
 ```
 
 ---
@@ -145,12 +148,34 @@ blocks cloud IPs, in which case pass `--eps`, `--bvps`, `--growth`, … yourself
 the report labels every input `supplied` / `yahoo` / `chart` / `default`). Add
 `--json` for a machine-readable report, or `--no-fetch` to stay fully offline.
 
-### Browser calculator
+### Live web app — just type a symbol
 
-`web/valuation.html` is a **self-contained** version of the same maths — open it
-(or serve it with `python -m http.server`) and tweak inputs to watch the fair
-value, verdict and pyramid ladder update live. It runs entirely in the browser,
-matches the dashboard's light/dark theme, and sends nothing anywhere.
+```bash
+python run.py serve            # opens http://127.0.0.1:8000/
+```
+
+A local web page where you **type a ticker and it fetches live and values it** —
+no manual number entry. It runs on your machine (not a browser sandbox), so it
+reaches Yahoo directly: the **current price** comes from the reliable chart
+endpoint and the **fundamentals** (EPS, book value, growth, dividend) are
+auto-fetched from Yahoo where your network allows, with every input tagged by
+source (`chart` / `yahoo` / `supplied` / `default`). Anything Yahoo won't give,
+you can fill in the collapsible *Assumptions & manual overrides* panel. NSE
+symbols work bare (`TCS`); for other markets use the full Yahoo symbol (`AAPL`,
+`TATASTEEL.BO`). `-p 8000` sets the port; `--host 0.0.0.0` exposes it on your LAN.
+
+> **Why not a claude.ai artifact?** A shared artifact runs in a locked-down
+> browser sandbox that blocks all network calls to outside sites (Yahoo
+> included), so a hosted artifact *cannot* fetch live quotes. This local app can,
+> which is why live valuation ships as `serve` rather than a shareable link.
+
+### Browser calculator (offline, shareable)
+
+`web/valuation.html` is a **self-contained** version of the same maths with no
+live fetch — open it (or serve it with `python -m http.server`) and type the
+numbers to watch the fair value, verdict and pyramid ladder update live. It runs
+entirely in the browser, matches the dashboard's light/dark theme, sends nothing
+anywhere, and works as a shareable claude.ai artifact.
 
 *Intrinsic value is an estimate; it is only as good as the growth and
 discount-rate assumptions fed in. Nothing here is investment advice.*
@@ -256,13 +281,15 @@ Mohit/
 │   ├── pyramid.py               # value / trend pyramiding ladders
 │   ├── fundamentals.py          # best-effort Yahoo fundamentals fetch
 │   ├── engine.py                # orchestrates fetch → intrinsic → pyramid
-│   └── report.py                # terminal report formatter
+│   ├── report.py                # terminal report formatter
+│   └── server.py                # local live web app (stdlib http.server + JSON API)
 ├── tests/
 │   └── test_valuation.py        # unittest suite (no network)
 ├── web/
 │   ├── screener_template.html   # artifact template (/*__DATA__*/ placeholder)
 │   ├── screener.html            # standalone artifact page (data embedded)
-│   └── valuation.html           # self-contained intrinsic-value / pyramid calculator
+│   ├── valuation.html           # self-contained (offline) intrinsic-value / pyramid calculator
+│   └── valuation_live.html      # front-end for `python run.py serve` (live fetch)
 ├── scripts/
 │   └── build_artifact.py        # builds web/screener.html from template + data
 ├── .github/workflows/

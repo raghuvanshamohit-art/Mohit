@@ -150,6 +150,12 @@ def cmd_value(args):
         print(format_report(rep))
 
 
+def cmd_serve(args):
+    """Run the live valuation web app (type a symbol -> live fetch -> value)."""
+    from valuation.server import serve
+    serve(host=args.host, port=args.port, open_browser=not args.no_browser)
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description="Indian sector & stock performance")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -218,6 +224,20 @@ def main(argv=None):
     v.add_argument("--trend-entry", dest="trend_entry", type=float,
                    help="base entry for --mode trend (default current price)")
     v.set_defaults(func=cmd_value)
+
+    sv = sub.add_parser(
+        "serve",
+        help="run the live valuation web app (type a symbol in the browser)",
+        description="Serve a local web page where you type a stock symbol and it "
+                    "fetches live market data and computes intrinsic value + a "
+                    "pyramiding plan. Runs on your machine so it can reach Yahoo "
+                    "directly. Open http://127.0.0.1:8000/ (opens automatically).")
+    sv.add_argument("-p", "--port", type=int, default=8000, help="port (default 8000)")
+    sv.add_argument("--host", default="127.0.0.1",
+                    help="bind address (default 127.0.0.1; use 0.0.0.0 to expose on LAN)")
+    sv.add_argument("--no-browser", action="store_true",
+                    help="do not open a browser automatically")
+    sv.set_defaults(func=cmd_serve)
 
     args = p.parse_args(argv)
     args.func(args)
