@@ -18,6 +18,12 @@ use.*
 
 Everything below hangs off that sentence.
 
+> **Want the numbers, not just the ideas?** The three operational questions —
+> *which stock at what price, which asset to sell/buy, and how to pyramid* — are
+> implemented as runnable engines. See [**The Decision System**](decision-system.md)
+> (`python run.py value | rebalance | pyramid`, or the `web/strategy.html`
+> calculator).
+
 ---
 
 ## Part 1 — Ten core beliefs (the mindset)

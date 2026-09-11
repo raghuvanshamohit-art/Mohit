@@ -42,6 +42,42 @@ python run.py list
 
 ---
 
+## The decision system (framework → numbers)
+
+Three engines turn [**The Investor's Framework**](docs/investment-framework.md)
+into concrete answers. See [`docs/decision-system.md`](docs/decision-system.md)
+for the formulas, assumptions and worked examples.
+
+```bash
+# 1. Which stock, at what price?  Intrinsic value (DCF) + margin of safety.
+python run.py value --eps 50 --growth 0.15 --years 10 \
+                    --bond-yield 0.07 --erp 0.05 --price 700 --implied
+#   → intrinsic value, how much comes from the terminal, margin of safety,
+#     a BUY/ACCUMULATE/HOLD/AVOID verdict, and the growth the price bakes in.
+#   Pass --symbol TCS.NS instead of --price to pull a live price.
+
+# 2. Which asset to sell / buy?  Counter-trend rebalance to a target mix.
+python run.py rebalance --holding equity=750000 --holding gold=150000 \
+                        --holding bonds=100000 --profile balanced --band 0.03
+#   Add --new-money 100000 to rebalance with fresh cash (no selling), or
+#   --years-to-goal 3 to apply the equity→bond glide path.
+
+# 3. How to pyramid?  A price-laddered plan that stops adding at fair value.
+python run.py pyramid --entry 100 --intrinsic 130 --budget 100000 \
+                      --tranches 6 --step 0.08 --decay 0.65 --cap 1.0
+```
+
+There is also a **no-install interactive calculator**: open `web/strategy.html`
+in a browser (all three engines, recomputing live — nothing to run).
+
+Run the engine tests with:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+---
+
 ## What you get
 
 **72 sectors, ~530 constituent stocks.** Example (`python run.py show`):
@@ -160,7 +196,7 @@ the workflow refuses to commit a partial pull.
 
 ```
 Mohit/
-├── run.py                       # CLI: generate / show / list
+├── run.py                       # CLI: generate / show / list / value / rebalance / pyramid
 ├── index.html                   # web dashboard (reads output/sector_performance.json)
 ├── output/
 │   └── sector_performance.json  # generated dataset (a snapshot is committed)
@@ -177,6 +213,15 @@ Mohit/
 │   ├── nse.py                   # optional live NSE constituent fetch (+ fallback)
 │   ├── performance.py           # 3/6/9/12-month return maths
 │   └── generate.py              # orchestrates fetch → JSON
+├── strategy/                    # the decision system (framework → numbers)
+│   ├── valuation.py             # intrinsic value (DCF), margin of safety, implied growth
+│   ├── allocation.py            # target mixes, counter-trend rebalance, glide path
+│   └── pyramid.py               # price-laddered add-to-a-winner plan
+├── web/strategy.html            # no-install interactive calculator for the three engines
+├── tests/test_strategy.py       # unit tests for the engines
+├── docs/
+│   ├── investment-framework.md  # the mindset/economics framework
+│   └── decision-system.md       # formulas + worked examples for the engines
 └── requirements.txt             # (no runtime deps required)
 ```
 

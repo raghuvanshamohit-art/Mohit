@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Investor's Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+  :root {
+    --bg: #eef1ef; --panel: #ffffff; --panel-2: #f6f8f7; --border: #dde3e0;
+    --text: #15201c; --muted: #5c6b64; --faint: #8a978f;
+    --accent: #0f766e; --accent-ink: #0b5b54; --accent-bg: #e4f1ef;
+    --pos: #047857; --pos-bg: #e8f6ef; --warn: #b45309; --warn-bg: #fdf3e3;
+    --neg: #b91c1c; --neg-bg: #fbeceb;
+    --shadow: 0 1px 2px rgba(16,32,28,.05), 0 8px 24px rgba(16,32,28,.06);
+    --serif: "IBM Plex Serif", Georgia, serif;
+    --sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0b120f; --panel: #121b17; --panel-2: #0f1713; --border: #24332c;
+      --text: #e7ede9; --muted: #9baaa1; --faint: #6f7f76;
+      --accent: #34d0c2; --accent-ink: #5fe0d3; --accent-bg: #10302c;
+      --pos: #3fca8e; --pos-bg: #0f2a1f; --warn: #e3a857; --warn-bg: #2c220f;
+      --neg: #f0776e; --neg-bg: #2e1513;
+      --shadow: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0b120f; --panel: #121b17; --panel-2: #0f1713; --border: #24332c;
+    --text: #e7ede9; --muted: #9baaa1; --faint: #6f7f76;
+    --accent: #34d0c2; --accent-ink: #5fe0d3; --accent-bg: #10302c;
+    --pos: #3fca8e; --pos-bg: #0f2a1f; --warn: #e3a857; --warn-bg: #2c220f;
+    --neg: #f0776e; --neg-bg: #2e1513;
+    --shadow: none;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.55 var(--sans);
+    font-variant-numeric: tabular-nums;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding-block: 30px 72px; padding-inline: 18px; }
+
+  header.masthead { border-bottom: 1px solid var(--border); padding-bottom: 20px; }
+  .eyebrow { font: 600 11.5px/1 var(--sans); letter-spacing: .16em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 10px; }
+  header.masthead h1 { font: 600 33px/1.05 var(--serif); letter-spacing: -.01em;
+    margin: 0; text-wrap: balance; }
+  header.masthead p { margin: 10px 0 0; color: var(--muted); max-width: 60ch; font-size: 14.5px; }
+  header.masthead .thesis { color: var(--text); font-style: italic; border-left: 2px solid var(--accent);
+    padding-left: 12px; margin-top: 14px; }
+
+  /* segmented tab control */
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 24px 0 22px;
+    background: var(--panel-2); border: 1px solid var(--border); border-radius: 12px; padding: 6px; }
+  .tab { flex: 1 1 180px; appearance: none; border: 0; cursor: pointer; border-radius: 8px;
+    background: transparent; color: var(--muted); font: 600 14px/1.2 var(--sans);
+    padding: 11px 12px; text-align: left; transition: background .15s, color .15s; }
+  .tab .t-sub { display: block; font-weight: 400; font-size: 12px; color: var(--faint); margin-top: 3px; }
+  .tab[aria-selected="true"] { background: var(--panel); color: var(--text); box-shadow: var(--shadow); }
+  .tab[aria-selected="true"] .t-sub { color: var(--muted); }
+  .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .engine { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 22px; align-items: start; }
+  @media (max-width: 760px) { .engine { grid-template-columns: 1fr; } }
+
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; }
+  .inputs { padding: 20px; }
+  .inputs h2 { font: 600 13px/1 var(--sans); letter-spacing: .04em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 16px; }
+  .field { margin-bottom: 14px; }
+  .field > label { display: block; font-size: 12.5px; color: var(--muted); margin-bottom: 5px; font-weight: 500; }
+  .field .hint { color: var(--faint); font-weight: 400; }
+  .ctrl { width: 100%; background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+    border-radius: 9px; padding: 9px 11px; font: 500 14.5px/1.2 var(--mono); }
+  .ctrl:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+  select.ctrl { font-family: var(--sans); font-weight: 500; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .suffix-group { position: relative; }
+  .suffix-group .suffix { position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
+    color: var(--faint); font: 500 13px/1 var(--mono); pointer-events: none; }
+  .suffix-group .ctrl { padding-right: 30px; }
+
+  .seg { display: flex; gap: 6px; }
+  .seg button { flex: 1; appearance: none; cursor: pointer; border: 1px solid var(--border);
+    background: var(--panel-2); color: var(--muted); border-radius: 8px; padding: 8px 6px;
+    font: 600 12.5px/1 var(--sans); transition: all .12s; }
+  .seg button[aria-pressed="true"] { background: var(--accent-bg); color: var(--accent-ink);
+    border-color: var(--accent); }
+  .seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .results { padding: 22px; min-height: 260px; }
+
+  /* headline figure */
+  .headline { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
+    gap: 14px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+  .headline .big { font: 600 40px/1 var(--mono); letter-spacing: -.02em; }
+  .headline .big .cur { font-size: 20px; color: var(--muted); margin-right: 4px; }
+  .headline .cap { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
+
+  .pill { display: inline-flex; align-items: center; gap: 7px; border-radius: 999px;
+    padding: 7px 14px; font: 600 13.5px/1 var(--sans); border: 1px solid transparent; white-space: nowrap; }
+  .pill .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .pill.pos { color: var(--pos); background: var(--pos-bg); border-color: color-mix(in srgb, var(--pos) 30%, transparent); }
+  .pill.warn { color: var(--warn); background: var(--warn-bg); border-color: color-mix(in srgb, var(--warn) 30%, transparent); }
+  .pill.neg { color: var(--neg); background: var(--neg-bg); border-color: color-mix(in srgb, var(--neg) 30%, transparent); }
+  .pill.neutral { color: var(--muted); background: var(--panel-2); border-color: var(--border); }
+
+  .statline { display: flex; flex-wrap: wrap; gap: 10px 26px; margin-top: 18px; }
+  .stat .k { font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; }
+  .stat .v { font: 600 18px/1.2 var(--mono); margin-top: 3px; }
+  .stat .v.pos { color: var(--pos); } .stat .v.neg { color: var(--neg); } .stat .v.warn { color: var(--warn); }
+
+  .note { margin-top: 18px; padding: 12px 14px; background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 10px; font-size: 13px; color: var(--muted); }
+  .note strong { color: var(--text); font-weight: 600; }
+
+  /* split bar (explicit vs terminal) */
+  .splitbar { margin-top: 20px; }
+  .splitbar .track { display: flex; height: 16px; border-radius: 6px; overflow: hidden; border: 1px solid var(--border); }
+  .splitbar .seg-a { background: var(--accent); }
+  .splitbar .seg-b { background: color-mix(in srgb, var(--accent) 32%, var(--panel-2)); }
+  .splitbar .leg { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: var(--muted); }
+  .splitbar .leg b { color: var(--text); font-weight: 600; }
+
+  /* MoS meter: 0 in middle, positive = discount (good) */
+  .meter { margin-top: 20px; }
+  .meter .scale { position: relative; height: 10px; background: var(--panel-2);
+    border: 1px solid var(--border); border-radius: 6px; }
+  .meter .zero { position: absolute; left: 50%; top: -4px; bottom: -4px; width: 1px; background: var(--faint); }
+  .meter .fill { position: absolute; top: 0; bottom: 0; border-radius: 4px; }
+  .meter .labels { display: flex; justify-content: space-between; margin-top: 7px; font-size: 11px; color: var(--faint); }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+  .tablewrap { overflow-x: auto; }
+  th, td { text-align: right; padding: 9px 10px; font-size: 13.5px; white-space: nowrap; }
+  th { font: 600 11px/1.2 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--muted);
+    border-bottom: 1px solid var(--border); }
+  th:first-child, td:first-child { text-align: left; }
+  tbody td { font-family: var(--mono); border-bottom: 1px solid var(--border); }
+  tbody tr:last-child td { border-bottom: 0; }
+  td .chip { display: inline-block; border-radius: 6px; padding: 3px 9px; font: 600 12px/1.3 var(--sans); }
+  .chip.buy { color: var(--pos); background: var(--pos-bg); }
+  .chip.sell { color: var(--neg); background: var(--neg-bg); }
+  .chip.hold { color: var(--muted); background: var(--panel-2); }
+
+  /* allocation mini dual-bars inside a cell */
+  .allocbar { display: inline-grid; gap: 3px; width: 118px; vertical-align: middle; }
+  .allocbar .b { height: 7px; border-radius: 3px; background: var(--panel-2); position: relative; overflow: hidden; }
+  .allocbar .b i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; }
+  .allocbar .b.now i { background: var(--accent); }
+  .allocbar .b.tgt i { background: var(--faint); }
+
+  footer { margin-top: 30px; padding-top: 18px; border-top: 1px solid var(--border);
+    color: var(--faint); font-size: 12px; }
+  footer a { color: var(--accent); }
+  .theme-toggle { position: fixed; top: 14px; right: 14px; z-index: 9; background: var(--panel);
+    border: 1px solid var(--border); color: var(--muted); border-radius: 9px; width: 38px; height: 38px;
+    cursor: pointer; font-size: 16px; box-shadow: var(--shadow); }
+  .theme-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<button class="theme-toggle" id="themeToggle" title="Toggle light / dark" aria-label="Toggle theme">◐</button>
+<div class="wrap">
+  <header class="masthead">
+    <p class="eyebrow">The Investor's Desk</p>
+    <h1>Value it, allocate it, pyramid it.</h1>
+    <p>Three calculators that turn the framework into numbers — which stock at what price,
+       which asset to sell or buy, and how to add to a winner. All figures in ₹; change any input and
+       the answer recomputes.</p>
+    <p class="thesis">Returns are the market's job. Your job is to assess risk, pay the right price,
+       allocate well, and control your own behaviour.</p>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Choose an engine">
+    <button class="tab" role="tab" id="tab-value" aria-controls="panel-value" aria-selected="true">
+      1 · Value a stock<span class="t-sub">Intrinsic value & margin of safety</span></button>
+    <button class="tab" role="tab" id="tab-rebalance" aria-controls="panel-rebalance" aria-selected="false">
+      2 · Rebalance<span class="t-sub">Which asset to sell / buy</span></button>
+    <button class="tab" role="tab" id="tab-pyramid" aria-controls="panel-pyramid" aria-selected="false">
+      3 · Pyramid<span class="t-sub">Add to a winner, with discipline</span></button>
+  </div>
+
+  <!-- ENGINE 1: VALUE -->
+  <section class="engine" id="panel-value" role="tabpanel" aria-labelledby="tab-value">
+    <form class="card inputs" id="form-value" autocomplete="off">
+      <h2>Business assumptions</h2>
+      <div class="field">
+        <label for="v-eps">Base cash flow / share <span class="hint">(EPS or FCF, trailing)</span></label>
+        <div class="suffix-group"><input class="ctrl" id="v-eps" type="number" step="any" value="50"><span class="suffix">₹</span></div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="v-growth">Stage-1 growth</label>
+          <div class="suffix-group"><input class="ctrl" id="v-growth" type="number" step="any" value="15"><span class="suffix">%</span></div>
+        </div>
+        <div class="field">
+          <label for="v-years">for years</label>
+          <input class="ctrl" id="v-years" type="number" step="1" value="10">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="v-growth2">Stage-2 growth <span class="hint">(opt.)</span></label>
+          <div class="suffix-group"><input class="ctrl" id="v-growth2" type="number" step="any" placeholder="—"><span class="suffix">%</span></div>
+        </div>
+        <div class="field">
+          <label for="v-years2">for years</label>
+          <input class="ctrl" id="v-years2" type="number" step="1" placeholder="—">
+        </div>
+      </div>
+      <div class="field">
+        <label for="v-terminal">Terminal growth <span class="hint">(forever after)</span></label>
+        <div class="suffix-group"><input class="ctrl" id="v-terminal" type="number" step="any" value="4"><span class="suffix">%</span></div>
+      </div>
+      <h2 style="margin-top:22px">The discount rate is the bond market</h2>
+      <div class="row2">
+        <div class="field">
+          <label for="v-bond">10Y G-sec yield</label>
+          <div class="suffix-group"><input class="ctrl" id="v-bond" type="number" step="any" value="7"><span class="suffix">%</span></div>
+        </div>
+        <div class="field">
+          <label for="v-erp">+ Risk premium</label>
+          <div class="suffix-group"><input class="ctrl" id="v-erp" type="number" step="any" value="5"><span class="suffix">%</span></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="v-price">Current price / share</label>
+        <div class="suffix-group"><input class="ctrl" id="v-price" type="number" step="any" value="700"><span class="suffix">₹</span></div>
+      </div>
+    </form>
+    <div class="card results" id="out-value"></div>
+  </section>
+
+  <!-- ENGINE 2: REBALANCE -->
+  <section class="engine" id="panel-rebalance" role="tabpanel" aria-labelledby="tab-rebalance" hidden>
+    <form class="card inputs" id="form-rebalance" autocomplete="off">
+      <h2>Your holdings today</h2>
+      <div class="field">
+        <label for="r-equity">Equity <span class="hint">(stocks, funds, ETFs)</span></label>
+        <div class="suffix-group"><input class="ctrl" id="r-equity" type="number" step="any" value="750000"><span class="suffix">₹</span></div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="r-gold">Gold</label>
+          <div class="suffix-group"><input class="ctrl" id="r-gold" type="number" step="any" value="150000"><span class="suffix">₹</span></div>
+        </div>
+        <div class="field">
+          <label for="r-bonds">Bonds / cash</label>
+          <div class="suffix-group"><input class="ctrl" id="r-bonds" type="number" step="any" value="100000"><span class="suffix">₹</span></div>
+        </div>
+      </div>
+      <h2 style="margin-top:22px">Target mix</h2>
+      <div class="field">
+        <label>Profile <span class="hint">(gold = insurance, 10→20%)</span></label>
+        <div class="seg" id="r-profile" role="group" aria-label="Target profile">
+          <button type="button" data-p="aggressive">Aggressive</button>
+          <button type="button" data-p="balanced" aria-pressed="true">Balanced</button>
+          <button type="button" data-p="conservative">Conservative</button>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="r-band">Drift band <span class="hint">(act beyond)</span></label>
+          <div class="suffix-group"><input class="ctrl" id="r-band" type="number" step="any" value="3"><span class="suffix">%</span></div>
+        </div>
+        <div class="field">
+          <label for="r-years">Years to goal <span class="hint">(glide)</span></label>
+          <input class="ctrl" id="r-years" type="number" step="any" placeholder="—">
+        </div>
+      </div>
+      <div class="field">
+        <label for="r-new">New money to deploy <span class="hint">(no selling)</span></label>
+        <div class="suffix-group"><input class="ctrl" id="r-new" type="number" step="any" placeholder="—"><span class="suffix">₹</span></div>
+      </div>
+    </form>
+    <div class="card results" id="out-rebalance"></div>
+  </section>
+
+  <!-- ENGINE 3: PYRAMID -->
+  <section class="engine" id="panel-pyramid" role="tabpanel" aria-labelledby="tab-pyramid" hidden>
+    <form class="card inputs" id="form-pyramid" autocomplete="off">
+      <h2>The position</h2>
+      <div class="row2">
+        <div class="field">
+          <label for="p-entry">First buy price</label>
+          <div class="suffix-group"><input class="ctrl" id="p-entry" type="number" step="any" value="100"><span class="suffix">₹</span></div>
+        </div>
+        <div class="field">
+          <label for="p-intrinsic">Intrinsic value</label>
+          <div class="suffix-group"><input class="ctrl" id="p-intrinsic" type="number" step="any" value="130"><span class="suffix">₹</span></div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="p-budget">Total budget for the position</label>
+        <div class="suffix-group"><input class="ctrl" id="p-budget" type="number" step="any" value="100000"><span class="suffix">₹</span></div>
+      </div>
+      <h2 style="margin-top:22px">The ladder</h2>
+      <div class="row2">
+        <div class="field">
+          <label for="p-tranches">Rungs</label>
+          <input class="ctrl" id="p-tranches" type="number" step="1" value="6">
+        </div>
+        <div class="field">
+          <label for="p-step">Step up / rung</label>
+          <div class="suffix-group"><input class="ctrl" id="p-step" type="number" step="any" value="8"><span class="suffix">%</span></div>
+        </div>
+      </div>
+      <div class="row3">
+        <div class="field">
+          <label for="p-decay">Size decay</label>
+          <input class="ctrl" id="p-decay" type="number" step="any" value="0.65">
+        </div>
+        <div class="field">
+          <label for="p-stop">Stop-loss</label>
+          <div class="suffix-group"><input class="ctrl" id="p-stop" type="number" step="any" value="15"><span class="suffix">%</span></div>
+        </div>
+        <div class="field">
+          <label for="p-cap">Cap × IV</label>
+          <input class="ctrl" id="p-cap" type="number" step="any" value="1.0">
+        </div>
+      </div>
+    </form>
+    <div class="card results" id="out-pyramid"></div>
+  </section>
+
+  <footer>
+    Calculators, not recommendations — every output is only as good as the growth you assume, which is
+    yours to judge. Markets carry risk of loss. Engines mirror <code>python run.py value | rebalance | pyramid</code>.
+  </footer>
+</div>
+
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+const num = (id) => { const v = parseFloat($(id).value); return Number.isFinite(v) ? v : null; };
+const inr = (x) => "₹" + Math.round(x).toLocaleString("en-IN");
+const pct = (x, d = 1) => (x >= 0 ? "+" : "") + (x * 100).toFixed(d) + "%";
+
+/* ---------- engine: valuation ---------- */
+function intrinsicValue(base, stages, terminalGrowth, discount) {
+  if (discount <= terminalGrowth) return { error: "Discount rate must exceed terminal growth." };
+  let cf = base, pvExplicit = 0, year = 0;
+  for (const s of stages) {
+    for (let i = 0; i < s.years; i++) {
+      year++; cf *= (1 + s.growth);
+      pvExplicit += cf / Math.pow(1 + discount, year);
+    }
+  }
+  const terminalCf = cf * (1 + terminalGrowth);
+  const tv = terminalCf / (discount - terminalGrowth);
+  const pvTerminal = tv / Math.pow(1 + discount, year);
+  const value = pvExplicit + pvTerminal;
+  return { value, pvExplicit, pvTerminal, terminalShare: value ? pvTerminal / value : 0 };
+}
+function verdict(mos) {
+  if (mos >= 0.30) return { label: "BUY — strong margin of safety", tone: "pos" };
+  if (mos >= 0.10) return { label: "ACCUMULATE — modest margin of safety", tone: "pos" };
+  if (mos >= -0.10) return { label: "HOLD — roughly fairly valued", tone: "warn" };
+  return { label: "AVOID — price above intrinsic value", tone: "neg" };
+}
+function impliedGrowth(base, price, years, terminalGrowth, discount) {
+  const iv = (g) => intrinsicValue(base, [{ growth: g, years }], terminalGrowth, discount).value;
+  let lo = -0.5, hi = 1.0;
+  if (iv(lo) - price > 0 || iv(hi) - price < 0) return null;
+  for (let i = 0; i < 200; i++) {
+    const mid = (lo + hi) / 2, f = iv(mid) - price;
+    if (Math.abs(f) < 1e-5 || (hi - lo) < 1e-6) return mid;
+    if (f < 0) lo = mid; else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+function renderValue() {
+  const base = num("v-eps"), g1 = num("v-growth"), y1 = num("v-years");
+  const g2 = num("v-growth2"), y2 = num("v-years2"), term = num("v-terminal");
+  const bond = num("v-bond"), erp = num("v-erp"), price = num("v-price");
+  const out = $("out-value");
+  if (base == null || g1 == null || y1 == null || term == null || bond == null || erp == null) {
+    out.innerHTML = `<div class="note">Fill in the business assumptions to value the stock.</div>`; return;
+  }
+  const discount = (bond + erp) / 100;
+  const stages = [{ growth: g1 / 100, years: Math.round(y1) }];
+  if (g2 != null && y2 != null && y2 > 0) stages.push({ growth: g2 / 100, years: Math.round(y2) });
+  const r = intrinsicValue(base, stages, term / 100, discount);
+  if (r.error) { out.innerHTML = `<div class="note"><strong>Can't value:</strong> ${r.error}</div>`; return; }
+
+  let html = `<div class="headline">
+    <div><div class="cap">Intrinsic value / share</div>
+      <div class="big"><span class="cur">₹</span>${r.value.toFixed(2)}</div></div>`;
+  let mos = null, v = null;
+  if (price != null) { mos = (r.value - price) / r.value; v = verdict(mos);
+    html += `<span class="pill ${v.tone}"><span class="dot"></span>${v.label}</span>`; }
+  html += `</div>`;
+
+  const exPct = Math.round((1 - r.terminalShare) * 100), tPct = Math.round(r.terminalShare * 100);
+  html += `<div class="splitbar"><div class="track">
+      <div class="seg-a" style="width:${exPct}%"></div><div class="seg-b" style="width:${tPct}%"></div></div>
+    <div class="leg"><span><b>${exPct}%</b> explicit cash flows (${r.pvExplicit.toFixed(0)})</span>
+      <span><b>${tPct}%</b> terminal value (${r.pvTerminal.toFixed(0)})</span></div></div>`;
+  if (r.terminalShare > 0.7)
+    html += `<div class="note">⚠ <strong>${tPct}%</strong> of value sits in the terminal — the answer is
+      very sensitive to terminal growth and the discount rate. Treat it as a range, not a point.</div>`;
+
+  if (price != null) {
+    const half = Math.min(0.5, Math.max(Math.abs(mos), 0.05));
+    const w = Math.min(Math.abs(mos), 0.5) / 0.5 * 50;
+    const pos = mos >= 0;
+    html += `<div class="meter"><div class="cap" style="margin-bottom:8px">Margin of safety</div>
+      <div class="scale"><div class="zero"></div>
+        <div class="fill" style="background:var(--${pos ? 'pos' : 'neg'}); ${pos ? 'left:50%' : 'right:50%'}; width:${w}%"></div></div>
+      <div class="labels"><span>−50% (overpaying)</span><span>0</span><span>+50% (deep discount)</span></div></div>`;
+
+    html += `<div class="statline">
+      <div class="stat"><div class="k">Price</div><div class="v">₹${price.toFixed(2)}</div></div>
+      <div class="stat"><div class="k">Margin of safety</div><div class="v ${mos >= 0.1 ? 'pos' : mos >= -0.1 ? 'warn' : 'neg'}">${pct(mos)}</div></div>
+      <div class="stat"><div class="k">Discount rate</div><div class="v">${(discount * 100).toFixed(1)}%</div></div>`;
+    const ig = impliedGrowth(base, price, Math.round(y1), term / 100, discount);
+    html += `<div class="stat"><div class="k">Growth priced in</div><div class="v">${ig == null ? "—" : (ig * 100).toFixed(1) + "%"}</div></div></div>`;
+    if (ig != null)
+      html += `<div class="note">The price bakes in <strong>${(ig * 100).toFixed(1)}% growth for ${Math.round(y1)}y</strong>.
+        Your case assumes ${g1}%. The gap is your edge — <strong>if</strong> ${g1}% is honest and sustainable.</div>`;
+  } else {
+    html += `<div class="note">Add a current price to see the margin of safety, a verdict, and the growth the market is already pricing in.</div>`;
+  }
+  out.innerHTML = html;
+}
+
+/* ---------- engine: allocation ---------- */
+const PROFILES = {
+  aggressive: { equity: 0.80, gold: 0.10, bonds: 0.10 },
+  balanced: { equity: 0.65, gold: 0.15, bonds: 0.20 },
+  conservative: { equity: 0.60, gold: 0.20, bonds: 0.20 },
+};
+let currentProfile = "balanced";
+function normalize(w) { const t = Object.values(w).reduce((a, b) => a + b, 0); const o = {}; for (const k in w) o[k] = w[k] / t; return o; }
+function glideTargets(base, years, start = 15) {
+  base = normalize(base);
+  if (years >= start) return base;
+  const frac = Math.max(0, years) / start;
+  const eq = base.equity || 0, newEq = eq * frac;
+  const o = { ...base }; o.equity = newEq; o.bonds = (base.bonds || 0) + (eq - newEq);
+  return normalize(o);
+}
+function renderRebalance() {
+  const holdings = { equity: num("r-equity") || 0, gold: num("r-gold") || 0, bonds: num("r-bonds") || 0 };
+  const total = holdings.equity + holdings.gold + holdings.bonds;
+  const out = $("out-rebalance");
+  if (total <= 0) { out.innerHTML = `<div class="note">Enter at least one holding value.</div>`; return; }
+  let targets = PROFILES[currentProfile];
+  const years = num("r-years");
+  if (years != null) targets = glideTargets(targets, years);
+  const band = (num("r-band") || 0) / 100;
+  const newMoney = num("r-new");
+  const assets = ["equity", "gold", "bonds"];
+
+  let rows = [], mode;
+  if (newMoney != null && newMoney > 0) {
+    mode = "new";
+    const future = total + newMoney;
+    const short = {}; let ts = 0;
+    assets.forEach(a => { short[a] = Math.max(0, (targets[a] || 0) * future - (holdings[a] || 0)); ts += short[a]; });
+    rows = assets.map(a => {
+      const buy = ts ? newMoney * short[a] / ts : 0;
+      return { asset: a, side: buy > 0 ? "BUY" : "HOLD", amount: buy,
+        now: (holdings[a] || 0) / future, tgt: targets[a] || 0 };
+    });
+  } else {
+    mode = "rebal";
+    rows = assets.map(a => {
+      const val = holdings[a] || 0, tw = targets[a] || 0, cw = val / total, drift = cw - tw, tv = tw * total;
+      let side = "HOLD", amount = 0;
+      if (Math.abs(drift) > band) { side = drift > 0 ? "SELL" : "BUY"; amount = Math.abs(val - tv); }
+      return { asset: a, side, amount, now: cw, tgt: tw };
+    });
+  }
+  rows.sort((a, b) => (a.side === "HOLD") - (b.side === "HOLD") || b.amount - a.amount);
+
+  const mixTxt = assets.map(a => `${a} ${Math.round((targets[a] || 0) * 100)}%`).join(" · ");
+  let html = `<div class="headline"><div><div class="cap">${mode === "new" ? "Deploy new money" : "Rebalance to target"}</div>
+      <div class="big" style="font-size:26px">${mixTxt}</div></div>
+    <span class="pill neutral">Portfolio ${inr(total)}${mode === "new" ? " + " + inr(newMoney) : ""}</span></div>`;
+  if (years != null) html += `<div class="note">Glide path applied for <strong>${years}</strong> years to goal — equity is being shifted into bonds as you approach it.</div>`;
+  html += `<div class="tablewrap"><table><thead><tr><th>Asset</th><th>Action</th><th>Amount</th><th>Now → Target</th><th>Drift</th></tr></thead><tbody>`;
+  for (const r of rows) {
+    const chip = r.side.toLowerCase();
+    const now = r.now, tgt = r.tgt, drift = now - tgt;
+    html += `<tr><td style="text-transform:capitalize">${r.asset}</td>
+      <td><span class="chip ${chip}">${r.side}</span></td>
+      <td>${r.amount ? inr(r.amount) : "—"}</td>
+      <td><span class="allocbar"><span class="b now"><i style="width:${Math.min(now*100,100)}%"></i></span>
+        <span class="b tgt"><i style="width:${Math.min(tgt*100,100)}%"></i></span></span>
+        <span style="font-size:12px;color:var(--muted);margin-left:8px">${Math.round(now*100)}→${Math.round(tgt*100)}%</span></td>
+      <td style="color:var(--${Math.abs(drift)<=band?'muted':drift>0?'neg':'pos'})">${pct(drift)}</td></tr>`;
+  }
+  html += `</tbody></table></div>`;
+  html += `<div class="note">${mode === "new"
+    ? "Fresh cash goes to the <strong>most underweight</strong> sleeves first — rebalancing with no selling, no tax."
+    : "<strong>Sell what ran up, buy what fell.</strong> Sleeves inside the ±" + (band*100).toFixed(0) + "% band are left alone so you don't churn on noise."}</div>`;
+  out.innerHTML = html;
+}
+
+/* ---------- engine: pyramid ---------- */
+function pyramidPlan(entry, iv, budget, tranches, step, decay, stop, cap) {
+  const ceiling = cap * iv;
+  const prices = [], weights = [];
+  for (let i = 0; i < tranches; i++) { prices.push(entry * Math.pow(1 + step, i)); weights.push(Math.pow(decay, i)); }
+  const wsum = weights.reduce((a, b) => a + b, 0);
+  const kept = [];
+  for (let i = 0; i < tranches; i++) if (prices[i] <= ceiling) kept.push({ price: prices[i], weight: weights[i] / wsum });
+  if (!kept.length) return { rungs: [], note: `Entry ₹${entry.toFixed(2)} is already above ${Math.round(cap*100)}% of intrinsic value (₹${ceiling.toFixed(2)}) — do not buy.`, deployed: 0, uninvested: budget, empty: true };
+  let cumS = 0, cumC = 0; const rungs = [];
+  kept.forEach((k, i) => {
+    const amt = budget * k.weight, sh = amt / k.price; cumS += sh; cumC += amt;
+    const avg = cumC / cumS;
+    rungs.push({ n: i + 1, price: k.price, amount: amt, shares: sh, cumCost: cumC, avg, stop: avg * (1 - stop) });
+  });
+  const avgCost = cumC / cumS, avgMos = (iv - avgCost) / iv, dropped = tranches - kept.length;
+  return { rungs, deployed: cumC, uninvested: budget - cumC, avgCost, avgMos,
+    note: dropped ? `${dropped} of ${tranches} rungs skipped — they breach ${Math.round(cap*100)}% of intrinsic value (₹${ceiling.toFixed(2)}). Let the winner run, but don't pyramid above value.`
+                  : `All ${tranches} rungs sit below ${Math.round(cap*100)}% of intrinsic value (₹${ceiling.toFixed(2)}).` };
+}
+function renderPyramid() {
+  const entry = num("p-entry"), iv = num("p-intrinsic"), budget = num("p-budget");
+  const tranches = Math.round(num("p-tranches") || 0), step = (num("p-step") || 0) / 100;
+  const decay = num("p-decay"), stop = (num("p-stop") || 0) / 100, cap = num("p-cap");
+  const out = $("out-pyramid");
+  if (!entry || !iv || !budget || !tranches || decay == null || cap == null) {
+    out.innerHTML = `<div class="note">Enter the position and ladder settings.</div>`; return;
+  }
+  const plan = pyramidPlan(entry, iv, budget, tranches, step, decay, stop, cap);
+  let html = `<div class="headline"><div><div class="cap">Average cost after the ladder</div>
+    <div class="big">${plan.empty ? "—" : '<span class="cur">₹</span>' + plan.avgCost.toFixed(2)}</div></div>`;
+  if (!plan.empty) html += `<span class="pill ${plan.avgMos >= 0.1 ? 'pos' : plan.avgMos >= -0.1 ? 'warn' : 'neg'}"><span class="dot"></span>avg-cost MoS ${pct(plan.avgMos)}</span>`;
+  else html += `<span class="pill neg"><span class="dot"></span>Do not buy</span>`;
+  html += `</div>`;
+  html += `<div class="note">${plan.note}</div>`;
+  if (!plan.empty) {
+    html += `<div class="statline">
+      <div class="stat"><div class="k">Deployed</div><div class="v">${inr(plan.deployed)}</div></div>
+      <div class="stat"><div class="k">Dry powder</div><div class="v">${inr(plan.uninvested)}</div></div>
+      <div class="stat"><div class="k">Budget</div><div class="v">${inr(budget)}</div></div></div>`;
+    html += `<div class="tablewrap"><table><thead><tr><th>#</th><th>Price</th><th>Buy</th><th>Shares</th><th>Cum cost</th><th>Avg cost</th><th>Stop</th></tr></thead><tbody>`;
+    for (const r of plan.rungs)
+      html += `<tr><td>${r.n}</td><td>₹${r.price.toFixed(2)}</td><td>${inr(r.amount)}</td>
+        <td>${r.shares.toFixed(1)}</td><td>${inr(r.cumCost)}</td><td>₹${r.avg.toFixed(2)}</td>
+        <td style="color:var(--neg)">₹${r.stop.toFixed(2)}</td></tr>`;
+    html += `</tbody></table></div>`;
+    html += `<div class="note">Decaying sizes keep the <strong>average cost below the top rung</strong>, so a normal pullback doesn't erase the gain. The stop trails the running average cost.</div>`;
+  }
+  out.innerHTML = html;
+}
+
+/* ---------- wiring ---------- */
+function selectTab(which) {
+  ["value", "rebalance", "pyramid"].forEach(name => {
+    const isSel = name === which;
+    $("tab-" + name).setAttribute("aria-selected", isSel ? "true" : "false");
+    $("panel-" + name).hidden = !isSel;
+  });
+}
+["value", "rebalance", "pyramid"].forEach(name => {
+  $("tab-" + name).addEventListener("click", () => selectTab(name));
+});
+$("form-value").addEventListener("input", renderValue);
+$("form-rebalance").addEventListener("input", renderRebalance);
+$("form-pyramid").addEventListener("input", renderPyramid);
+document.querySelectorAll("#r-profile button").forEach(b => b.addEventListener("click", () => {
+  currentProfile = b.dataset.p;
+  document.querySelectorAll("#r-profile button").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+  renderRebalance();
+}));
+
+/* theme toggle */
+const root = document.documentElement;
+$("themeToggle").addEventListener("click", () => {
+  const cur = root.getAttribute("data-theme");
+  const isDark = cur === "dark" || (cur !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
+  root.setAttribute("data-theme", isDark ? "light" : "dark");
+});
+
+renderValue(); renderRebalance(); renderPyramid();
+</script>
+</body>
+</html>
