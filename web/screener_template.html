@@ -1,0 +1,296 @@
+<title>Indian Sector Screener</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --bg: #f7f8fa; --panel: #ffffff; --panel2: #fbfcfd; --border: #e4e7ec;
+    --text: #101828; --muted: #667085; --faint: #98a2b3;
+    --accent: #3538cd; --accent-soft: #eef0ff;
+    --pos: #067647; --pos-bg: #ecfdf3; --pos-bar: #17b26a;
+    --neg: #b42318; --neg-bg: #fef3f2; --neg-bar: #f04438;
+    --shadow: 0 1px 2px rgba(16,24,40,.05), 0 1px 3px rgba(16,24,40,.04);
+    --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    --sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0a0e17; --panel: #121824; --panel2: #0f1420; --border: #222b3a;
+      --text: #e7eaf1; --muted: #8b98ad; --faint: #5b6678;
+      --accent: #8098ff; --accent-soft: #1a2036;
+      --pos: #5ee29a; --pos-bg: #0e2a1c; --pos-bar: #17b26a;
+      --neg: #f98a80; --neg-bg: #2a1416; --neg-bar: #f04438; --shadow: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0a0e17; --panel: #121824; --panel2: #0f1420; --border: #222b3a;
+    --text: #e7eaf1; --muted: #8b98ad; --faint: #5b6678;
+    --accent: #8098ff; --accent-soft: #1a2036;
+    --pos: #5ee29a; --pos-bg: #0e2a1c; --pos-bar: #17b26a;
+    --neg: #f98a80; --neg-bg: #2a1416; --neg-bar: #f04438; --shadow: none;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans);
+    font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 28px 18px 72px; }
+
+  header { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 20px; }
+  .brand { flex: 1 1 auto; min-width: 260px; }
+  .eyebrow { font-family: var(--mono); font-size: 11.5px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--accent); margin: 0 0 6px; }
+  h1 { margin: 0; font-size: 30px; font-weight: 700; letter-spacing: -.025em; text-wrap: balance; }
+  .sub { margin: 8px 0 0; color: var(--muted); font-size: 13.5px; max-width: 64ch; }
+  .stamp { font-family: var(--mono); font-size: 12px; color: var(--muted); text-align: right; line-height: 1.7; }
+  .stamp b { color: var(--text); font-weight: 600; }
+
+  .toolbar { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap;
+    gap: 10px; align-items: center; margin: 22px 0 6px; padding: 12px 0;
+    background: linear-gradient(var(--bg) 72%, rgba(0,0,0,0)); }
+  .field { display: flex; align-items: center; gap: 8px; background: var(--panel);
+    border: 1px solid var(--border); border-radius: 9px; padding: 0 12px; height: 40px; box-shadow: var(--shadow); }
+  .field svg { width: 15px; height: 15px; color: var(--faint); flex: none; }
+  .field.grow { flex: 1 1 240px; min-width: 160px; }
+  input, select { border: 0; background: transparent; color: var(--text); font: inherit; outline: none; }
+  input { width: 100%; }
+  select { font-family: var(--mono); font-size: 13px; cursor: pointer; }
+  .field label { font-family: var(--mono); font-size: 11px; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--muted); }
+  button.theme { height: 40px; padding: 0 14px; background: var(--panel); color: var(--text);
+    border: 1px solid var(--border); border-radius: 9px; cursor: pointer;
+    font-family: var(--mono); font-size: 12.5px; box-shadow: var(--shadow); }
+  button.theme:hover { border-color: var(--accent); color: var(--accent); }
+
+  .macrohead { display: flex; align-items: baseline; gap: 10px; margin: 26px 2px 4px; }
+  .macrohead .mname { font-family: var(--mono); font-size: 12px; font-weight: 600; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--text); }
+  .macrohead .mcount { font-family: var(--mono); font-size: 11px; color: var(--faint); }
+  .macrohead .mrule { flex: 1; height: 1px; background: var(--border); }
+
+  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 13px;
+    box-shadow: var(--shadow); margin: 10px 0; overflow: hidden; }
+  .phead { display: flex; align-items: center; gap: 11px; padding: 13px 16px; cursor: pointer; user-select: none; }
+  .phead .caret { color: var(--faint); font-size: 11px; transition: transform .15s; width: 12px; }
+  .panel.collapsed .phead .caret { transform: rotate(-90deg); }
+  .phead h2 { margin: 0; font-size: 15.5px; font-weight: 600; letter-spacing: -.01em; }
+  .tag { font-family: var(--mono); font-size: 11px; letter-spacing: .04em; color: var(--muted);
+    border: 1px solid var(--border); background: var(--panel2); padding: 3px 9px; border-radius: 999px; }
+  .phead .spacer { flex: 1; }
+  .lead-metric { font-family: var(--mono); font-size: 13px; font-weight: 600; }
+  .panel .body { border-top: 1px solid var(--border); overflow-x: auto; }
+  .panel.collapsed .body { display: none; }
+
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 10px 14px; text-align: right; white-space: nowrap; }
+  th:first-child, td:first-child, th.l, td.l { text-align: left; }
+  thead th { font-family: var(--mono); font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--muted); font-weight: 500; cursor: pointer; border-bottom: 1px solid var(--border);
+    background: var(--panel); }
+  thead th.sorted { color: var(--accent); }
+  thead th.sorted::after { content: " ↓"; }
+  tbody td { font-size: 14px; border-bottom: 1px solid var(--border); }
+  tbody tr:last-child td { border-bottom: 0; }
+  tbody tr:nth-child(even) td { background: var(--panel2); }
+  .sym { font-family: var(--mono); font-weight: 600; font-size: 13px; }
+  .co { color: var(--muted); max-width: 240px; overflow: hidden; text-overflow: ellipsis; }
+  .price { font-family: var(--mono); color: var(--muted); font-size: 13px; }
+  .pct { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 600; font-size: 13px;
+    padding: 3px 8px; border-radius: 6px; display: inline-block; min-width: 66px; }
+  .pct.pos { color: var(--pos); background: var(--pos-bg); }
+  .pct.neg { color: var(--neg); background: var(--neg-bg); }
+  .pct.na  { color: var(--faint); background: transparent; }
+  .avg td { border-top: 2px solid var(--border); background: transparent !important; }
+  .avg .sym { text-transform: uppercase; letter-spacing: .05em; font-size: 11px; color: var(--muted); }
+  .avg .co { color: var(--text); font-weight: 500; }
+  .flag { font-family: var(--mono); color: var(--faint); font-size: 10px; margin-left: 6px;
+    border: 1px solid var(--border); border-radius: 4px; padding: 1px 4px; }
+
+  .heatcell { position: relative; }
+  .heatcell .bar { position: absolute; top: 50%; transform: translateY(-50%); height: 22px; border-radius: 5px; opacity: .16; }
+  .heatcell .bar.pos { right: 50%; background: var(--pos-bar); }
+  .heatcell .bar.neg { left: 50%; background: var(--neg-bar); }
+  .heatcell .val { position: relative; }
+  .heatcell .zero { position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: var(--border); }
+  .leader .co { color: var(--text); font-weight: 600; cursor: pointer; }
+  .leader .co:hover { color: var(--accent); text-decoration: underline; }
+  .rank { font-family: var(--mono); color: var(--faint); font-size: 12px; }
+  .mtag { font-family: var(--mono); color: var(--muted); font-size: 11.5px; }
+
+  .note { color: var(--muted); font-size: 12.5px; line-height: 1.6; margin: 20px 2px 0; max-width: 92ch; }
+  .note b { color: var(--text); }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin: 14px 2px 0;
+    font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+  .swatch { display: inline-block; width: 11px; height: 11px; border-radius: 3px; vertical-align: -1px; margin-right: 5px; }
+  @media (max-width: 560px) { h1 { font-size: 24px; } .stamp { text-align: left; } .co { max-width: 130px; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <p class="eyebrow">72 Industry Groups · NSE Classification · Yahoo Finance</p>
+      <h1>Indian Sector Screener</h1>
+      <p class="sub">The whole Indian market across 72 industry groups — banks to defence to specialty
+        chemicals — each with its constituent stocks ranked by trailing price growth over 3, 6, 9 and
+        12 months. Returns use adjusted close (splits &amp; dividends included).</p>
+    </div>
+    <div class="stamp" id="stamp"></div>
+  </header>
+
+  <div class="toolbar">
+    <div class="field grow">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="q" type="search" placeholder="Filter — symbol, company, sector or macro (e.g. HDFC, defence)" autocomplete="off">
+    </div>
+    <div class="field">
+      <label for="macro">Macro</label>
+      <select id="macro"><option value="">All</option></select>
+    </div>
+    <div class="field">
+      <label for="sort">Rank by</label>
+      <select id="sort">
+        <option value="12m">12 months</option><option value="9m">9 months</option>
+        <option value="6m">6 months</option><option value="3m">3 months</option><option value="name">Name</option>
+      </select>
+    </div>
+    <button class="theme" id="theme">◐ Theme</button>
+  </div>
+
+  <div id="root"></div>
+
+  <div class="legend">
+    <span><span class="swatch" style="background:var(--pos-bar)"></span>Gain</span>
+    <span><span class="swatch" style="background:var(--neg-bar)"></span>Loss</span>
+    <span><span class="swatch" style="background:var(--border)"></span>No / partial data</span>
+    <span>Leaderboard bars scale to the largest move in the ranked period.</span>
+  </div>
+  <p class="note" id="note"></p>
+</div>
+
+<script id="data" type="application/json">/*__DATA__*/</script>
+<script>
+const DATA = JSON.parse(document.getElementById("data").textContent);
+const PERIODS = ["3m","6m","9m","12m"];
+const state = { sort: "12m", q: "", macro: "", open: new Set(["__lead"]) };
+
+const fmt = v => v==null ? '<span class="pct na">—</span>'
+  : `<span class="pct ${v>=0?'pos':'neg'}">${v>=0?'+':''}${v.toFixed(2)}%</span>`;
+const inr = v => v==null ? "—" : "₹" + v.toLocaleString("en-IN");
+
+function flag(st){
+  if(!st.ok) return "";
+  const h = st.history_days||0;
+  return h<340 ? `<span class="flag" title="Only ${Math.round(h)} days of price history (recent listing / demerger) — long-period figures are partial">${Math.round(h)}d</span>` : "";
+}
+function sortStocks(list, key){
+  const a = list.slice();
+  if(key==="name") a.sort((x,y)=>(x.name||"").localeCompare(y.name||""));
+  else a.sort((x,y)=>{ const xv=x.returns?.[key], yv=y.returns?.[key];
+    if(xv==null) return 1; if(yv==null) return -1; return yv-xv; });
+  return a;
+}
+function stockRow(st){
+  const cells = PERIODS.map(p=>`<td>${fmt(st.returns?.[p])}</td>`).join("");
+  return `<tr><td class="l"><span class="sym">${st.symbol}</span>${flag(st)}</td>
+    <td class="l co" title="${st.long_name||st.name}">${st.name}</td>
+    <td class="price">${st.ok?inr(st.price):"—"}</td>${cells}</tr>`;
+}
+function head(){
+  const ths = PERIODS.map(p=>`<th class="${state.sort===p?'sorted':''}" data-sort="${p}">${p.replace('m',' M')}</th>`).join("");
+  return `<tr><th class="l" data-sort="name">Symbol</th><th class="l">Company</th><th>Price</th>${ths}</tr>`;
+}
+function sectorPanel(sec){
+  const open = state.open.has(sec.key);
+  let stocks = sortStocks(sec.stocks, state.sort);
+  if(state.q){ const q=state.q.toLowerCase();
+    if(!(sec.name.toLowerCase().includes(q)||sec.macro.toLowerCase().includes(q)))
+      stocks = stocks.filter(s=>s.symbol.toLowerCase().includes(q)||(s.name||"").toLowerCase().includes(q)); }
+  const rows = stocks.map(stockRow).join("") || `<tr><td class="l co" colspan="7">No matches in this sector.</td></tr>`;
+  const avg = sec.average_returns||{};
+  const avgCells = PERIODS.map(p=>`<td>${fmt(avg[p])}</td>`).join("");
+  const lead = avg[state.sort==="name"?"12m":state.sort];
+  const leadHtml = lead==null?"":`<span class="lead-metric" style="color:${lead>=0?'var(--pos)':'var(--neg)'}">${lead>=0?'+':''}${lead.toFixed(2)}%</span>`;
+  return `<section class="panel ${open?'':'collapsed'}" data-key="${sec.key}">
+    <div class="phead" data-toggle="${sec.key}"><span class="caret">▾</span><h2>${sec.name}</h2>
+      <span class="tag">${sec.num_ok}/${sec.num_stocks}</span>
+      <span class="spacer"></span>${leadHtml}</div>
+    <div class="body"><table><thead>${head()}</thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr class="avg"><td class="l"><span class="sym">AVG</span></td>
+        <td class="l co">Equal-weighted sector average</td><td></td>${avgCells}</tr></tfoot>
+    </table></div></section>`;
+}
+function leaderboard(secs){
+  const key = state.sort==="name" ? "12m" : state.sort;
+  const ranked = secs.slice().sort((a,b)=>{
+    if(state.sort==="name") return a.name.localeCompare(b.name);
+    const av=a.average_returns[key], bv=b.average_returns[key];
+    if(av==null) return 1; if(bv==null) return -1; return bv-av; });
+  const max = Math.max(1, ...ranked.map(s=>Math.abs(s.average_returns[key]??0)));
+  const ths = PERIODS.map(p=>`<th class="${state.sort===p?'sorted':''}" data-sort="${p}">${p.replace('m',' M')}</th>`).join("");
+  const rows = ranked.map((s,i)=>{
+    const cells = PERIODS.map(p=>{
+      const v = s.average_returns[p];
+      if(p!==key) return `<td>${fmt(v)}</td>`;
+      const w = v==null?0:(Math.abs(v)/max)*46;
+      const bar = v==null?"":`<span class="bar ${v>=0?'pos':'neg'}" style="width:${w}%"></span>`;
+      return `<td class="heatcell">${bar}<span class="zero"></span><span class="val">${fmt(v)}</span></td>`;
+    }).join("");
+    return `<tr><td class="l rank">${String(i+1).padStart(2,'0')}</td>
+      <td class="l co" data-goto="${s.key}">${s.name}</td>
+      <td class="l mtag">${s.macro}</td>${cells}</tr>`;
+  }).join("");
+  const open = state.open.has("__lead");
+  return `<section class="panel leader ${open?'':'collapsed'}" data-key="__lead">
+    <div class="phead" data-toggle="__lead"><span class="caret">▾</span><h2>Sector Leaderboard</h2>
+      <span class="tag">${secs.length} sectors</span><span class="tag">equal-weighted</span>
+      <span class="spacer"></span><span class="mtag">ranked by ${key.replace('m','-month')}</span></div>
+    <div class="body"><table>
+      <thead><tr><th class="l">#</th><th class="l">Sector</th><th class="l">Macro</th>${ths}</tr></thead>
+      <tbody>${rows}</tbody></table></div></section>`;
+}
+function render(){
+  let secs = DATA.sectors;
+  if(state.macro) secs = secs.filter(s=>s.macro===state.macro);
+  if(state.q){ const q=state.q.toLowerCase();
+    secs = secs.filter(s=> s.name.toLowerCase().includes(q) || s.macro.toLowerCase().includes(q)
+      || s.stocks.some(st=>st.symbol.toLowerCase().includes(q)||(st.name||"").toLowerCase().includes(q))); }
+  let html = leaderboard(secs);
+  let cur = null;
+  for(const s of secs){
+    if(s.macro!==cur){ cur=s.macro;
+      const n = secs.filter(x=>x.macro===cur).length;
+      html += `<div class="macrohead"><span class="mname">${cur}</span><span class="mcount">${n} sector${n>1?'s':''}</span><span class="mrule"></span></div>`; }
+    html += sectorPanel(s);
+  }
+  document.getElementById("root").innerHTML = html || `<p class="note">No sectors match.</p>`;
+}
+function boot(){
+  const m = DATA.meta;
+  document.getElementById("stamp").innerHTML =
+    `<b>${m.num_ok}/${m.num_unique_stocks}</b> stocks · <b>${m.num_sectors}</b> sectors<br>generated <b>${m.generated_at}</b>`;
+  document.getElementById("note").innerHTML =
+    `<b>Method.</b> Growth% = (latest adjusted close ÷ close N months ago − 1). Sector figures are the `+
+    `equal-weighted average of constituent returns — a readable aggregate, not an official free-float index return. `+
+    `A <b>Nd</b> flag marks a stock with limited price history (recent listing, merger or demerger such as the `+
+    `Tata Motors split), whose longer-period figures are partial. Sectors follow the NSE macro → sector → industry `+
+    `classification; prices are from Yahoo Finance as of generation. <b>For information only — not investment advice.</b>`;
+  const sel = document.getElementById("macro");
+  (m.macros||[]).forEach(mac=>{ const o=document.createElement("option"); o.value=mac; o.textContent=mac; sel.appendChild(o); });
+  document.getElementById("root").addEventListener("click", e=>{
+    const t = e.target.closest("[data-toggle]");
+    if(t){ const k=t.getAttribute("data-toggle"); state.open.has(k)?state.open.delete(k):state.open.add(k); render(); return; }
+    const g = e.target.closest("[data-goto]");
+    if(g){ const k=g.getAttribute("data-goto"); state.open.add(k); render();
+      const el=document.querySelector(`.panel[data-key="${k}"]`); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); return; }
+    const th = e.target.closest("th[data-sort]");
+    if(th){ state.sort=th.getAttribute("data-sort"); document.getElementById("sort").value=state.sort; render(); }
+  });
+  document.getElementById("q").addEventListener("input", e=>{ state.q=e.target.value.trim(); render(); });
+  document.getElementById("sort").addEventListener("change", e=>{ state.sort=e.target.value; render(); });
+  document.getElementById("macro").addEventListener("change", e=>{ state.macro=e.target.value; render(); });
+  document.getElementById("theme").addEventListener("click", ()=>{
+    const r=document.documentElement, c=r.getAttribute("data-theme");
+    r.setAttribute("data-theme", c==="dark"?"light":(c==="light"?"":"dark")); });
+  render();
+}
+boot();
+</script>

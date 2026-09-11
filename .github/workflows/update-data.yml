@@ -1,0 +1,61 @@
+name: Update sector data
+
+# Refreshes output/sector_performance.json from Yahoo Finance every weekday
+# evening (after the NSE close at 15:30 IST) and commits the result.
+#
+# NOTE: GitHub only runs `schedule` triggers from the repository's DEFAULT
+# branch, so this begins firing automatically once merged to `main`. Until
+# then (and any time), run it on demand from the Actions tab via "Run workflow"
+# (workflow_dispatch).
+
+on:
+  schedule:
+    - cron: "30 12 * * 1-5"   # 12:30 UTC = 18:00 IST, Mon–Fri
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-sector-data
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Generate dataset (stdlib only — no pip install)
+        run: python run.py generate -w 6
+
+      - name: Sanity-check coverage before committing
+        run: |
+          python - <<'PY'
+          import json, sys
+          d = json.load(open("output/sector_performance.json"))
+          n = d["meta"]["num_unique_stocks"]; ok = d["meta"]["num_ok"]
+          ratio = ok / n if n else 0
+          print(f"coverage: {ok}/{n} = {ratio:.0%}; failed={d['meta']['failed_symbols']}")
+          # Yahoo occasionally rate-limits CI IPs; only publish a healthy pull.
+          sys.exit(0 if ratio >= 0.8 else 1)
+          PY
+
+      - name: Rebuild embedded artifact page
+        run: python scripts/build_artifact.py
+
+      - name: Commit refreshed data
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add output/sector_performance.json web/screener.html
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore: daily sector data refresh ($(date -u +%F))"
+            git push
+          fi

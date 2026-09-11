@@ -130,6 +130,32 @@ returns are partial.
 
 ---
 
+## Automatic daily updates
+
+The data is **not** live — it is a snapshot produced by `python run.py generate`.
+Two mechanisms keep it fresh daily:
+
+1. **GitHub Actions** (`.github/workflows/update-data.yml`) regenerates
+   `output/sector_performance.json`, rebuilds `web/screener.html`, sanity-checks
+   coverage (≥ 80 % of stocks must fetch), and commits — every weekday at
+   **18:00 IST** (after the NSE close). GitHub only runs scheduled workflows from
+   the **default branch**, so this begins firing once merged to `main`; until
+   then, trigger it manually from the repo's **Actions → Update sector data →
+   Run workflow**.
+
+2. **Live artifact republish** — the shareable dashboard link embeds its data and
+   cannot self-refresh, so a scheduled Claude routine regenerates and republishes
+   it daily. Rebuild it manually anytime with:
+
+   ```bash
+   python run.py generate && python scripts/build_artifact.py
+   ```
+
+Markets trade Mon–Fri; Yahoo occasionally rate-limits cloud/CI IPs, which is why
+the workflow refuses to commit a partial pull.
+
+---
+
 ## Project layout
 
 ```
@@ -138,6 +164,13 @@ Mohit/
 ├── index.html                   # web dashboard (reads output/sector_performance.json)
 ├── output/
 │   └── sector_performance.json  # generated dataset (a snapshot is committed)
+├── web/
+│   ├── screener_template.html   # artifact template (/*__DATA__*/ placeholder)
+│   └── screener.html            # standalone artifact page (data embedded)
+├── scripts/
+│   └── build_artifact.py        # builds web/screener.html from template + data
+├── .github/workflows/
+│   └── update-data.yml          # daily GitHub Actions refresh
 ├── sector_stocks/
 │   ├── sectors.py               # 72 industry groups → constituent stocks (+ macro map)
 │   ├── yahoo.py                 # stdlib Yahoo Finance client
