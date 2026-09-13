@@ -15,6 +15,9 @@ def main():
     LO = float(os.environ.get("LO", "1000"))
     HI = os.environ.get("HI", "20000")
     HI = float(HI) if HI not in ("", "none", "None") else None
+    RS_LO = float(os.environ.get("RS_LO", "0"))          # min 6-month outperformance
+    RS_HI = os.environ.get("RS_HI", "")                  # max (blank = no cap)
+    RS_HI = float(RS_HI) if RS_HI not in ("", "none", "None") else None
     symbols, data, master = ce.setup()
     mc_raw = mt.fetch_marketcaps(sorted(set(symbols)))
     mt.annotate_mcap(data, {s: mc_raw.get(s) for s in symbols})
@@ -22,11 +25,12 @@ def main():
     bt.POS_PCT = 0.04
     r = bt.simulate(symbols, data, master, bt.EXIT_MODES["ATR trail only"],
                     trail_type="pct", pct_trail=0.20, rs_entry=True, size_mode="fixed",
-                    max_pos=50, mcap_lo=LO, mcap_hi=HI)
+                    max_pos=50, mcap_lo=LO, mcap_hi=HI, rs_thresh=RS_LO, rs_thresh_hi=RS_HI)
     bt.POS_PCT = 0.02
     m = bt.metrics(r["curve"], periods_per_year=52); t = bt.trade_stats(r["trades"])
     band = f"{int(LO)}–{int(HI) if HI else '∞'}"
-    print(f"Market cap ₹{band} cr | window {master[0]} -> {master[-1]} "
+    rsband = f"RS {RS_LO:g}–{RS_HI:g}" if RS_HI is not None else f"RS >{RS_LO:g}"
+    print(f"Market cap ₹{band} cr | {rsband} | window {master[0]} -> {master[-1]} "
           f"({(master[-1]-master[0]).days/365.25:.1f} yrs)")
     print(f"  CAGR {m['cagr']*100:.1f}%   Max DD {m['maxdd']*100:.1f}%   Calmar {m['calmar']:.2f}   "
           f"Sharpe {m['sharpe']:.2f}   Trades {t['n']}   Win {t['win_rate']*100:.0f}%   "
