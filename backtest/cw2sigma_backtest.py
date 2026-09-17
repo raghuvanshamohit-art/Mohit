@@ -392,15 +392,17 @@ def bench_curve(symbol, start_d):
     base = bars[0][4]
     return [(b[0], INIT_CAPITAL * b[4] / base) for b in bars]
 
-def annotate_rs(data, symbols, lookback=26, index_sym="%5ECRSLDX", key="rs"):
-    """Tag each bar[key] with stock's L-week return minus Nifty 500's L-week return
-    (positive => outperforming the index). Weekly, as-of carry-forward on the index."""
+def annotate_rs(data, symbols, lookback=26, index_sym="%5ECRSLDX", key="rs", mode="diff"):
+    """Tag each bar[key] with the stock's relative strength vs the index over `lookback`
+    weeks. mode='diff': (stock_ratio-1) - (index_ratio-1) = return difference.
+    mode='ratio': stock_ratio / index_ratio - 1 (the screener's exact formula, where
+    ratio = close / close_{t-lookback}). Weekly, as-of carry-forward on the index."""
     import bisect
     bars = fetch_weekly(index_sym)
     idates = [b[0] for b in bars]; iclose = [b[4] for b in bars]
     iret = {}
     for p in range(lookback, len(bars)):
-        iret[idates[p]] = iclose[p] / iclose[p - lookback] - 1.0
+        iret[idates[p]] = iclose[p] / iclose[p - lookback] - 1.0   # index L-week return
     ik = sorted(iret)
     def idx_ret_asof(d):
         j = bisect.bisect_right(ik, d) - 1
@@ -409,9 +411,12 @@ def annotate_rs(data, symbols, lookback=26, index_sym="%5ECRSLDX", key="rs"):
         ds = sorted(data[s].keys())
         cl = [data[s][x]["c"] for x in ds]
         for p, x in enumerate(ds):
-            sret = cl[p] / cl[p - lookback] - 1.0 if p >= lookback else None
             ir = idx_ret_asof(x)
-            data[s][x][key] = (sret - ir) if (sret is not None and ir is not None) else None
+            if p >= lookback and ir is not None:
+                sratio = cl[p] / cl[p - lookback]
+                data[s][x][key] = (sratio / (1.0 + ir) - 1.0) if mode == "ratio" else (sratio - 1.0 - ir)
+            else:
+                data[s][x][key] = None
 
 # ----------------------------------------------------------------------------- main
 def load_universe():
