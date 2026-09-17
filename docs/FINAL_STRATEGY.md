@@ -1,47 +1,50 @@
-# CW 2σ — Final Strategy (entry / exit conditions)
+# CW 2σ — Final Strategy (best entry / exit, all backtests combined)
 
-The configuration selected by `backtest/best_combo.py` after testing every lever.
-Weekly timeframe, Nifty 500 universe. **Educational; in-sample & survivorship-biased.**
+> Selected by `backtest/final_best.py` after every sweep (RS floor, trail width, sizing, market cap, regime). Weekly, Nifty 500 universe. **Educational; in-sample & survivorship-biased.**
 
-## Timeframe & universe
-- **Weekly.** Evaluate on the **Friday (weekly) close**, execute at the **next Monday's open**.
-- **Universe:** all Nifty 500 stocks (no market-cap restriction).
+## Candidates compared
 
-## ENTRY — buy at Monday's open when BOTH are true on Friday's close
-1. **Bollinger breakout** — weekly close crosses **above the Upper Bollinger Band (SMA 52, 2σ)**:
-   - `UpperBB = SMA(close, 52) + 2 × StdDev(close, 52)`
-   - `close[t] > UpperBB[t]` **and** `close[t-1] ≤ UpperBB[t-1]`
-2. **Relative strength > 0.2** — outperforming the Nifty 500 by **>20% over 26 weeks**:
-   - `RS = (close[t] / close[t-26]) − (NIFTY500[t] / NIFTY500[t-26])`
-   - require `RS > 0.20` (no upper cap)
+| Combination | CAGR | Max DD | Calmar | Sharpe | Trades | Final |
+|---|--:|--:|--:|--:|--:|--:|
+| 10% trail · 1000-10000cr ⭐ | 30.0% | 18.5% | **1.62** | 1.80 | 984 | ₹228,994,880 |
+| 10% trail · 1000-20000cr | 29.0% | 20.8% | **1.39** | 1.69 | 1306 | ₹198,974,482 |
+| 10% trail · all-cap | 29.2% | 21.7% | **1.35** | 1.60 | 1698 | ₹205,571,066 |
+| 15% trail · all-cap | 30.2% | 23.4% | **1.29** | 1.67 | 1018 | ₹237,657,576 |
+| 12% trail · all-cap | 29.6% | 23.2% | **1.28** | 1.61 | 1349 | ₹216,746,432 |
+| 20% trail · all-cap | 29.4% | 24.5% | **1.20** | 1.65 | 549 | ₹210,667,474 |
+| 10% trail · 1000-20000 +regime | 25.0% | 21.7% | **1.15** | 1.58 | 1116 | ₹113,853,540 |
+| 10% trail · all-cap +regime | 25.6% | 27.4% | **0.93** | 1.48 | 1484 | ₹123,357,633 |
 
-## POSITION SIZING
-- **4% of current equity** per position: `qty = floor(0.04 × equity ÷ price)`
-- **Max 50 concurrent positions**; take a new signal only when a slot is free and cash allows.
+## ⭐ Best combination: 10% trail · 1000-10000cr
 
-## EXIT — 20% ratcheting trailing stop (sell at Monday's open)
-- On entry: `stop = entry × 0.80`
-- Each weekly close: `stop = max(prev_stop, weekly_close × 0.80)` — ratchets **up only**
-- Exit when **weekly close < stop**. No profit target.
+CAGR **30.0%** · Max DD **18.5%** · Calmar **1.62** · Sharpe **1.80** · 984 trades · win 54% · ₹20L → ₹228,994,880 over 18.1 yrs.
 
-## Deliberately NOT used (each reduced performance in testing)
-- No 100 EMA in the exit · No market-regime filter · No market-cap band · No upper cap on RS.
+## The rules
 
-## Backtested result (2008–2026, ₹20L, 0.25%/side, in-sample)
-| Metric | Value |
-|---|--:|
-| CAGR | ~29.4% |
-| Max drawdown | ~24.5% |
-| Calmar | ~1.20 |
-| Sharpe | ~1.65 |
-| Win rate | ~55% |
-| vs Nifty 500 B&H | ~11.7% CAGR / 45% DD |
+**Timeframe:** Weekly. Evaluate on Friday's close, act at Monday's open. **Universe:** ₹1,000–10,000 cr.
 
-## Reproduce
-```bash
-python3 backtest/best_combo.py     # full candidate comparison + this pick
-```
+**ENTRY — buy Monday's open when BOTH are true on Friday's close:**
+1. Weekly close crosses **above the Upper Bollinger Band (SMA 52, 2σ)** — `close[t] > UpperBB` and `close[t-1] ≤ UpperBB`.
+2. **RS > 0.2** — `(close/close₂₆w) − (Nifty500/Nifty500₂₆w) > 0.20` (outperform Nifty 500 by >20% over 6 months; no upper cap).
 
-⚠️ In-sample and survivorship-biased (today's Nifty 500). The ~29% CAGR is an optimistic
-upper bound; trust the rules and their relative edge over the alternatives, not the exact number.
-Validate on a point-in-time universe and out-of-sample before risking capital. Not investment advice.
+**EXIT — 10% ratcheting trailing stop (sell Monday's open):**
+- On entry: `stop = entry × 0.90`.
+- Each weekly close: `stop = max(prev_stop, weekly_close × 0.90)` — ratchets up only.
+- Exit when weekly close < stop. No profit target.
+
+**SIZING:** 4% of current equity per position, max 50 positions.
+
+**NOT used (each reduced performance):** no 100 EMA, no regime filter, no narrow RS band, no upper RS cap.
+
+## Why this is the pick
+
+- **10% trailing stop** beat 15% and 20% on risk-adjusted return — it locks profit sooner (much lower drawdown) while still riding winners; 5% was too tight (whipsaw).
+- **RS > 0.2 floor** (no cap) was the return optimum vs any narrow band or higher floor.
+- **4% sizing** beat 2% and 5%. **Regime filter and the 100 EMA both hurt** and are dropped.
+- Universe: ₹1,000–10,000 cr gave the best Calmar; small-caps carry the return but are the most survivorship-biased.
+
+## ⚠️ Caveats
+
+- In-sample, survivorship-biased (today's Nifty 500). The absolute CAGR is an optimistic upper bound — trust the *rules and their relative edge* over the alternatives, not the exact number. Tighter stops raise turnover, so real cost matters more. Validate out-of-sample.
+
+*Generated by `backtest/final_best.py`.*
