@@ -419,17 +419,23 @@ def annotate_rs(data, symbols, lookback=26, index_sym="%5ECRSLDX", key="rs", mod
                 data[s][x][key] = None
 
 # ----------------------------------------------------------------------------- main
-def load_universe():
-    txt = http_get("https://archives.nseindia.com/content/indices/ind_nifty500list.csv").decode("utf-8", "replace")
-    rows = list(csv.DictReader(txt.splitlines()))
-    syms = []
-    for r in rows:
-        s = (r.get("Symbol") or "").strip()
-        if s:
-            syms.append(s.replace("&", "%26") + ".NS")
-    return syms
-
 CACHE = os.path.join(OUTDIR, "cache", "weekly.json")
+
+def load_universe():
+    try:
+        txt = http_get("https://archives.nseindia.com/content/indices/ind_nifty500list.csv").decode("utf-8", "replace")
+        rows = list(csv.DictReader(txt.splitlines()))
+        syms = [s.replace("&", "%26") + ".NS" for r in rows
+                if (s := (r.get("Symbol") or "").strip())]
+        if syms:
+            return syms
+    except Exception:
+        pass
+    # fallback: NSE unreachable (rate-limited) -> use the cached universe (weekly.json keys)
+    if os.path.exists(CACHE):
+        with open(CACHE) as f:
+            return sorted(json.load(f).keys())
+    raise RuntimeError("cannot load universe: NSE fetch failed and no cache present")
 
 def load_bars_map(universe):
     """Fetch (or load from cache) weekly bars for the universe. Caching makes runs
