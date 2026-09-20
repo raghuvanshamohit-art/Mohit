@@ -4,8 +4,8 @@
 > Requested 20 years; Yahoo's Indian-equity history starts ~2006, so ~18 years is the honest maximum here.
 
 - **Initial capital:** ₹2,000,000 (₹20 lakh)
-- **Window:** 2008-06-23 → 2026-07-27  (18.1 years)
-- **Universe:** current NSE Nifty 500 — 456 of 500 symbols had usable Yahoo data
+- **Window:** 2008-08-04 → 2026-09-07  (18.1 years)
+- **Universe:** current NSE Nifty 500 — 459 of 459 symbols had usable Yahoo data
 - **Rules:** BB(52,2) upper-band breakout entry · 2% equity/position · 20% initial stop · trailing 100 EMA + ratcheting ATR(14×1.8) stop · weekly
 - **Settings source:** confirmed from the official indicator legend (*%Stop 20 · BB 52 SMA 2 · EMA 100 · ATR Stop Loss 14 1.8*).
 - **Costs:** 0.25% per side · max 50 concurrent positions · cash earns 0%
@@ -16,15 +16,15 @@
 
 | Metric | Value |
 |---|---|
-| Final equity | **₹85,722,059** |
-| Total return | 4,186% (×42.9) |
-| CAGR | **23.1%** |
-| Max drawdown | 26.2% |
-| Calmar (CAGR/MaxDD) | **0.88** |
-| Exposure (avg invested) | 76% |
-| Trades | 3116 |
-| Win rate | 44.8% |
-| Avg win / loss | +30% / -9% |
+| Final equity | **₹96,067,355** |
+| Total return | 4,703% (×48.0) |
+| CAGR | **23.9%** |
+| Max drawdown | 25.9% |
+| Calmar (CAGR/MaxDD) | **0.92** |
+| Exposure (avg invested) | 77% |
+| Trades | 3138 |
+| Win rate | 44.7% |
+| Avg win / loss | +29% / -9% |
 | Avg hold winners / losers | 124d / 42d |
 | Best trade | GRAPHITE +604% |
 
@@ -32,41 +32,41 @@
 
 | Exit mode | Final equity | CAGR | Max DD | Calmar | Trades | Win% | Exposure |
 |---|--:|--:|--:|--:|--:|--:|--:|
-| tightest (max EMA,ATR) ⭐ | ₹85,722,059 | 23.1% | 26.2% | 0.88 | 3116 | 45% | 76% |
-| loosest (min EMA,ATR) | ₹98,438,942 | 24.0% | 30.8% | 0.78 | 498 | 49% | 94% |
-| 100 EMA only | ₹96,104,245 | 23.9% | 31.1% | 0.77 | 487 | 50% | 94% |
-| ATR trail only | ₹86,832,247 | 23.2% | 26.7% | 0.87 | 3092 | 45% | 77% |
+| tightest (max EMA,ATR) ⭐ | ₹96,067,355 | 23.9% | 25.9% | 0.92 | 3138 | 45% | 77% |
+| loosest (min EMA,ATR) | ₹104,148,317 | 24.4% | 30.4% | 0.80 | 489 | 50% | 94% |
+| 100 EMA only | ₹99,615,113 | 24.1% | 29.8% | 0.81 | 491 | 49% | 94% |
+| ATR trail only | ₹90,721,245 | 23.5% | 26.7% | 0.88 | 3127 | 45% | 77% |
 
 ## Benchmarks — ₹20 lakh buy & hold, same window
 
 | Benchmark | Final equity | CAGR | Max DD | Calmar |
 |---|--:|--:|--:|--:|
-| Nifty 50 (^NSEI) | ₹12,337,799 | 10.6% | 43.0% | 0.25 |
-| Nifty 500 (^CRSLDX) | ₹14,979,080 | 11.8% | 44.9% | 0.26 |
+| Nifty 50 (^NSEI) | ₹10,538,470 | 9.6% | 41.7% | 0.23 |
+| Nifty 500 (^CRSLDX) | ₹12,863,222 | 10.8% | 43.6% | 0.25 |
 
 ## Year-by-year (headline config)
 
 | Year | Return | Year-end equity |
 |---|--:|--:|
-| 2008 | — | ₹1,959,223 |
-| 2009 | +45.9% | ₹2,858,804 |
-| 2010 | +15.6% | ₹3,303,649 |
-| 2011 | -10.3% | ₹2,962,988 |
-| 2012 | +34.8% | ₹3,993,260 |
-| 2013 | +11.2% | ₹4,440,148 |
-| 2014 | +104.2% | ₹9,066,535 |
-| 2015 | +3.5% | ₹9,382,412 |
-| 2016 | +8.8% | ₹10,205,515 |
-| 2017 | +80.4% | ₹18,406,307 |
-| 2018 | -10.5% | ₹16,475,696 |
-| 2019 | -3.7% | ₹15,869,718 |
-| 2020 | +37.9% | ₹21,882,617 |
-| 2021 | +61.3% | ₹35,287,263 |
-| 2022 | +5.6% | ₹37,277,958 |
-| 2023 | +70.3% | ₹63,480,748 |
-| 2024 | +27.8% | ₹81,136,947 |
-| 2025 | +2.5% | ₹83,185,068 |
-| 2026 | +3.0% | ₹85,722,059 |
+| 2008 | — | ₹1,973,270 |
+| 2009 | +45.8% | ₹2,877,113 |
+| 2010 | +16.4% | ₹3,349,640 |
+| 2011 | -10.3% | ₹3,004,423 |
+| 2012 | +35.4% | ₹4,068,000 |
+| 2013 | +11.2% | ₹4,524,367 |
+| 2014 | +105.1% | ₹9,281,527 |
+| 2015 | +3.0% | ₹9,562,618 |
+| 2016 | +7.6% | ₹10,290,100 |
+| 2017 | +86.5% | ₹19,193,784 |
+| 2018 | -9.6% | ₹17,341,814 |
+| 2019 | -3.8% | ₹16,685,191 |
+| 2020 | +38.6% | ₹23,118,214 |
+| 2021 | +66.9% | ₹38,575,036 |
+| 2022 | +5.9% | ₹40,838,003 |
+| 2023 | +69.6% | ₹69,262,343 |
+| 2024 | +29.0% | ₹89,379,245 |
+| 2025 | +2.6% | ₹91,668,048 |
+| 2026 | +4.8% | ₹96,067,355 |
 
 ## ⚠️ Honest limitations (read before trusting any number)
 
