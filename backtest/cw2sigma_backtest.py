@@ -139,7 +139,8 @@ def simulate(symbols, data, master_dates, trail_fn,
              rank_by="strength", trail_type="atr", pct_trail=0.20,
              size_mode="fixed", vol_ref=0.06, vol_cap=0.04, equity_filter=None,
              rs_entry=False, rs_exit=False, rs_thresh=0.0, rupee_size=50000,
-             mcap_lo=None, mcap_hi=None, monthly_add=0, rs_thresh_hi=None):
+             mcap_lo=None, mcap_hi=None, monthly_add=0, rs_thresh_hi=None,
+             pyramid=False, pyr_trigger=1.0, pyr_size=None, pyr_max=1):
     """regime_ok: optional {date: bool} gate — entries only allowed when True.
     rank_by: 'strength' (breakout distance) or 'mom' (26-week momentum) for priority.
     trail_type: 'atr' (ratcheting close-atr_mult*ATR) or 'pct' (ratcheting close*(1-pct_trail)).
@@ -152,6 +153,7 @@ def simulate(symbols, data, master_dates, trail_fn,
     held = {}            # sym -> dict(shares, entry, entry_date, hi)
     entry_queue = []     # list of (strength, sym) valid for the NEXT master week only
     exit_queue = set()   # syms to sell at next available open (carried until filled)
+    pyr_queue = set()    # held syms to ADD to (pyramid) at next open
     equity_curve = []    # (date, equity)
     invested_frac = []
     trades = []
@@ -222,8 +224,27 @@ def simulate(symbols, data, master_dates, trail_fn,
             tr0 = bar["o"] * (1 - pct_trail) if trail_type == "pct" else bar["o"] - atr_mult * atr0
             held[sym] = dict(shares=shares, entry=bar["o"], entry_date=d,
                              cost=cost, weeks=0, init_stop=bar["o"] * stop_frac,
-                             atr_trail=tr0)
+                             atr_trail=tr0, orig_entry=bar["o"], n_adds=0)
         entry_queue = []
+
+        # 2b) PYRAMID: add to winners that crossed the next gain threshold (cash priority
+        #     over new entries; the ratcheting trailing stop then governs the whole position)
+        if pyramid:
+            for sym in sorted(pyr_queue):
+                pos = held.get(sym); bar = data[sym].get(d)
+                if pos is None or bar is None:
+                    pyr_queue.discard(sym); continue
+                addval = (pyr_size if pyr_size is not None else POS_PCT) * prev_equity
+                sh = math.floor(addval / bar["o"])
+                if sh > 0:
+                    cost = sh * bar["o"] * (1 + COST_PSIDE)
+                    if cost > cash:
+                        sh = math.floor(cash / (bar["o"] * (1 + COST_PSIDE)))
+                        cost = sh * bar["o"] * (1 + COST_PSIDE)
+                    if sh > 0:
+                        cash -= cost
+                        pos["shares"] += sh; pos["cost"] += cost; pos["n_adds"] += 1
+                pyr_queue.discard(sym)
 
         # 3) mark-to-market at this week's close
         invested = 0.0
@@ -253,6 +274,9 @@ def simulate(symbols, data, master_dates, trail_fn,
             elif (rs_exit and d != pos["entry_date"]
                   and bar.get("rs") is not None and bar["rs"] < 0):
                 exit_queue.add(sym)               # underperforming Nifty 500 -> exit
+            if pyramid and sym not in exit_queue and pos["n_adds"] < pyr_max:
+                if bar["c"] >= pos["orig_entry"] * (1 + (pos["n_adds"] + 1) * pyr_trigger):
+                    pyr_queue.add(sym)            # crossed next +X% gain -> add next open
         regime_on = True if regime_ok is None else regime_ok.get(d, True)
         if regime_on:
             for sym in symbols:
