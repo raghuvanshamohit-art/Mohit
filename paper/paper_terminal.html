@@ -1,0 +1,511 @@
+<title>CW 2σ Paper Terminal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#f5f7fa; --surface:#ffffff; --surface2:#eef1f6; --border:#e2e6ee; --border2:#d3d9e4;
+  --ink:#131824; --muted:#5c6675; --faint:#8a94a4;
+  --accent:#3b5bdb; --accent2:#eaeeff;
+  --gain:#0f8a57; --gainbg:#e2f4ea; --loss:#d23a49; --lossbg:#fce9eb;
+  --warn:#a9711a; --warnbg:#fbf1de;
+  --shadow:0 1px 2px rgba(20,30,55,.05),0 4px 16px rgba(20,30,55,.05);
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0d1219; --surface:#151b25; --surface2:#1b232f; --border:#28323f; --border2:#333f4e;
+  --ink:#e7edf5; --muted:#95a2b3; --faint:#6c7889;
+  --accent:#6d8bff; --accent2:#1a2540;
+  --gain:#33c689; --gainbg:#12301f; --loss:#f26370; --lossbg:#331519;
+  --warn:#e0a94a; --warnbg:#31260f;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 22px rgba(0,0,0,.28);
+}}
+:root[data-theme="dark"]{
+  --bg:#0d1219; --surface:#151b25; --surface2:#1b232f; --border:#28323f; --border2:#333f4e;
+  --ink:#e7edf5; --muted:#95a2b3; --faint:#6c7889;
+  --accent:#6d8bff; --accent2:#1a2540;
+  --gain:#33c689; --gainbg:#12301f; --loss:#f26370; --lossbg:#331519;
+  --warn:#e0a94a; --warnbg:#31260f;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 22px rgba(0,0,0,.28);
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.45;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding-block:18px 60px;padding-inline:16px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+h1,h2,h3{margin:0;text-wrap:balance}
+button{font-family:var(--sans);cursor:pointer}
+a{color:var(--accent)}
+
+/* header */
+header{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;margin-bottom:16px}
+.brand{display:flex;align-items:center;gap:11px}
+.mark{width:34px;height:34px;border-radius:9px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700;font-family:var(--mono);font-size:15px;flex:none}
+.brand h1{font-size:17px;font-weight:600;letter-spacing:-.2px}
+.brand .sub{font-size:11.5px;color:var(--muted);letter-spacing:.02em}
+.hspace{flex:1}
+.hbtns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--border2);background:var(--surface);color:var(--ink);border-radius:9px;padding:7px 12px;font-size:12.5px;font-weight:500;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{color:#fff;filter:brightness(1.06)}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--muted);padding:7px 8px}
+.btn.ghost:hover{color:var(--accent);background:var(--surface2)}
+
+/* sample banner */
+.banner{display:none;align-items:center;gap:10px;background:var(--warnbg);border:1px solid color-mix(in srgb,var(--warn) 35%,transparent);color:var(--warn);border-radius:10px;padding:9px 13px;font-size:12.5px;margin-bottom:14px}
+.banner.show{display:flex}
+.banner b{color:var(--warn)}
+
+/* tiles */
+.tiles{display:grid;grid-template-columns:repeat(6,1fr);gap:11px;margin-bottom:18px}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:13px 14px;box-shadow:var(--shadow);min-width:0}
+.tile .lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint);font-weight:600}
+.tile .val{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:20px;font-weight:600;margin-top:5px;letter-spacing:-.4px;line-height:1.1}
+.tile .val.sm{font-size:16px}
+.tile .foot{font-size:11px;color:var(--muted);margin-top:3px;font-family:var(--mono)}
+.tile.hero{grid-column:span 2;background:linear-gradient(160deg,var(--accent) 0%,color-mix(in srgb,var(--accent) 78%,#111) 100%);border:none;color:#fff}
+.tile.hero .lbl{color:rgba(255,255,255,.8)}
+.tile.hero .val{font-size:26px}
+.tile.hero .foot{color:rgba(255,255,255,.85)}
+.pos{color:var(--gain)} .neg{color:var(--loss)}
+
+/* panels */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);margin-bottom:18px;overflow:hidden}
+.phead{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--border)}
+.phead h2{font-size:13.5px;font-weight:600;letter-spacing:.01em}
+.phead .count{font-family:var(--mono);font-size:11.5px;color:var(--muted);background:var(--surface2);border-radius:20px;padding:2px 9px}
+.pbody{padding:6px 6px}
+.empty{padding:26px 16px;text-align:center;color:var(--muted);font-size:13px}
+
+/* table */
+.tblwrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);font-weight:600;text-align:right;padding:9px 10px;white-space:nowrap;position:sticky}
+th.l,td.l{text-align:left}
+td{padding:9px 10px;text-align:right;border-top:1px solid var(--border);white-space:nowrap;font-family:var(--mono);font-variant-numeric:tabular-nums}
+tr:first-child td{border-top:none}
+td.sym{font-family:var(--sans);font-weight:600;letter-spacing:.01em}
+td .tag{font-family:var(--sans)}
+.priceinp{width:78px;font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;border:1px solid var(--border2);background:var(--bg);color:var(--ink);border-radius:7px;padding:4px 6px;font-size:12px}
+.priceinp:focus{outline:2px solid var(--accent2);border-color:var(--accent)}
+.tag{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:20px;letter-spacing:.02em}
+.tag.hold{background:var(--gainbg);color:var(--gain)}
+.tag.near{background:var(--warnbg);color:var(--warn)}
+.tag.exit{background:var(--lossbg);color:var(--loss)}
+.tag::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.xbtn{border:1px solid var(--border2);background:var(--surface);color:var(--muted);border-radius:7px;padding:4px 9px;font-size:11px;font-weight:600;font-family:var(--sans)}
+.xbtn:hover{border-color:var(--loss);color:var(--loss);background:var(--lossbg)}
+
+/* add form */
+.form{display:grid;grid-template-columns:1.4fr .9fr .9fr .8fr auto;gap:10px;align-items:end;padding:14px 16px}
+.fld{display:flex;flex-direction:column;gap:4px;min-width:0}
+.fld label{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);font-weight:600}
+.fld input{border:1px solid var(--border2);background:var(--bg);color:var(--ink);border-radius:9px;padding:8px 10px;font-size:13px;font-family:var(--mono);width:100%}
+.fld input:focus{outline:2px solid var(--accent2);border-color:var(--accent)}
+.fld input.sym{font-family:var(--sans);text-transform:uppercase;font-weight:600}
+.hint{font-size:11px;color:var(--muted);padding:0 16px 12px}
+.paste{padding:0 16px 15px;display:none}
+.paste.show{display:block}
+.paste textarea{width:100%;min-height:70px;border:1px solid var(--border2);background:var(--bg);color:var(--ink);border-radius:10px;padding:10px;font-family:var(--mono);font-size:12.5px;resize:vertical}
+
+/* chart */
+.chartbox{padding:12px 14px 16px}
+.chartbox svg{width:100%;height:auto;display:block}
+.split{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}
+
+/* settings modal */
+.modal{position:fixed;inset:0;background:rgba(10,15,25,.5);display:none;place-items:center;padding:16px;z-index:50}
+.modal.show{display:grid}
+.sheet{background:var(--surface);border:1px solid var(--border);border-radius:16px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden}
+.sheet h3{font-size:15px;font-weight:600;padding:16px 18px 4px}
+.sheet .sbody{padding:8px 18px 18px;display:grid;gap:12px}
+.srow{display:flex;justify-content:space-between;align-items:center;gap:14px}
+.srow label{font-size:12.5px;color:var(--muted)}
+.srow input{width:130px;border:1px solid var(--border2);background:var(--bg);color:var(--ink);border-radius:9px;padding:7px 10px;font-family:var(--mono);font-size:13px;text-align:right}
+.sfoot{display:flex;justify-content:flex-end;gap:9px;padding:0 18px 18px}
+.mini{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.rulebar{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:11.5px;color:var(--muted);padding:2px 2px 16px}
+.rulebar b{color:var(--ink);font-weight:600}
+@media(max-width:820px){
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .tile.hero{grid-column:span 2}
+  .split{grid-template-columns:1fr}
+  .form{grid-template-columns:1fr 1fr}
+}
+@media(max-width:440px){.form{grid-template-columns:1fr}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="mark">2σ</div>
+      <div>
+        <h1>CW 2σ Paper Terminal</h1>
+        <div class="sub">Weekly · Bollinger breakout + RS &gt; 0.2 · ratcheting trailing stop</div>
+      </div>
+    </div>
+    <div class="hspace"></div>
+    <div class="hbtns">
+      <button class="btn ghost" id="themeBtn" title="Toggle theme">◐ Theme</button>
+      <button class="btn ghost" id="expBtn">↧ Export</button>
+      <button class="btn ghost" id="impBtn">↥ Import</button>
+      <button class="btn" id="setBtn">⚙ Settings</button>
+    </div>
+  </header>
+
+  <div class="banner" id="banner">
+    <span>📌 <b>Book full — 25 holdings (25 Sep 2026)</b>. 8 new breakouts added by highest 26-week RS (E2E, OPTIEMUS, MARKSANS, KDDL, PGIL, TCPLPACK, GNA, ROLEXRINGS). ₹20 L book, 4% each, 20% ratcheting trailing stop. Just send screenshots each week and I refresh everything. <b>Reset</b> starts empty.</span>
+    <div class="hspace"></div>
+    <button class="btn" id="resetSample">Reset &amp; start empty</button>
+  </div>
+
+  <div class="tiles" id="tiles"></div>
+
+  <div class="rulebar" id="rulebar"></div>
+
+  <!-- OPEN POSITIONS -->
+  <div class="panel">
+    <div class="phead">
+      <h2>Open positions</h2><span class="count" id="openCount">0</span>
+      <div class="hspace" style="flex:1"></div>
+      <span class="mini">edit “Now ₹” each week → stop ratchets, exit flags automatically</span>
+    </div>
+    <div class="pbody">
+      <div class="tblwrap"><table id="openTbl"></table></div>
+      <div class="empty" id="openEmpty" hidden>No open positions. Add your screener picks below.</div>
+    </div>
+  </div>
+
+  <!-- ADD -->
+  <div class="panel">
+    <div class="phead">
+      <h2>Add position</h2>
+      <div class="hspace" style="flex:1"></div>
+      <button class="btn ghost" id="pasteToggle">⧉ Paste list</button>
+    </div>
+    <form class="form" id="addForm" autocomplete="off">
+      <div class="fld"><label for="fSym">Symbol</label><input class="sym" id="fSym" placeholder="APARINDS" required></div>
+      <div class="fld"><label for="fDate">Entry date</label><input type="date" id="fDate"></div>
+      <div class="fld"><label for="fPrice">Entry ₹</label><input id="fPrice" inputmode="decimal" placeholder="640.00" required></div>
+      <div class="fld"><label for="fQty">Qty <span class="mini" id="qtyAuto"></span></label><input id="fQty" inputmode="numeric" placeholder="auto"></div>
+      <button class="btn primary" type="submit" style="height:38px">＋ Buy</button>
+    </form>
+    <div class="hint">Quantity auto-fills to <b id="sizeHint">4%</b> of current equity (editable). Your screener supplies the entries — the terminal handles sizing, the trailing-stop exit, and all the stats.</div>
+    <div class="paste" id="pasteBox">
+      <textarea id="pasteArea" placeholder="One per line — SYMBOL, entry price&#10;JWL, 415&#10;TITAGARH, 1090&#10;TRIDENT, 34"></textarea>
+      <div style="margin-top:9px"><button class="btn primary" id="pasteAdd">Add all</button> <span class="mini">uses today’s date; qty auto-sized</span></div>
+    </div>
+  </div>
+
+  <div class="split">
+    <!-- EQUITY CURVE -->
+    <div class="panel">
+      <div class="phead"><h2>Equity curve</h2><div class="hspace" style="flex:1"></div>
+        <button class="btn ghost" id="snapBtn" title="Log today’s equity to the curve">◉ Snapshot</button></div>
+      <div class="chartbox" id="chartbox"></div>
+    </div>
+    <!-- STATS -->
+    <div class="panel">
+      <div class="phead"><h2>Trade stats</h2></div>
+      <div class="pbody"><table id="statTbl"></table></div>
+    </div>
+  </div>
+
+  <!-- CLOSED -->
+  <div class="panel">
+    <div class="phead"><h2>Closed trades</h2><span class="count" id="closedCount">0</span></div>
+    <div class="pbody">
+      <div class="tblwrap"><table id="closedTbl"></table></div>
+      <div class="empty" id="closedEmpty" hidden>No closed trades yet.</div>
+    </div>
+  </div>
+
+  <p class="mini" style="text-align:center;opacity:.8;margin-top:8px">Paper trading only — for practice and journaling. Not investment advice. Data is saved in this browser; use Export to back up.</p>
+</div>
+
+<!-- settings modal -->
+<div class="modal" id="modal">
+  <div class="sheet">
+    <h3>Settings</h3>
+    <div class="sbody">
+      <div class="srow"><label for="sCap">Starting capital (₹)</label><input id="sCap" class="mono" inputmode="numeric"></div>
+      <div class="srow"><label for="sStart">Start date</label><input id="sStart" type="date"></div>
+      <div class="srow"><label for="sSize">Position size (% equity)</label><input id="sSize" class="mono" inputmode="decimal"></div>
+      <div class="srow"><label for="sTrail">Trailing stop (%)</label><input id="sTrail" class="mono" inputmode="decimal"></div>
+      <div class="mini">Changing capital or start date resets the book. Trail/size apply to new trades and re-compute stops live.</div>
+    </div>
+    <div class="sfoot">
+      <button class="btn" id="hardReset" style="margin-right:auto;color:var(--loss);border-color:var(--border2)">Erase everything</button>
+      <button class="btn" id="setCancel">Cancel</button>
+      <button class="btn primary" id="setSave">Save</button>
+    </div>
+  </div>
+</div>
+<input type="file" id="fileInp" accept="application/json" hidden>
+
+<script>
+(function(){
+"use strict";
+const KEY="cw2sigma_paper_v5";
+const $=s=>document.querySelector(s);
+const today=()=>new Date().toISOString().slice(0,10);
+const D=s=>new Date(s+"T00:00:00");
+const weeksBetween=(a,b)=>Math.max(0,Math.round((D(b)-D(a))/6048e5));
+
+/* ---------- state ---------- */
+let S=null;
+function fresh(cap){return {capital:cap||2000000, start:today(), sizePct:4, trailPct:20,
+  cash:cap||2000000, positions:[], closed:[], equity:[{date:today(),eq:cap||2000000}], sample:false};}
+function currentWeekSeed(){
+  const s=fresh(2000000); s.sample=true;
+  const START="2026-09-21";   // entry week
+  const ASOF ="2026-09-25";   // latest price update
+  s.start=START;
+  // [symbol, entry price, latest price, running weekly-high(optional)] — 4% each, 20% ratcheting trail.
+  const picks=[
+    ["UNITEDPOLY",44.75,46.81], ["TATVA",1744.7,1793.2], ["VIJAYA",1560.6,1513.6],
+    ["MVGJL",215.81,224.38],    ["INDGN",596.15,608.95], ["SURAKSHA",350.75,343.30],
+    ["SAMBHV",152.13,159.12],   ["QPOWER",1509.0,1517.8],["SPLPETRO",868.00,880.00],
+    ["GNFC",585.25,630.30],     ["TALBROAUTO",464.05,457.35],["TI",580.20,581.70],
+    ["GUFICBIO",438.15,423.75], ["SOMANYCERA",587.05,618.05],["ACE",1244.1,1226.6],
+    ["LUMAXTECH",2073.0,2026.8],["STEL",658.00,619.30]];
+  picks.forEach(([sym,ep,np,pk])=>{const qty=Math.floor(0.04*s.capital/ep); if(qty<=0)return;
+    s.cash-=qty*ep; const hi=Math.max(ep,np,pk||0);
+    s.positions.push({id:(crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2)),
+      sym,date:START,entry:ep,qty,now:np,high:hi,stop:hi*(1-s.trailPct/100)});});
+  // NEW breakouts added 25 Sep 2026 — top 8 of the screener by 26-week RS, ~4% of equity each.
+  // [symbol, entry price, qty]  (fills the book from 17 to the 25-name cap)
+  const NEW="2026-09-25";
+  const adds=[
+    ["E2E",652.15,123], ["OPTIEMUS",758.55,106], ["MARKSANS",336.95,238], ["KDDL",4033.40,19],
+    ["PGIL",1329.10,60],["TCPLPACK",4103.80,19], ["GNA",617.65,130],     ["ROLEXRINGS",195.35,411]];
+  adds.forEach(([sym,ep,qty])=>{ s.cash-=qty*ep;
+    s.positions.push({id:(crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2)),
+      sym,date:NEW,entry:ep,qty,now:ep,high:ep,stop:ep*(1-s.trailPct/100)});});
+  s.equity=[{date:START,eq:s.capital},{date:ASOF,eq:equityOf(s)}];
+  return s;
+}
+function equityOf(st){let mv=0; st.positions.forEach(p=>mv+=p.qty*p.now); return st.cash+mv;}
+function load(){ try{const r=localStorage.getItem(KEY); if(r) return JSON.parse(r);}catch(e){} return null; }
+function save(){ try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){} }
+
+/* ---------- money format (Indian) ---------- */
+function inr(n){ if(n==null||isNaN(n)) return "–"; const neg=n<0; n=Math.round(Math.abs(n));
+  let s=String(n); let last3=s.slice(-3),rest=s.slice(0,-3);
+  if(rest) last3=","+last3; rest=rest.replace(/\B(?=(\d{2})+(?!\d))/g,","); return (neg?"-₹":"₹")+rest+last3; }
+function cr(n){ const a=Math.abs(n); const sg=n<0?"-":"";
+  if(a>=1e7) return sg+"₹"+(a/1e7).toFixed(2)+" Cr";
+  if(a>=1e5) return sg+"₹"+(a/1e5).toFixed(2)+" L"; return inr(n); }
+function pct(x,d){return (x>=0?"+":"")+(x*100).toFixed(d==null?1:d)+"%";}
+
+/* ---------- render ---------- */
+function ratchet(p){ p.high=Math.max(p.high||p.entry,p.now); p.stop=Math.max(p.stop||0,p.high*(1-S.trailPct/100)); }
+function statusOf(p){ if(p.now<p.stop) return "exit"; if(p.now<=p.stop*1.03) return "near"; return "hold"; }
+
+function render(){
+  S.positions.forEach(ratchet);
+  const eq=equityOf(S);
+  const invested=S.positions.reduce((a,p)=>a+p.qty*p.now,0);
+  const realized=S.closed.reduce((a,t)=>a+t.pnl,0);
+  const unreal=S.positions.reduce((a,p)=>a+(p.now-p.entry)*p.qty,0);
+  const totalPnl=eq-S.capital, totRet=totalPnl/S.capital;
+  const yrs=Math.max((D(today())-D(S.start))/3.15576e10,0);
+  const cagr=yrs>0.12&&eq>0?Math.pow(eq/S.capital,1/yrs)-1:null;
+  const wins=S.closed.filter(t=>t.ret>0).length, cl=S.closed.length;
+  const winR=cl?wins/cl:null;
+  const avgHoldC=cl?S.closed.reduce((a,t)=>a+t.weeks,0)/cl:null;
+
+  // tiles
+  const pn=v=>v>=0?"pos":"neg";
+  $("#tiles").innerHTML=`
+   <div class="tile hero"><div class="lbl">Total equity</div><div class="val mono">${cr(eq)}</div>
+     <div class="foot">${inr(eq)} · start ${inr(S.capital)}</div></div>
+   <div class="tile"><div class="lbl">Total P&amp;L</div><div class="val mono ${pn(totalPnl)}">${cr(totalPnl)}</div>
+     <div class="foot ${pn(totRet)}">${pct(totRet)}</div></div>
+   <div class="tile"><div class="lbl">CAGR</div><div class="val mono ${cagr==null?'':pn(cagr)}">${cagr==null?'–':pct(cagr,1)}</div>
+     <div class="foot">${yrs<0.12?'needs &gt;6 wk':yrs.toFixed(1)+' yrs'}</div></div>
+   <div class="tile"><div class="lbl">Win ratio</div><div class="val mono">${winR==null?'–':(winR*100).toFixed(0)+'%'}</div>
+     <div class="foot">${wins}/${cl} closed</div></div>
+   <div class="tile"><div class="lbl">Avg holding</div><div class="val mono sm">${avgHoldC==null?'–':avgHoldC+' wk'}</div>
+     <div class="foot">${avgHoldC==null?'':'~'+(avgHoldC/4.33).toFixed(1)+' mo'}</div></div>
+   <div class="tile"><div class="lbl">Invested / Cash</div><div class="val mono sm">${((invested/(eq||1))*100).toFixed(0)}%</div>
+     <div class="foot">cash ${cr(S.cash)}</div></div>`;
+
+  $("#rulebar").innerHTML=`<span>Book: <b>${inr(S.capital)}</b></span><span>Size/pos: <b>${S.sizePct}%</b></span>
+     <span>Trailing stop: <b>${S.trailPct}%</b></span><span>Realized: <b class="${pn(realized)}">${cr(realized)}</b></span>
+     <span>Unrealized: <b class="${pn(unreal)}">${cr(unreal)}</b></span>`;
+  $("#sizeHint").textContent=S.sizePct+"%";
+
+  // open table
+  const ot=$("#openTbl"); $("#openCount").textContent=S.positions.length;
+  $("#openEmpty").hidden=S.positions.length>0;
+  if(S.positions.length){
+    ot.innerHTML=`<thead><tr><th class="l">Symbol</th><th>Entry</th><th>Entry ₹</th><th>Qty</th>
+      <th>Now ₹</th><th>Stop ₹</th><th>Gain</th><th>Held</th><th>Value</th><th>Status</th><th></th></tr></thead><tbody>`+
+      S.positions.map(p=>{const g=p.now/p.entry-1,st=statusOf(p),val=p.qty*p.now,hw=weeksBetween(p.date,today());
+        return `<tr data-id="${p.id}">
+         <td class="l sym">${p.sym}</td><td>${p.date.slice(5)}</td><td>${p.entry.toFixed(2)}</td><td>${p.qty}</td>
+         <td><input class="priceinp" data-id="${p.id}" value="${p.now}"></td>
+         <td>${p.stop.toFixed(2)}</td><td class="${g>=0?'pos':'neg'}">${pct(g)}</td>
+         <td>${hw}w</td><td>${cr(val)}</td>
+         <td><span class="tag ${st}">${st==='exit'?'EXIT':st==='near'?'NEAR':'HOLD'}</span></td>
+         <td><button class="xbtn" data-exit="${p.id}">Sell</button></td></tr>`;}).join("")+`</tbody>`;
+  } else ot.innerHTML="";
+
+  // stats table
+  const best=S.closed.concat(S.positions.map(p=>({ret:p.now/p.entry-1,sym:p.sym})))
+                .reduce((a,t)=>t.ret>(a?a.ret:-9)?t:a,null);
+  const worst=S.closed.reduce((a,t)=>a===null||t.ret<a.ret?t:a,null);
+  const avgW=cl&&wins?S.closed.filter(t=>t.ret>0).reduce((a,t)=>a+t.ret,0)/wins:null;
+  const losL=S.closed.filter(t=>t.ret<=0); const avgL=losL.length?losL.reduce((a,t)=>a+t.ret,0)/losL.length:null;
+  const rows=[
+    ["Total trades", cl+S.positions.length+" ("+S.positions.length+" open)"],
+    ["Closed", cl], ["Winners / Losers", wins+" / "+(cl-wins)],
+    ["Win ratio", winR==null?'–':(winR*100).toFixed(0)+'%'],
+    ["Avg win", avgW==null?'–':`<span class="pos">${pct(avgW)}</span>`],
+    ["Avg loss", avgL==null?'–':`<span class="neg">${pct(avgL)}</span>`],
+    ["Avg hold (closed)", avgHoldC==null?'–':avgHoldC+' wk'],
+    ["Best", best?`${best.sym} <span class="pos">${pct(best.ret)}</span>`:'–'],
+    ["Worst", worst?`${worst.sym} <span class="neg">${pct(worst.ret)}</span>`:'–'],
+    ["Realized P&L", `<span class="${realized>=0?'pos':'neg'}">${cr(realized)}</span>`],
+  ];
+  $("#statTbl").innerHTML="<tbody>"+rows.map(r=>`<tr><td class="l" style="font-family:var(--sans);color:var(--muted)">${r[0]}</td><td>${r[1]}</td></tr>`).join("")+"</tbody>";
+
+  // closed table
+  const ct=$("#closedTbl"); $("#closedCount").textContent=S.closed.length;
+  $("#closedEmpty").hidden=S.closed.length>0;
+  if(S.closed.length){
+    ct.innerHTML=`<thead><tr><th class="l">Symbol</th><th>Entry</th><th>Exit</th><th>Entry ₹</th><th>Exit ₹</th>
+      <th>Qty</th><th>Return</th><th>P&amp;L ₹</th><th>Held</th></tr></thead><tbody>`+
+      S.closed.slice().reverse().map(t=>`<tr>
+        <td class="l sym">${t.sym}</td><td>${t.date.slice(5)}</td><td>${t.exitDate.slice(5)}</td>
+        <td>${t.entry.toFixed(2)}</td><td>${t.exit.toFixed(2)}</td><td>${t.qty}</td>
+        <td class="${t.ret>=0?'pos':'neg'}">${pct(t.ret)}</td>
+        <td class="${t.pnl>=0?'pos':'neg'}">${cr(t.pnl)}</td><td>${t.weeks}w</td></tr>`).join("")+`</tbody>`;
+  } else ct.innerHTML="";
+
+  drawChart(); $("#banner").classList.toggle("show",!!S.sample);
+  save();
+}
+
+/* ---------- equity chart ---------- */
+function drawChart(){
+  const box=$("#chartbox");
+  const pts=S.equity.slice().sort((a,b)=>a.date<b.date?-1:1);
+  // include a live 'now' point
+  const live={date:today(),eq:equityOf(S)};
+  const data=pts.filter(p=>p.date!==live.date).concat([live]);
+  if(data.length<2){box.innerHTML='<div class="empty">Add trades and snapshot to build the curve.</div>';return;}
+  const W=560,H=210,pl=52,pr=14,pt=12,pb=26, iw=W-pl-pr, ih=H-pt-pb;
+  const xs=data.map(d=>D(d.date).getTime()); const ys=data.map(d=>d.eq);
+  const x0=Math.min(...xs),x1=Math.max(...xs); const capLine=S.capital;
+  let lo=Math.min(...ys,capLine),hi=Math.max(...ys,capLine); const pad=(hi-lo)*0.12||hi*0.05; lo-=pad;hi+=pad;
+  const X=t=>pl+(x1===x0?iw/2:(t-x0)/(x1-x0)*iw);
+  const Y=v=>pt+(hi===lo?ih/2:(hi-v)/(hi-lo)*ih);
+  const line=data.map((d,i)=>(i?"L":"M")+X(xs[i]).toFixed(1)+" "+Y(ys[i]).toFixed(1)).join(" ");
+  const area=line+` L ${X(x1).toFixed(1)} ${Y(lo).toFixed(1)} L ${X(x0).toFixed(1)} ${Y(lo).toFixed(1)} Z`;
+  const up=live.eq>=S.capital;
+  const col=up?"var(--gain)":"var(--loss)";
+  const ticks=[lo+(hi-lo)*0,lo+(hi-lo)*.5,hi];
+  let grid=ticks.map(v=>`<line x1="${pl}" y1="${Y(v).toFixed(1)}" x2="${W-pr}" y2="${Y(v).toFixed(1)}" stroke="var(--border)" stroke-width="1"/>
+     <text x="${pl-7}" y="${(Y(v)+3.5).toFixed(1)}" font-size="9.5" fill="var(--faint)" text-anchor="end" font-family="var(--mono)">${cr(v)}</text>`).join("");
+  const capY=Y(capLine).toFixed(1);
+  const fmtd=t=>{const d=new Date(t);return d.toLocaleDateString('en-IN',{month:'short',year:'2-digit'});};
+  box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Equity curve">
+    <defs><linearGradient id="ar" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="${col}" stop-opacity="0.20"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>
+    ${grid}
+    <line x1="${pl}" y1="${capY}" x2="${W-pr}" y2="${capY}" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3 3" opacity="0.55"/>
+    <text x="${W-pr}" y="${(+capY-4)}" font-size="9" fill="var(--muted)" text-anchor="end" font-family="var(--mono)">start</text>
+    <path d="${area}" fill="url(#ar)"/>
+    <path d="${line}" fill="none" stroke="${col}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="${X(x1).toFixed(1)}" cy="${Y(live.eq).toFixed(1)}" r="3.6" fill="${col}"/>
+    <text x="${pl}" y="${H-7}" font-size="9.5" fill="var(--faint)" font-family="var(--mono)">${fmtd(x0)}</text>
+    <text x="${W-pr}" y="${H-7}" font-size="9.5" fill="var(--faint)" text-anchor="end" font-family="var(--mono)">${fmtd(x1)}</text>
+  </svg>`;
+}
+
+/* ---------- actions ---------- */
+function autoQty(price){const eq=equityOf(S);return price>0?Math.floor(S.sizePct/100*eq/price):0;}
+function pushEquity(dt){const e=equityOf(S);S.equity=S.equity.filter(p=>p.date!==(dt||today()));S.equity.push({date:dt||today(),eq:e});}
+function addPos(sym,date,price,qty){
+  sym=sym.trim().toUpperCase().replace(/[^A-Z0-9&._-]/g,""); if(!sym||!(price>0))return false;
+  qty=qty>0?qty:autoQty(price); if(qty<=0)return false;
+  const cost=qty*price; if(cost>S.cash){qty=Math.floor(S.cash/price); if(qty<=0)return false;}
+  S.cash-=qty*price;
+  S.positions.push({id:(crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2)),
+    sym,date:date||today(),entry:price,qty,now:price,high:price,stop:price*(1-S.trailPct/100)});
+  pushEquity(); return true;
+}
+function exitPos(id){
+  const i=S.positions.findIndex(p=>p.id===id); if(i<0)return; const p=S.positions[i];
+  let xp=prompt(`Sell ${p.sym} — exit price ₹`,p.now.toString()); if(xp===null)return;
+  xp=parseFloat(xp); if(!(xp>0))return;
+  let xd=prompt(`Exit date (YYYY-MM-DD)`,today())||today();
+  S.cash+=p.qty*xp;
+  S.closed.push({sym:p.sym,date:p.date,exitDate:xd,entry:p.entry,exit:xp,qty:p.qty,
+    ret:xp/p.entry-1,pnl:(xp-p.entry)*p.qty,weeks:weeksBetween(p.date,xd)});
+  S.positions.splice(i,1); pushEquity(xd); pushEquity(); render();
+}
+
+/* ---------- events ---------- */
+$("#addForm").addEventListener("submit",e=>{e.preventDefault();
+  const sym=$("#fSym").value,price=parseFloat($("#fPrice").value),qty=parseInt($("#fQty").value)||0,date=$("#fDate").value||today();
+  if(addPos(sym,date,price,qty)){e.target.reset();$("#fDate").value=today();$("#qtyAuto").textContent="";render();}
+});
+$("#fPrice").addEventListener("input",()=>{const p=parseFloat($("#fPrice").value);
+  $("#qtyAuto").textContent=p>0?"("+autoQty(p)+")":"";});
+$("#pasteToggle").addEventListener("click",()=>$("#pasteBox").classList.toggle("show"));
+$("#pasteAdd").addEventListener("click",()=>{let n=0;
+  $("#pasteArea").value.split(/\n/).forEach(line=>{const m=line.split(/[,\t;]+/);
+    if(m[0]&&m[0].trim()){const pr=parseFloat(m[1]); if(pr>0&&addPos(m[0],today(),pr,0))n++;}});
+  if(n){$("#pasteArea").value="";$("#pasteBox").classList.remove("show");render();} else alert("Add lines like: SYMBOL, price");
+});
+document.addEventListener("change",e=>{
+  if(e.target.classList.contains("priceinp")){const id=e.target.dataset.id,v=parseFloat(e.target.value);
+    const p=S.positions.find(x=>x.id===id); if(p&&v>0){p.now=v;pushEquity();render();}}
+});
+document.addEventListener("click",e=>{const id=e.target.dataset.exit; if(id)exitPos(id);});
+$("#snapBtn").addEventListener("click",()=>{pushEquity();render();});
+$("#resetSample").addEventListener("click",()=>{S=fresh(2000000);render();});
+
+// settings
+const modal=$("#modal");
+function openSet(){$("#sCap").value=S.capital;$("#sStart").value=S.start;$("#sSize").value=S.sizePct;$("#sTrail").value=S.trailPct;modal.classList.add("show");}
+$("#setBtn").addEventListener("click",openSet);
+$("#setCancel").addEventListener("click",()=>modal.classList.remove("show"));
+modal.addEventListener("click",e=>{if(e.target===modal)modal.classList.remove("show");});
+$("#setSave").addEventListener("click",()=>{
+  const cap=parseFloat($("#sCap").value)||S.capital, start=$("#sStart").value||S.start;
+  const size=parseFloat($("#sSize").value)||S.sizePct, trail=parseFloat($("#sTrail").value)||S.trailPct;
+  const reset=(cap!==S.capital||start!==S.start);
+  if(reset && (S.positions.length||S.closed.length) && !confirm("Changing capital/start date resets the book. Continue?")){return;}
+  if(reset){S=fresh(cap);S.start=start;} else {S.sizePct=size;S.trailPct=trail;}
+  if(!reset){S.sizePct=size;S.trailPct=trail;}
+  modal.classList.remove("show");render();
+});
+$("#hardReset").addEventListener("click",()=>{if(confirm("Erase all paper-trading data?")){S=fresh(2000000);modal.classList.remove("show");render();}});
+
+// theme
+$("#themeBtn").addEventListener("click",()=>{const r=document.documentElement;
+  const cur=r.getAttribute("data-theme")|| (matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");
+  const next=cur==="dark"?"light":"dark"; r.setAttribute("data-theme",next);
+  try{localStorage.setItem("cw2_theme",next);}catch(e){} });
+try{const t=localStorage.getItem("cw2_theme"); if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}
+
+// export / import
+$("#expBtn").addEventListener("click",()=>{
+  const blob=JSON.stringify(S,null,2);
+  navigator.clipboard?.writeText(blob).then(()=>alert("Portfolio JSON copied to clipboard — paste it somewhere safe to back up."),
+    ()=>prompt("Copy your backup JSON:",blob)); });
+$("#impBtn").addEventListener("click",()=>{const t=prompt("Paste a previously exported portfolio JSON:");
+  if(t){try{const o=JSON.parse(t); if(o&&o.positions){S=o;S.sample=false;render();}else alert("Not a valid backup.");}catch(e){alert("Could not read that JSON.");}}});
+
+/* ---------- boot ---------- */
+S=load()|| currentWeekSeed();
+if(!S.equity||!S.equity.length)S.equity=[{date:S.start,eq:S.capital}];
+$("#fDate").value=today();
+render();
+})();
+</script>
