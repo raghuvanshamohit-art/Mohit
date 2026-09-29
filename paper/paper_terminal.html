@@ -127,6 +127,11 @@ td .tag{font-family:var(--sans)}
 .mini{font-size:11px;color:var(--muted);font-family:var(--mono)}
 .rulebar{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:11.5px;color:var(--muted);padding:2px 2px 16px}
 .rulebar b{color:var(--ink);font-weight:600}
+.seg{display:inline-flex;border:1px solid var(--border2);border-radius:9px;overflow:hidden;flex:none}
+.seg button{border:none;background:var(--surface);color:var(--muted);padding:5px 12px;font-size:12px;font-weight:600;font-family:var(--sans)}
+.seg button+button{border-left:1px solid var(--border2)}
+.seg button.active{background:var(--accent);color:#fff}
+.seg button:hover:not(.active){background:var(--surface2);color:var(--accent)}
 @media(max-width:820px){
   .tiles{grid-template-columns:repeat(2,1fr)}
   .tile.hero{grid-column:span 2}
@@ -155,7 +160,7 @@ td .tag{font-family:var(--sans)}
   </header>
 
   <div class="banner" id="banner">
-    <span>📌 <b>Book full — 25 holdings (25 Sep 2026)</b> + <b>₹20k/mo SIP</b> now on. See the new <b>10-year projection</b> panel below. ₹20 L start, 4% each, 20% ratcheting trailing stop. Just send screenshots each week and I refresh everything. <b>Reset</b> starts empty.</span>
+    <span>📌 <b>Book full — 25 holdings (25 Sep 2026)</b> + <b>₹20k/mo SIP</b> now on. See the <b>long-term projection</b> panel below (10/15/20-year toggle). ₹20 L start, 4% each, 20% ratcheting trailing stop. Just send screenshots each week and I refresh everything. <b>Reset</b> starts empty.</span>
     <div class="hspace"></div>
     <button class="btn" id="resetSample">Reset &amp; start empty</button>
   </div>
@@ -214,9 +219,9 @@ td .tag{font-family:var(--sans)}
 
   <!-- PROJECTION -->
   <div class="panel">
-    <div class="phead"><h2>10-year projection</h2><span class="count">₹20k/mo SIP</span>
+    <div class="phead"><h2>Long-term projection</h2><span class="count">₹20k/mo SIP</span>
       <div class="hspace" style="flex:1"></div>
-      <span class="mini">book + SIP compounded at 8–25% p.a. · your live equity (black) tracks against the fan</span></div>
+      <div class="seg" id="projHz"><button data-yr="10">10y</button><button data-yr="15">15y</button><button data-yr="20">20y</button></div></div>
     <div class="chartbox" id="projbox"></div>
     <div class="rulebar" id="projlegend" style="padding:2px 16px 14px;gap:6px 14px"></div>
     <div class="hint" style="padding-top:0">Projection only — not a forecast. Real returns are almost always <b>below</b> the in-sample backtest (survivorship bias, fitting, gap risk), and the path includes 30–45% drawdowns and multi-year flat stretches. Plan around the <b>12–15%</b> lines; treat higher as upside.</div>
@@ -266,7 +271,7 @@ const weeksBetween=(a,b)=>Math.max(0,Math.round((D(b)-D(a))/6048e5));
 
 /* ---------- state ---------- */
 let S=null;
-function fresh(cap){return {capital:cap||2000000, start:today(), sizePct:4, trailPct:20, sipMonthly:20000,
+function fresh(cap){return {capital:cap||2000000, start:today(), sizePct:4, trailPct:20, sipMonthly:20000, projYears:15,
   cash:cap||2000000, positions:[], closed:[], contribs:[], equity:[{date:today(),eq:cap||2000000}], sample:false};}
 function currentWeekSeed(){
   const s=fresh(2000000); s.sample=true;
@@ -472,7 +477,9 @@ function drawProjection(){
   const cs=getComputedStyle(document.documentElement);
   const g=(n,f)=>(cs.getPropertyValue(n).trim()||f);
   const INK=g('--ink','#131824'),BORD=g('--border','#e2e6ee'),FAINT=g('--faint','#8a94a4'),ACC=g('--accent','#3b5bdb'),GAIN=g('--gain','#0f8a57');
-  const start=D(S.start), V0=S.capital, sip=S.sipMonthly||0, N=120;
+  const yrsH=S.projYears||15, N=yrsH*12;
+  const hz=$("#projHz"); if(hz) hz.querySelectorAll("button").forEach(b=>b.classList.toggle("active",+b.dataset.yr===yrsH));
+  const start=D(S.start), V0=S.capital, sip=S.sipMonthly||0;
   const addM=(dt,k)=>{const d=new Date(dt.getTime()); d.setMonth(d.getMonth()+k); return d;};
   const scen=[[0.08,'#94a3b8','8%'],[0.12,'#60a5fa','12%'],[0.15,ACC,'15%'],[0.20,'#8b5cf6','20%'],[0.25,GAIN,'25%']];
   const series=scen.map(([r,c,l])=>{let v=V0; const pts=[{t:start.getTime(),v}];
@@ -490,8 +497,8 @@ function drawProjection(){
   for(let k=0;k<=4;k++){const v=maxV*k/4, y=Y(v).toFixed(1);
     grid+=`<line x1="${pl}" y1="${y}" x2="${pl+iw}" y2="${y}" stroke="${BORD}" stroke-width="1"/>`
       +`<text x="${pl-7}" y="${(+y+3.5)}" font-size="9.5" fill="${FAINT}" text-anchor="end" font-family="var(--mono)">${cr(v)}</text>`;}
-  let xt='';
-  for(let yv=0;yv<=10;yv+=2){const t=addM(start,yv*12).getTime();
+  let xt=''; const step=Math.max(1,Math.round(yrsH/5));
+  for(let yv=0;yv<=yrsH;yv+=step){const t=addM(start,yv*12).getTime();
     xt+=`<text x="${X(t).toFixed(1)}" y="${H-8}" font-size="9.5" fill="${FAINT}" text-anchor="middle" font-family="var(--mono)">${yv}y</text>`;}
   let lines='', labels='';
   series.forEach(s=>{const bold=s.r===0.15;
@@ -512,8 +519,8 @@ function drawProjection(){
     <text x="${lx}" y="${(+ly-8)}" font-size="9.5" fill="${INK}" font-family="var(--mono)" font-weight="600" text-anchor="start">you are here</text>
   </svg>`;
   const lg=$("#projlegend");
-  if(lg) lg.innerHTML=`<span>Start <b>${inr(S.capital)}</b> + <b>${inr(S.sipMonthly)}</b>/mo × 10 yrs `
-    +`(<b>${cr(S.capital+S.sipMonthly*120)}</b> put in) →</span>`
+  if(lg) lg.innerHTML=`<span>Start <b>${inr(S.capital)}</b> + <b>${inr(S.sipMonthly)}</b>/mo × ${yrsH} yrs `
+    +`(<b>${cr(S.capital+S.sipMonthly*N)}</b> put in) →</span>`
     +series.map(s=>`<span style="color:${s.c}"><b>${s.l}</b>&nbsp;${cr(s.end)}</span>`).join('');
 }
 
@@ -560,6 +567,8 @@ document.addEventListener("change",e=>{
 document.addEventListener("click",e=>{const id=e.target.dataset.exit; if(id)exitPos(id);});
 $("#snapBtn").addEventListener("click",()=>{pushEquity();render();});
 $("#resetSample").addEventListener("click",()=>{S=fresh(2000000);render();});
+$("#projHz").addEventListener("click",e=>{const b=e.target.closest("button"); if(!b)return;
+  S.projYears=+b.dataset.yr; save(); drawProjection();});
 
 // settings
 const modal=$("#modal");
@@ -597,6 +606,7 @@ $("#impBtn").addEventListener("click",()=>{const t=prompt("Paste a previously ex
 /* ---------- boot ---------- */
 S=load()|| currentWeekSeed();
 if(!S.equity||!S.equity.length)S.equity=[{date:S.start,eq:S.capital}];
+if(S.sipMonthly==null)S.sipMonthly=20000; if(!S.contribs)S.contribs=[]; if(!S.projYears)S.projYears=15;
 $("#fDate").value=today();
 render();
 })();
