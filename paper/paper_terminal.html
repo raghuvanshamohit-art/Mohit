@@ -155,7 +155,7 @@ td .tag{font-family:var(--sans)}
   </header>
 
   <div class="banner" id="banner">
-    <span>📌 <b>Book full — 25 holdings (25 Sep 2026)</b>. 8 new breakouts added by highest 26-week RS (E2E, OPTIEMUS, MARKSANS, KDDL, PGIL, TCPLPACK, GNA, ROLEXRINGS). ₹20 L book, 4% each, 20% ratcheting trailing stop. Just send screenshots each week and I refresh everything. <b>Reset</b> starts empty.</span>
+    <span>📌 <b>Book full — 25 holdings (25 Sep 2026)</b> + <b>₹20k/mo SIP</b> now on. See the new <b>10-year projection</b> panel below. ₹20 L start, 4% each, 20% ratcheting trailing stop. Just send screenshots each week and I refresh everything. <b>Reset</b> starts empty.</span>
     <div class="hspace"></div>
     <button class="btn" id="resetSample">Reset &amp; start empty</button>
   </div>
@@ -212,6 +212,16 @@ td .tag{font-family:var(--sans)}
     </div>
   </div>
 
+  <!-- PROJECTION -->
+  <div class="panel">
+    <div class="phead"><h2>10-year projection</h2><span class="count">₹20k/mo SIP</span>
+      <div class="hspace" style="flex:1"></div>
+      <span class="mini">book + SIP compounded at 8–25% p.a. · your live equity (black) tracks against the fan</span></div>
+    <div class="chartbox" id="projbox"></div>
+    <div class="rulebar" id="projlegend" style="padding:2px 16px 14px;gap:6px 14px"></div>
+    <div class="hint" style="padding-top:0">Projection only — not a forecast. Real returns are almost always <b>below</b> the in-sample backtest (survivorship bias, fitting, gap risk), and the path includes 30–45% drawdowns and multi-year flat stretches. Plan around the <b>12–15%</b> lines; treat higher as upside.</div>
+  </div>
+
   <!-- CLOSED -->
   <div class="panel">
     <div class="phead"><h2>Closed trades</h2><span class="count" id="closedCount">0</span></div>
@@ -233,7 +243,8 @@ td .tag{font-family:var(--sans)}
       <div class="srow"><label for="sStart">Start date</label><input id="sStart" type="date"></div>
       <div class="srow"><label for="sSize">Position size (% equity)</label><input id="sSize" class="mono" inputmode="decimal"></div>
       <div class="srow"><label for="sTrail">Trailing stop (%)</label><input id="sTrail" class="mono" inputmode="decimal"></div>
-      <div class="mini">Changing capital or start date resets the book. Trail/size apply to new trades and re-compute stops live.</div>
+      <div class="srow"><label for="sSip">Monthly SIP (₹)</label><input id="sSip" class="mono" inputmode="numeric"></div>
+      <div class="mini">Changing capital or start date resets the book. Trail/size/SIP apply live. SIP cash is added on the 1st of each month and deployed into new breakouts.</div>
     </div>
     <div class="sfoot">
       <button class="btn" id="hardReset" style="margin-right:auto;color:var(--loss);border-color:var(--border2)">Erase everything</button>
@@ -247,7 +258,7 @@ td .tag{font-family:var(--sans)}
 <script>
 (function(){
 "use strict";
-const KEY="cw2sigma_paper_v5";
+const KEY="cw2sigma_paper_v6";
 const $=s=>document.querySelector(s);
 const today=()=>new Date().toISOString().slice(0,10);
 const D=s=>new Date(s+"T00:00:00");
@@ -255,8 +266,8 @@ const weeksBetween=(a,b)=>Math.max(0,Math.round((D(b)-D(a))/6048e5));
 
 /* ---------- state ---------- */
 let S=null;
-function fresh(cap){return {capital:cap||2000000, start:today(), sizePct:4, trailPct:20,
-  cash:cap||2000000, positions:[], closed:[], equity:[{date:today(),eq:cap||2000000}], sample:false};}
+function fresh(cap){return {capital:cap||2000000, start:today(), sizePct:4, trailPct:20, sipMonthly:20000,
+  cash:cap||2000000, positions:[], closed:[], contribs:[], equity:[{date:today(),eq:cap||2000000}], sample:false};}
 function currentWeekSeed(){
   const s=fresh(2000000); s.sample=true;
   const START="2026-09-21";   // entry week
@@ -287,6 +298,32 @@ function currentWeekSeed(){
   return s;
 }
 function equityOf(st){let mv=0; st.positions.forEach(p=>mv+=p.qty*p.now); return st.cash+mv;}
+function totalIn(){return S.capital + (S.contribs||[]).reduce((a,c)=>a+(c.amount||0),0);}
+function accrueSip(){                       // add ₹sipMonthly cash for each month since start
+  if(!S.sipMonthly||S.sipMonthly<=0)return;
+  S.contribs=S.contribs||[];
+  const done=new Set(S.contribs.map(c=>c.date.slice(0,7)));
+  let y=+S.start.slice(0,4), m=+S.start.slice(5,7);       // start month itself gets no SIP
+  const ty=+today().slice(0,4), tm=+today().slice(5,7);
+  m++; if(m>12){m=1;y++;}
+  while(y<ty||(y===ty&&m<=tm)){
+    const key=y+"-"+String(m).padStart(2,"0");
+    if(!done.has(key)){S.contribs.push({date:key+"-01",amount:S.sipMonthly}); S.cash+=S.sipMonthly;}
+    m++; if(m>12){m=1;y++;}
+  }
+}
+function xirr(){                            // annualised money-weighted return (handles SIP)
+  const flows=[{d:S.start,a:-S.capital}];
+  (S.contribs||[]).forEach(c=>flows.push({d:c.date,a:-c.amount}));
+  flows.push({d:today(),a:equityOf(S)});
+  const t0=D(flows[0].d).getTime(), yr=f=>(D(f.d).getTime()-t0)/3.15576e10;
+  const npv=r=>flows.reduce((s,f)=>s+f.a/Math.pow(1+r,yr(f)),0);
+  let r=0.15;
+  for(let i=0;i<80;i++){const f0=npv(r),h=1e-4,dv=(npv(r+h)-f0)/h;
+    if(!isFinite(dv)||Math.abs(dv)<1e-9)break; const nr=r-f0/dv;
+    if(!isFinite(nr))break; if(Math.abs(nr-r)<1e-9){r=nr;break;} r=nr;}
+  return (r>-0.99&&r<20)?r:null;
+}
 function load(){ try{const r=localStorage.getItem(KEY); if(r) return JSON.parse(r);}catch(e){} return null; }
 function save(){ try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){} }
 
@@ -304,14 +341,16 @@ function ratchet(p){ p.high=Math.max(p.high||p.entry,p.now); p.stop=Math.max(p.s
 function statusOf(p){ if(p.now<p.stop) return "exit"; if(p.now<=p.stop*1.03) return "near"; return "hold"; }
 
 function render(){
+  accrueSip();
   S.positions.forEach(ratchet);
   const eq=equityOf(S);
+  const tin=totalIn();
   const invested=S.positions.reduce((a,p)=>a+p.qty*p.now,0);
   const realized=S.closed.reduce((a,t)=>a+t.pnl,0);
   const unreal=S.positions.reduce((a,p)=>a+(p.now-p.entry)*p.qty,0);
-  const totalPnl=eq-S.capital, totRet=totalPnl/S.capital;
+  const totalPnl=eq-tin, totRet=tin>0?totalPnl/tin:0;
   const yrs=Math.max((D(today())-D(S.start))/3.15576e10,0);
-  const cagr=yrs>0.12&&eq>0?Math.pow(eq/S.capital,1/yrs)-1:null;
+  const cagr=yrs>0.12&&eq>0?xirr():null;
   const wins=S.closed.filter(t=>t.ret>0).length, cl=S.closed.length;
   const winR=cl?wins/cl:null;
   const avgHoldC=cl?S.closed.reduce((a,t)=>a+t.weeks,0)/cl:null;
@@ -320,11 +359,11 @@ function render(){
   const pn=v=>v>=0?"pos":"neg";
   $("#tiles").innerHTML=`
    <div class="tile hero"><div class="lbl">Total equity</div><div class="val mono">${cr(eq)}</div>
-     <div class="foot">${inr(eq)} · start ${inr(S.capital)}</div></div>
+     <div class="foot">${inr(eq)} · in ${cr(tin)}</div></div>
    <div class="tile"><div class="lbl">Total P&amp;L</div><div class="val mono ${pn(totalPnl)}">${cr(totalPnl)}</div>
-     <div class="foot ${pn(totRet)}">${pct(totRet)}</div></div>
-   <div class="tile"><div class="lbl">CAGR</div><div class="val mono ${cagr==null?'':pn(cagr)}">${cagr==null?'–':pct(cagr,1)}</div>
-     <div class="foot">${yrs<0.12?'needs &gt;6 wk':yrs.toFixed(1)+' yrs'}</div></div>
+     <div class="foot ${pn(totRet)}">${pct(totRet)} over contributed</div></div>
+   <div class="tile"><div class="lbl">Return p.a.</div><div class="val mono ${cagr==null?'':pn(cagr)}">${cagr==null?'–':pct(cagr,1)}</div>
+     <div class="foot">${yrs<0.12?'needs &gt;6 wk':yrs.toFixed(1)+' yrs · XIRR'}</div></div>
    <div class="tile"><div class="lbl">Win ratio</div><div class="val mono">${winR==null?'–':(winR*100).toFixed(0)+'%'}</div>
      <div class="foot">${wins}/${cl} closed</div></div>
    <div class="tile"><div class="lbl">Avg holding</div><div class="val mono sm">${avgHoldC==null?'–':avgHoldC+' wk'}</div>
@@ -332,8 +371,9 @@ function render(){
    <div class="tile"><div class="lbl">Invested / Cash</div><div class="val mono sm">${((invested/(eq||1))*100).toFixed(0)}%</div>
      <div class="foot">cash ${cr(S.cash)}</div></div>`;
 
-  $("#rulebar").innerHTML=`<span>Book: <b>${inr(S.capital)}</b></span><span>Size/pos: <b>${S.sizePct}%</b></span>
-     <span>Trailing stop: <b>${S.trailPct}%</b></span><span>Realized: <b class="${pn(realized)}">${cr(realized)}</b></span>
+  $("#rulebar").innerHTML=`<span>Start: <b>${inr(S.capital)}</b></span><span>SIP: <b>${inr(S.sipMonthly)}/mo</b></span>
+     <span>Contributed: <b>${cr(tin)}</b></span><span>Size/pos: <b>${S.sizePct}%</b></span>
+     <span>Trail: <b>${S.trailPct}%</b></span><span>Realized: <b class="${pn(realized)}">${cr(realized)}</b></span>
      <span>Unrealized: <b class="${pn(unreal)}">${cr(unreal)}</b></span>`;
   $("#sizeHint").textContent=S.sizePct+"%";
 
@@ -385,7 +425,7 @@ function render(){
         <td class="${t.pnl>=0?'pos':'neg'}">${cr(t.pnl)}</td><td>${t.weeks}w</td></tr>`).join("")+`</tbody>`;
   } else ct.innerHTML="";
 
-  drawChart(); $("#banner").classList.toggle("show",!!S.sample);
+  drawChart(); drawProjection(); $("#banner").classList.toggle("show",!!S.sample);
   save();
 }
 
@@ -424,6 +464,57 @@ function drawChart(){
     <text x="${pl}" y="${H-7}" font-size="9.5" fill="var(--faint)" font-family="var(--mono)">${fmtd(x0)}</text>
     <text x="${W-pr}" y="${H-7}" font-size="9.5" fill="var(--faint)" text-anchor="end" font-family="var(--mono)">${fmtd(x1)}</text>
   </svg>`;
+}
+
+/* ---------- 10-year projection (scenario fan + SIP) ---------- */
+function drawProjection(){
+  const box=$("#projbox"); if(!box)return;
+  const cs=getComputedStyle(document.documentElement);
+  const g=(n,f)=>(cs.getPropertyValue(n).trim()||f);
+  const INK=g('--ink','#131824'),BORD=g('--border','#e2e6ee'),FAINT=g('--faint','#8a94a4'),ACC=g('--accent','#3b5bdb'),GAIN=g('--gain','#0f8a57');
+  const start=D(S.start), V0=S.capital, sip=S.sipMonthly||0, N=120;
+  const addM=(dt,k)=>{const d=new Date(dt.getTime()); d.setMonth(d.getMonth()+k); return d;};
+  const scen=[[0.08,'#94a3b8','8%'],[0.12,'#60a5fa','12%'],[0.15,ACC,'15%'],[0.20,'#8b5cf6','20%'],[0.25,GAIN,'25%']];
+  const series=scen.map(([r,c,l])=>{let v=V0; const pts=[{t:start.getTime(),v}];
+    for(let m=1;m<=N;m++){v=v*(1+r/12)+sip; pts.push({t:addM(start,m).getTime(),v});}
+    return {r,c,l,pts,end:v};});
+  const t0=start.getTime(), t1=addM(start,N).getTime();
+  const maxV=Math.max(...series.map(s=>s.end));
+  const W=760,H=300,pl=64,pr=118,pt=16,pb=28,iw=W-pl-pr,ih=H-pt-pb;
+  const X=t=>pl+(t-t0)/(t1-t0)*iw, Y=v=>pt+(maxV-v)/maxV*ih;
+  const path=s=>s.pts.map((p,i)=>(i?'L':'M')+X(p.t).toFixed(1)+' '+Y(p.v).toFixed(1)).join(' ');
+  const lo=series[0], hi=series[series.length-1];
+  const band=hi.pts.map((p,i)=>(i?'L':'M')+X(p.t).toFixed(1)+' '+Y(p.v).toFixed(1)).join(' ')
+    +' '+lo.pts.slice().reverse().map(p=>'L'+X(p.t).toFixed(1)+' '+Y(p.v).toFixed(1)).join(' ')+' Z';
+  let grid='';
+  for(let k=0;k<=4;k++){const v=maxV*k/4, y=Y(v).toFixed(1);
+    grid+=`<line x1="${pl}" y1="${y}" x2="${pl+iw}" y2="${y}" stroke="${BORD}" stroke-width="1"/>`
+      +`<text x="${pl-7}" y="${(+y+3.5)}" font-size="9.5" fill="${FAINT}" text-anchor="end" font-family="var(--mono)">${cr(v)}</text>`;}
+  let xt='';
+  for(let yv=0;yv<=10;yv+=2){const t=addM(start,yv*12).getTime();
+    xt+=`<text x="${X(t).toFixed(1)}" y="${H-8}" font-size="9.5" fill="${FAINT}" text-anchor="middle" font-family="var(--mono)">${yv}y</text>`;}
+  let lines='', labels='';
+  series.forEach(s=>{const bold=s.r===0.15;
+    lines+=`<path d="${path(s)}" fill="none" stroke="${s.c}" stroke-width="${bold?2.4:1.3}"${bold?'':' stroke-dasharray="4 3"'} stroke-linejoin="round"/>`;
+    labels+=`<text x="${pl+iw+6}" y="${(Y(s.end)+3).toFixed(1)}" font-size="10" fill="${s.c}" font-family="var(--mono)" font-weight="600">${s.l} ${cr(s.end)}</text>`;});
+  const eqp=S.equity.slice().sort((a,b)=>a.date<b.date?-1:1).concat([{date:today(),eq:equityOf(S)}]);
+  const seen={}; const aeq=eqp.filter(p=>{if(seen[p.date])return false;seen[p.date]=1;return true;});
+  const aline=aeq.map((p,i)=>(i?'L':'M')+X(D(p.date).getTime()).toFixed(1)+' '+Y(p.eq).toFixed(1)).join(' ');
+  const last=aeq[aeq.length-1], lx=X(D(last.date).getTime()).toFixed(1), ly=Y(last.eq).toFixed(1);
+  box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="10-year projection with scenarios">
+    <defs><linearGradient id="pb" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="${ACC}" stop-opacity="0.12"/><stop offset="1" stop-color="${ACC}" stop-opacity="0.02"/></linearGradient></defs>
+    ${grid}${xt}
+    <path d="${band}" fill="url(#pb)"/>
+    ${lines}
+    <path d="${aline}" fill="none" stroke="${INK}" stroke-width="2.8" stroke-linejoin="round"/>
+    <circle cx="${lx}" cy="${ly}" r="3.8" fill="${INK}"/>
+    <text x="${lx}" y="${(+ly-8)}" font-size="9.5" fill="${INK}" font-family="var(--mono)" font-weight="600" text-anchor="start">you are here</text>
+  </svg>`;
+  const lg=$("#projlegend");
+  if(lg) lg.innerHTML=`<span>Start <b>${inr(S.capital)}</b> + <b>${inr(S.sipMonthly)}</b>/mo × 10 yrs `
+    +`(<b>${cr(S.capital+S.sipMonthly*120)}</b> put in) →</span>`
+    +series.map(s=>`<span style="color:${s.c}"><b>${s.l}</b>&nbsp;${cr(s.end)}</span>`).join('');
 }
 
 /* ---------- actions ---------- */
@@ -472,17 +563,18 @@ $("#resetSample").addEventListener("click",()=>{S=fresh(2000000);render();});
 
 // settings
 const modal=$("#modal");
-function openSet(){$("#sCap").value=S.capital;$("#sStart").value=S.start;$("#sSize").value=S.sizePct;$("#sTrail").value=S.trailPct;modal.classList.add("show");}
+function openSet(){$("#sCap").value=S.capital;$("#sStart").value=S.start;$("#sSize").value=S.sizePct;$("#sTrail").value=S.trailPct;$("#sSip").value=S.sipMonthly;modal.classList.add("show");}
 $("#setBtn").addEventListener("click",openSet);
 $("#setCancel").addEventListener("click",()=>modal.classList.remove("show"));
 modal.addEventListener("click",e=>{if(e.target===modal)modal.classList.remove("show");});
 $("#setSave").addEventListener("click",()=>{
   const cap=parseFloat($("#sCap").value)||S.capital, start=$("#sStart").value||S.start;
   const size=parseFloat($("#sSize").value)||S.sizePct, trail=parseFloat($("#sTrail").value)||S.trailPct;
+  const sipv=parseFloat($("#sSip").value); const sip=isNaN(sipv)?S.sipMonthly:Math.max(0,sipv);
   const reset=(cap!==S.capital||start!==S.start);
   if(reset && (S.positions.length||S.closed.length) && !confirm("Changing capital/start date resets the book. Continue?")){return;}
-  if(reset){S=fresh(cap);S.start=start;} else {S.sizePct=size;S.trailPct=trail;}
-  if(!reset){S.sizePct=size;S.trailPct=trail;}
+  if(reset){S=fresh(cap);S.start=start;}
+  S.sizePct=size;S.trailPct=trail;S.sipMonthly=sip;
   modal.classList.remove("show");render();
 });
 $("#hardReset").addEventListener("click",()=>{if(confirm("Erase all paper-trading data?")){S=fresh(2000000);modal.classList.remove("show");render();}});
