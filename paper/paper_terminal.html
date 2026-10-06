@@ -160,7 +160,7 @@ td .tag{font-family:var(--sans)}
   </header>
 
   <div class="banner" id="banner">
-    <span>📌 <b>Prices updated to 2 Oct 2026</b> — 25 holdings, <b>no stop-outs</b> (all HOLD) in a red week. 1 Oct SIP of ₹20k added to cash. Book full, so it waits for a stop-out to free a slot. ₹20 L start + ₹20k/mo SIP, 4% each, 20% trailing stop. Just send screenshots and I refresh everything. <b>Reset</b> starts empty.</span>
+    <span>📌 <b>Prices updated to 6 Oct 2026</b> — 25 holdings, <b>no stop-outs</b> (all HOLD). Recovery week: equity back to ₹20.14 L (10 names above entry). Book full + ₹30k idle cash waiting for a stop-out to free a slot. ₹20 L start + ₹20k/mo SIP, 4% each, 20% trailing stop. Just send screenshots and I refresh everything. <b>Reset</b> starts empty.</span>
     <div class="hspace"></div>
     <button class="btn" id="resetSample">Reset &amp; start empty</button>
   </div>
@@ -263,7 +263,7 @@ td .tag{font-family:var(--sans)}
 <script>
 (function(){
 "use strict";
-const KEY="cw2sigma_paper_v7";
+const KEY="cw2sigma_paper_v8";
 const $=s=>document.querySelector(s);
 const today=()=>new Date().toISOString().slice(0,10);
 const D=s=>new Date(s+"T00:00:00");
@@ -276,16 +276,16 @@ function fresh(cap){return {capital:cap||2000000, start:today(), sizePct:4, trai
 function currentWeekSeed(){
   const s=fresh(2000000); s.sample=true;
   const START="2026-09-21";   // entry week
-  const ASOF ="2026-10-02";   // latest price update
+  const ASOF ="2026-10-06";   // latest price update
   s.start=START;
   // [symbol, entry price, latest price, running weekly-high(optional)] — 4% each, 20% ratcheting trail.
   const picks=[
-    ["UNITEDPOLY",44.75,47.05], ["TATVA",1744.7,1743.2,1793.2], ["VIJAYA",1560.6,1428.0],
-    ["MVGJL",215.81,206.69,224.38], ["INDGN",596.15,593.50,608.95], ["SURAKSHA",350.75,350.15],
-    ["SAMBHV",152.13,161.45],    ["QPOWER",1509.0,1564.6], ["SPLPETRO",868.00,780.45,880.00],
-    ["GNFC",585.25,589.15,630.30], ["TALBROAUTO",464.05,419.70], ["TI",580.20,542.55,581.70],
-    ["GUFICBIO",438.15,418.40], ["SOMANYCERA",587.05,614.20,618.05], ["ACE",1244.1,1212.3],
-    ["LUMAXTECH",2073.0,1978.9], ["STEL",658.00,574.15]];
+    ["UNITEDPOLY",44.75,48.49], ["TATVA",1744.7,1877.4], ["VIJAYA",1560.6,1466.7],
+    ["MVGJL",215.81,203.16,224.38], ["INDGN",596.15,596.30,608.95], ["SURAKSHA",350.75,332.00],
+    ["SAMBHV",152.13,162.19],    ["QPOWER",1509.0,1648.8], ["SPLPETRO",868.00,819.60,880.00],
+    ["GNFC",585.25,629.50,630.30], ["TALBROAUTO",464.05,429.45], ["TI",580.20,547.80,581.70],
+    ["GUFICBIO",438.15,427.80], ["SOMANYCERA",587.05,625.00], ["ACE",1244.1,1252.2],
+    ["LUMAXTECH",2073.0,1856.9], ["STEL",658.00,575.95]];
   picks.forEach(([sym,ep,np,pk])=>{const qty=Math.floor(0.04*s.capital/ep); if(qty<=0)return;
     s.cash-=qty*ep; const hi=Math.max(ep,np,pk||0);
     s.positions.push({id:(crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2)),
@@ -293,15 +293,15 @@ function currentWeekSeed(){
   // NEW breakouts added 25 Sep 2026 — top 8 of the screener by 26-week RS, ~4% of equity each.
   // [symbol, entry price, qty]  (fills the book from 17 to the 25-name cap)
   const NEW="2026-09-25";
-  // [symbol, entry, qty, latest price]
+  // [symbol, entry, qty, latest price, running weekly-high(optional)]
   const adds=[
-    ["E2E",652.15,123,648.00], ["OPTIEMUS",758.55,106,803.70], ["MARKSANS",336.95,238,325.60], ["KDDL",4033.40,19,3911.2],
-    ["PGIL",1329.10,60,1263.0],["TCPLPACK",4103.80,19,3927.1], ["GNA",617.65,130,580.70], ["ROLEXRINGS",195.35,411,196.36]];
-  adds.forEach(([sym,ep,qty,np])=>{ s.cash-=qty*ep; const hi=Math.max(ep,np);
+    ["E2E",652.15,123,688.90], ["OPTIEMUS",758.55,106,889.90], ["MARKSANS",336.95,238,324.40], ["KDDL",4033.40,19,3999.9],
+    ["PGIL",1329.10,60,1266.7],["TCPLPACK",4103.80,19,4007.9], ["GNA",617.65,130,615.80], ["ROLEXRINGS",195.35,411,188.18,196.36]];
+  adds.forEach(([sym,ep,qty,np,pk])=>{ s.cash-=qty*ep; const hi=Math.max(ep,np,pk||0);
     s.positions.push({id:(crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2)),
       sym,date:NEW,entry:ep,qty,now:np,high:hi,stop:hi*(1-s.trailPct/100)});});
-  // weekly equity history (21 Sep start · 25 Sep week-1 · 2 Oct after 1-Oct SIP, marked down)
-  s.equity=[{date:"2026-09-21",eq:2000000},{date:"2026-09-25",eq:2011112},{date:ASOF,eq:1972825}];
+  // weekly equity history (21 Sep start · 25 Sep · 2 Oct after 1-Oct SIP · 6 Oct recovery)
+  s.equity=[{date:"2026-09-21",eq:2000000},{date:"2026-09-25",eq:2011112},{date:"2026-10-02",eq:1972825},{date:ASOF,eq:2014519}];
   return s;
 }
 function equityOf(st){let mv=0; st.positions.forEach(p=>mv+=p.qty*p.now); return st.cash+mv;}
