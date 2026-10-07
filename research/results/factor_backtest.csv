@@ -1,0 +1,30 @@
+Factor,Portfolio,CAGR %,Vol %,Sharpe,MaxDD %,Avg turnover %
+Momentum 12-1m,Top quintile (net),28.918,23.127,1.228,-28.179,21.137
+Momentum 12-1m,Bottom quintile,10.118,28.62,0.479,-52.897,
+Momentum 12-1m,Long-short Q5-Q1 (gross),15.407,15.861,0.989,-26.213,
+Momentum 6-1m,Top quintile (net),27.468,22.782,1.192,-30.468,32.641
+Momentum 6-1m,Bottom quintile,12.515,26.404,0.578,-50.666,
+Momentum 6-1m,Long-short Q5-Q1 (gross),13.214,13.927,0.966,-22.575,
+Short-term reversal,Top quintile (net),18.167,26.353,0.77,-40.295,80.97
+Short-term reversal,Bottom quintile,24.469,21.33,1.143,-46.098,
+Short-term reversal,Long-short Q5-Q1 (gross),-0.85,11.545,-0.017,-45.999,
+Low volatility (3m),Top quintile (net),13.7,16.243,0.877,-24.874,24.599
+Low volatility (3m),Bottom quintile,28.558,28.402,1.036,-52.022,
+Low volatility (3m),Long-short Q5-Q1 (gross),-14.324,16.411,-0.852,-80.305,
+Low beta (1y),Top quintile (net),18.939,18.797,1.023,-26.406,11.821
+Low beta (1y),Bottom quintile,18.516,29.038,0.736,-56.75,
+Low beta (1y),Long-short Q5-Q1 (gross),-2.907,16.559,-0.096,-54.645,
+Near 52-week high,Top quintile (net),21.784,18.728,1.157,-27.856,44.636
+Near 52-week high,Bottom quintile,14.207,30.839,0.584,-53.738,
+Near 52-week high,Long-short Q5-Q1 (gross),4.034,18.811,0.309,-41.152,
+Trend (price/200DMA),Top quintile (net),30.591,22.127,1.332,-29.084,29.21
+Trend (price/200DMA),Bottom quintile,14.455,28.738,0.614,-48.921,
+Trend (price/200DMA),Long-short Q5-Q1 (gross),12.51,16.559,0.799,-21.442,
+Low MAX (lottery),Top quintile (net),15.05,19.977,0.806,-35.72,66.219
+Low MAX (lottery),Bottom quintile,24.939,25.056,1.024,-49.787,
+Low MAX (lottery),Long-short Q5-Q1 (gross),-6.728,10.717,-0.594,-62.645,
+Composite (Mom+52wH+LowVol),Top quintile (net),21.855,18.269,1.185,-25.324,26.81
+Composite (Mom+52wH+LowVol),Bottom quintile,13.8,31.404,0.569,-58.259,
+Composite (Mom+52wH+LowVol),Long-short Q5-Q1 (gross),3.114,19.681,0.258,-49.817,
+Benchmark,Nifty 50,9.176,16.725,0.612,-29.344,
+Benchmark,Equal-weight universe,18.867,22.583,0.886,-39.421,

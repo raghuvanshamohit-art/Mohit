@@ -1,0 +1,10 @@
+,Momentum 12-1m,Momentum 6-1m,Short-term reversal,Low volatility (3m),Low beta (1y),Near 52-week high,Trend (price/200DMA),Low MAX (lottery),Composite (Mom+52wH+LowVol)
+Momentum 12-1m,1.0,0.82,-0.4,0.17,0.2,0.72,0.85,-0.04,0.69
+Momentum 6-1m,0.82,1.0,-0.38,0.19,0.2,0.71,0.9,0.02,0.66
+Short-term reversal,-0.4,-0.38,1.0,-0.36,-0.36,-0.69,-0.66,0.08,-0.61
+Low volatility (3m),0.17,0.19,-0.36,1.0,0.81,0.68,0.28,0.81,0.77
+Low beta (1y),0.2,0.2,-0.36,0.81,1.0,0.61,0.33,0.66,0.66
+Near 52-week high,0.72,0.71,-0.69,0.68,0.61,1.0,0.85,0.35,0.97
+Trend (price/200DMA),0.85,0.9,-0.66,0.28,0.33,0.85,1.0,-0.02,0.77
+Low MAX (lottery),-0.04,0.02,0.08,0.81,0.66,0.35,-0.02,1.0,0.47
+Composite (Mom+52wH+LowVol),0.69,0.66,-0.61,0.77,0.66,0.97,0.77,0.47,1.0
