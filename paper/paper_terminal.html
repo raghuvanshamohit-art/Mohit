@@ -223,8 +223,9 @@ td .tag{font-family:var(--sans)}
       <div class="hspace" style="flex:1"></div>
       <div class="seg" id="projHz"><button data-yr="10">10y</button><button data-yr="15">15y</button><button data-yr="20">20y</button></div></div>
     <div class="chartbox" id="projbox"></div>
-    <div class="rulebar" id="projlegend" style="padding:2px 16px 14px;gap:6px 14px"></div>
-    <div class="hint" style="padding-top:0">Projection only — not a forecast. Real returns are almost always <b>below</b> the in-sample backtest (survivorship bias, fitting, gap risk), and the path includes 30–45% drawdowns and multi-year flat stretches. Plan around the <b>12–15%</b> lines; treat higher as upside.</div>
+    <div class="rulebar" id="projlegend" style="padding:2px 16px 6px;gap:6px 14px"></div>
+    <div class="rulebar" id="projdbl" style="padding:0 16px 12px;gap:6px 14px"></div>
+    <div class="hint" style="padding-top:0">Projection only — not a forecast. The coloured lines compound your book + SIP; the <b>gold dotted line</b> is the Rule of 72 (24% p.a. doubles every 3 yrs, on your ₹20 L with no SIP). Real returns are almost always <b>below</b> the in-sample backtest (survivorship bias, fitting, gap risk), and the path includes 30–45% drawdowns and flat stretches. Plan around the <b>12–15%</b> lines; treat higher as upside.</div>
   </div>
 
   <!-- CLOSED -->
@@ -459,6 +460,11 @@ function drawChart(){
      <text x="${pl-7}" y="${(Y(v)+3.5).toFixed(1)}" font-size="9.5" fill="var(--faint)" text-anchor="end" font-family="var(--mono)">${cr(v)}</text>`).join("");
   const capY=Y(capLine).toFixed(1);
   const fmtd=t=>{const d=new Date(t);return d.toLocaleDateString('en-IN',{month:'short',year:'2-digit'});};
+  const yrsE=Math.max((D(today())-D(S.start))/3.15576e10,0);
+  const cagrN=yrsE>0.02&&live.eq>0?Math.pow(live.eq/S.capital,1/yrsE)-1:null;   // naive point-to-point
+  const xrE=yrsE>0.02?xirr():null;                                              // money-weighted (SIP-aware)
+  const sg=v=>(v>=0?'+':'')+(v*100).toFixed(1)+'%';
+  const mlbl=`CAGR ${cagrN==null?'–':sg(cagrN)}   ·   XIRR ${xrE==null?'–':sg(xrE)}${yrsE<0.5?'   (annualised · early)':''}`;
   box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Equity curve">
     <defs><linearGradient id="ar" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="${col}" stop-opacity="0.20"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>
@@ -470,6 +476,7 @@ function drawChart(){
     <circle cx="${X(x1).toFixed(1)}" cy="${Y(live.eq).toFixed(1)}" r="3.6" fill="${col}"/>
     <text x="${pl}" y="${H-7}" font-size="9.5" fill="var(--faint)" font-family="var(--mono)">${fmtd(x0)}</text>
     <text x="${W-pr}" y="${H-7}" font-size="9.5" fill="var(--faint)" text-anchor="end" font-family="var(--mono)">${fmtd(x1)}</text>
+    <text x="${pl}" y="${pt+9}" font-size="9.5" fill="var(--muted)" font-family="var(--mono)" font-weight="600">${mlbl}</text>
   </svg>`;
 }
 
@@ -478,7 +485,7 @@ function drawProjection(){
   const box=$("#projbox"); if(!box)return;
   const cs=getComputedStyle(document.documentElement);
   const g=(n,f)=>(cs.getPropertyValue(n).trim()||f);
-  const INK=g('--ink','#131824'),BORD=g('--border','#e2e6ee'),FAINT=g('--faint','#8a94a4'),ACC=g('--accent','#3b5bdb'),GAIN=g('--gain','#0f8a57');
+  const INK=g('--ink','#131824'),BORD=g('--border','#e2e6ee'),FAINT=g('--faint','#8a94a4'),ACC=g('--accent','#3b5bdb'),GAIN=g('--gain','#0f8a57'),WARN=g('--warn','#a9711a');
   const yrsH=S.projYears||15, N=yrsH*12;
   const hz=$("#projHz"); if(hz) hz.querySelectorAll("button").forEach(b=>b.classList.toggle("active",+b.dataset.yr===yrsH));
   const start=D(S.start), V0=S.capital, sip=S.sipMonthly||0;
@@ -506,6 +513,15 @@ function drawProjection(){
   series.forEach(s=>{const bold=s.r===0.15;
     lines+=`<path d="${path(s)}" fill="none" stroke="${s.c}" stroke-width="${bold?2.4:1.3}"${bold?'':' stroke-dasharray="4 3"'} stroke-linejoin="round"/>`;
     labels+=`<text x="${pl+iw+6}" y="${(Y(s.end)+3).toFixed(1)}" font-size="10" fill="${s.c}" font-family="var(--mono)" font-weight="600">${s.l} ${cr(s.end)}</text>`;});
+  // Rule of 72 @ 24% — pure compounding (no SIP), portfolio doubles every 3 years
+  const dblYrs=72/24, V=S.capital;
+  let dbPath=''; for(let m=0;m<=N;m++){const v=Math.min(V*Math.pow(2,(m/12)/dblYrs),maxV);
+    dbPath+=(m?'L':'M')+X(addM(start,m).getTime()).toFixed(1)+' '+Y(v).toFixed(1)+' ';}
+  let dbMarks='';
+  for(let d=dblYrs; d<=yrsH+1e-6; d+=dblYrs){const v=V*Math.pow(2,d/dblYrs); if(v>maxV)break;
+    const x=X(addM(start,Math.round(d*12)).getTime()).toFixed(1), y=Y(v).toFixed(1);
+    dbMarks+=`<circle cx="${x}" cy="${y}" r="3.2" fill="${WARN}"/>`
+      +`<text x="${x}" y="${(+y-7)}" font-size="9" fill="${WARN}" text-anchor="middle" font-family="var(--mono)" font-weight="700">${Math.round(Math.pow(2,Math.round(d/dblYrs)))}×</text>`;}
   const eqp=S.equity.slice().sort((a,b)=>a.date<b.date?-1:1).concat([{date:today(),eq:equityOf(S)}]);
   const seen={}; const aeq=eqp.filter(p=>{if(seen[p.date])return false;seen[p.date]=1;return true;});
   const aline=aeq.map((p,i)=>(i?'L':'M')+X(D(p.date).getTime()).toFixed(1)+' '+Y(p.eq).toFixed(1)).join(' ');
@@ -516,6 +532,8 @@ function drawProjection(){
     ${grid}${xt}
     <path d="${band}" fill="url(#pb)"/>
     ${lines}
+    <path d="${dbPath}" fill="none" stroke="${WARN}" stroke-width="1.8" stroke-dasharray="1 4" stroke-linecap="round"/>
+    ${dbMarks}
     <path d="${aline}" fill="none" stroke="${INK}" stroke-width="2.8" stroke-linejoin="round"/>
     <circle cx="${lx}" cy="${ly}" r="3.8" fill="${INK}"/>
     <text x="${lx}" y="${(+ly-8)}" font-size="9.5" fill="${INK}" font-family="var(--mono)" font-weight="600" text-anchor="start">you are here</text>
@@ -524,6 +542,10 @@ function drawProjection(){
   if(lg) lg.innerHTML=`<span>Start <b>${inr(S.capital)}</b> + <b>${inr(S.sipMonthly)}</b>/mo × ${yrsH} yrs `
     +`(<b>${cr(S.capital+S.sipMonthly*N)}</b> put in) →</span>`
     +series.map(s=>`<span style="color:${s.c}"><b>${s.l}</b>&nbsp;${cr(s.end)}</span>`).join('');
+  const dbl=yrsH/dblYrs, mult=Math.pow(2,dbl), dval=V*mult;
+  const dp=$("#projdbl");
+  if(dp) dp.innerHTML=`<span style="color:${WARN}">● <b>Rule of 72 @ 24%</b> (gold dotted, no SIP): doubles every <b>3 yrs</b> → `
+    +`<b>${dbl.toFixed(1)} doublings</b> in ${yrsH} yrs → <b>${mult<100?mult.toFixed(1):Math.round(mult)}×</b> → <b>${cr(dval)}</b> from your ₹20 L</span>`;
 }
 
 /* ---------- actions ---------- */
