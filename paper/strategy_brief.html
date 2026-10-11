@@ -1,0 +1,189 @@
+<title>CW 2σ Strategy Brief</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#f5f7fa; --surface:#ffffff; --surface2:#eef1f6; --border:#e2e6ee; --border2:#d3d9e4;
+  --ink:#131824; --muted:#5c6675; --faint:#8a94a4;
+  --accent:#3b5bdb; --accent2:#eaeeff;
+  --gain:#0f8a57; --gainbg:#e2f4ea; --loss:#d23a49; --lossbg:#fce9eb;
+  --warn:#a9711a; --warnbg:#fbf1de;
+  --shadow:0 1px 2px rgba(20,30,55,.05),0 4px 16px rgba(20,30,55,.05);
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0d1219; --surface:#151b25; --surface2:#1b232f; --border:#28323f; --border2:#333f4e;
+  --ink:#e7edf5; --muted:#95a2b3; --faint:#6c7889;
+  --accent:#6d8bff; --accent2:#1a2540;
+  --gain:#33c689; --gainbg:#12301f; --loss:#f26370; --lossbg:#331519;
+  --warn:#e0a94a; --warnbg:#31260f;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 22px rgba(0,0,0,.28);
+}}
+:root[data-theme="dark"]{
+  --bg:#0d1219; --surface:#151b25; --surface2:#1b232f; --border:#28323f; --border2:#333f4e;
+  --ink:#e7edf5; --muted:#95a2b3; --faint:#6c7889;
+  --accent:#6d8bff; --accent2:#1a2540;
+  --gain:#33c689; --gainbg:#12301f; --loss:#f26370; --lossbg:#331519;
+  --warn:#e0a94a; --warnbg:#31260f;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 22px rgba(0,0,0,.28);
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:860px;margin:0 auto;padding-block:26px 64px;padding-inline:16px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+h1,h2,h3{margin:0;text-wrap:balance;letter-spacing:-.2px}
+
+/* header */
+.head{display:flex;align-items:center;gap:13px;margin-bottom:6px}
+.mark{width:42px;height:42px;border-radius:11px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700;font-family:var(--mono);font-size:18px;flex:none}
+.head h1{font-size:23px;font-weight:700}
+.head .sub{font-size:12.5px;color:var(--muted);margin-top:2px}
+.tagline{color:var(--muted);font-size:14.5px;margin:12px 2px 22px;max-width:62ch}
+.tagline b{color:var(--ink)}
+
+/* spec strip */
+.spec{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
+.spec .cell{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 13px;box-shadow:var(--shadow)}
+.spec .k{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint);font-weight:600}
+.spec .v{font-family:var(--mono);font-size:17px;font-weight:600;margin-top:4px;letter-spacing:-.3px}
+.spec .n{font-size:11px;color:var(--muted);margin-top:1px}
+
+/* section cards */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:16px 18px;margin-bottom:14px}
+.card h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:11px}
+.card h2 .num{font-family:var(--mono);background:var(--accent2);color:var(--accent);border-radius:6px;padding:1px 7px;font-size:11px}
+ul{margin:0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+li{position:relative;padding-left:20px;font-size:14px}
+li::before{content:"";position:absolute;left:3px;top:8px;width:6px;height:6px;border-radius:50%;background:var(--accent);opacity:.7}
+li b{font-weight:600}
+.k2{font-family:var(--mono);background:var(--surface2);border-radius:5px;padding:1px 6px;font-size:12.5px;font-variant-numeric:tabular-nums}
+.good{color:var(--gain);font-weight:600}.bad{color:var(--loss);font-weight:600}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.formula{font-family:var(--mono);font-size:12.5px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-top:4px;color:var(--ink);overflow-x:auto;white-space:nowrap}
+
+/* do / dont */
+.dd{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dd .box{border-radius:12px;padding:13px 15px}
+.dd .do{background:var(--gainbg);border:1px solid color-mix(in srgb,var(--gain) 30%,transparent)}
+.dd .dont{background:var(--lossbg);border:1px solid color-mix(in srgb,var(--loss) 30%,transparent)}
+.dd h3{font-size:12px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:9px}
+.dd .do h3{color:var(--gain)} .dd .dont h3{color:var(--loss)}
+.dd ul{gap:6px}.dd li{font-size:13px;padding-left:18px}
+.dd .do li::before{background:var(--gain)} .dd .dont li::before{background:var(--loss)}
+
+.reality{background:var(--warnbg);border:1px solid color-mix(in srgb,var(--warn) 32%,transparent);border-radius:14px;padding:16px 18px;margin-bottom:14px}
+.reality h2{color:var(--warn)}
+.reality li::before{background:var(--warn)}
+.foot{text-align:center;color:var(--faint);font-size:11.5px;margin-top:20px;font-family:var(--mono)}
+
+@media(max-width:720px){.spec{grid-template-columns:repeat(2,1fr)}.grid2,.dd{grid-template-columns:1fr}}
+</style>
+
+<div class="wrap">
+  <div class="head">
+    <div class="mark">2σ</div>
+    <div>
+      <h1>CW 2σ — Strategy Brief</h1>
+      <div class="sub">Compounding Wealth · 2-Sigma · rule-based Indian-equity momentum · weekly</div>
+    </div>
+  </div>
+  <p class="tagline">A mechanical system to <b>compound capital by riding winners and cutting losers</b>: buy weekly Bollinger-band breakouts in strong small/mid-caps, size each the same, and let a ratcheting trailing stop decide every exit. No targets, no predictions, no emotions — the rules decide.</p>
+
+  <div class="spec">
+    <div class="cell"><div class="k">Capital</div><div class="v">₹20,00,000</div><div class="n">+ ₹20,000/mo SIP</div></div>
+    <div class="cell"><div class="k">Position size</div><div class="v">4%</div><div class="n">of current equity</div></div>
+    <div class="cell"><div class="k">Max names</div><div class="v">25</div><div class="n">25 × 4% = fully invested</div></div>
+    <div class="cell"><div class="k">Trailing stop</div><div class="v">20%</div><div class="n">ratcheting, weekly close</div></div>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">1</span> Universe &amp; scan</h2>
+    <ul>
+      <li>NSE-listed stocks, <b>market cap ₹1,000–20,000 cr</b> (small &amp; mid-cap — where momentum pays most).</li>
+      <li>Scanned <b>weekly</b> with a screener; decisions are made on the <b>weekly close</b>, never intraday.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">2</span> Entry — all conditions true on the weekly close</h2>
+    <ul>
+      <li><b>Breakout:</b> weekly close crosses <b>above the upper Bollinger Band (50, 2σ)</b> — the "2σ" in the name.</li>
+      <li><b>Relative strength &gt; 0.2</b> vs Nifty 500 over 26 weeks (the stock is beating the market by &gt;20%):</li>
+    </ul>
+    <div class="formula">RS = (Close ÷ Close₂₆w ago) ÷ (N500 ÷ N500₂₆w ago) − 1  &gt; 0.2</div>
+    <ul style="margin-top:8px">
+      <li><b>Market cap</b> within ₹1,000–20,000 cr at entry.</li>
+      <li><b>Priority when cash/slots are limited:</b> take the <b>highest 26-week RS</b> names first.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">3</span> Exit — one rule only</h2>
+    <ul>
+      <li><b>20% ratcheting trailing stop.</b> Sell when the weekly close falls <b>20% below the position's highest weekly close since entry</b>.</li>
+      <li>The stop <b>only moves up, never down</b> — it locks in gains as a winner rises and never loosens.</li>
+      <li><b>No profit targets, no time limit.</b> A winner is held as long as it keeps making new highs; a loser is cut the moment it gives back 20% from its peak.</li>
+    </ul>
+  </div>
+
+  <div class="grid2">
+    <div class="card" style="margin-bottom:0">
+      <h2><span class="num">4</span> Position sizing</h2>
+      <ul>
+        <li>Each new buy = <b>4% of current equity</b> (≈ ₹80,000 today).</li>
+        <li>25 names × 4% = 100% → the book is <b>fully invested at 25 holdings</b>.</li>
+        <li>Winners are <b>allowed to grow past 4%</b> — you never trim them.</li>
+      </ul>
+    </div>
+    <div class="card" style="margin-bottom:0">
+      <h2><span class="num">5</span> Cadence &amp; metrics</h2>
+      <ul>
+        <li><b>Weekly:</b> mark holdings to the weekly close, apply stops, scan for new breakouts.</li>
+        <li>Tracked: <b>XIRR</b> (primary, SIP-aware), CAGR, max drawdown, win rate, holding period.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <h2><span class="num">6</span> Portfolio &amp; cash flow</h2>
+    <ul>
+      <li>Each week is two independent checks: <b>sell</b> whatever stopped out, then <b>buy</b> new breakouts up to 25 names and available cash. Not forced one-in-one-out.</li>
+      <li><b>All exit proceeds — profit or loss — go to one cash pool</b> and fund the next breakout at 4% of equity. Cash is cash; the system doesn't treat a winner's proceeds differently from a loser's.</li>
+      <li><b>SIP ₹20,000</b> is added on the 1st of each month to the same pool; if the book is full it waits as cash until a slot opens.</li>
+    </ul>
+  </div>
+
+  <div class="dd" style="margin-bottom:14px">
+    <div class="box do">
+      <h3>✓ The system does</h3>
+      <ul>
+        <li>Ride winners — let them run, stop ratchets up underneath</li>
+        <li>Cut losers automatically at the 20% trail</li>
+        <li>Recycle every exit into the next breakout</li>
+        <li>Add fresh SIP cash on a fixed schedule</li>
+      </ul>
+    </div>
+    <div class="box dont">
+      <h3>✕ Never does</h3>
+      <ul>
+        <li>No averaging down / adding to a loser</li>
+        <li>No pyramiding / adding to winners</li>
+        <li>No rebalancing or trimming winners</li>
+        <li>No withdrawing profits, no profit targets</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="reality">
+    <h2><span class="num" style="background:var(--warnbg);color:var(--warn)">!</span> Reality check</h2>
+    <ul>
+      <li><b>Plan for ~12–15% CAGR</b>, not the backtest's 20–30%. The backtest is optimistic — survivorship bias, in-sample fitting, and gap risk all pull live returns lower.</li>
+      <li>Expect <b>30–45% drawdowns</b> and <b>multi-year flat stretches</b>. A concentrated small/mid-cap book is volatile by design.</li>
+      <li><b>The edge is discipline, not prediction.</b> The strategy only works if it's followed through the ugly stretches — that's the hard part, and the whole point of paper-trading it first.</li>
+    </ul>
+  </div>
+
+  <p class="foot">CW 2σ · personal strategy brief · paper-trading for practice — not investment advice</p>
+</div>
