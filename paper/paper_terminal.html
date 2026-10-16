@@ -160,7 +160,7 @@ td .tag{font-family:var(--sans)}
   </header>
 
   <div class="banner" id="banner">
-    <span>📌 <b>Prices updated to 9 Oct 2026</b> — 25 holdings, <b>no stop-outs</b> (all HOLD) but pullback week: equity ₹19.47 L. <b>STEL closest to its stop (3.5% cushion)</b> — may exit soon. Book full + ₹30k idle cash waiting for a slot. ₹20 L start + ₹20k/mo SIP, 4% each, 20% trailing stop. Just send screenshots and I refresh everything. <b>Reset</b> starts empty.</span>
+    <span>📌 <b>Prices updated to 16 Oct 2026</b> — <b>first exit: TALBROAUTO stopped out −20.5%</b> (−₹16,400). 24 holdings now, <b>1 slot open</b> with ₹93.7k cash awaiting the next high-RS breakout. Equity ₹19.52 L. ₹20 L start + ₹20k/mo SIP, 4% each, 20% trailing stop. Just send screenshots and I refresh everything. <b>Reset</b> starts empty.</span>
     <div class="hspace"></div>
     <button class="btn" id="resetSample">Reset &amp; start empty</button>
   </div>
@@ -264,7 +264,7 @@ td .tag{font-family:var(--sans)}
 <script>
 (function(){
 "use strict";
-const KEY="cw2sigma_paper_v9";
+const KEY="cw2sigma_paper_v10";
 const $=s=>document.querySelector(s);
 const today=()=>new Date().toISOString().slice(0,10);
 const D=s=>new Date(s+"T00:00:00");
@@ -277,16 +277,17 @@ function fresh(cap){return {capital:cap||2000000, start:today(), sizePct:4, trai
 function currentWeekSeed(){
   const s=fresh(2000000); s.sample=true;
   const START="2026-09-21";   // entry week
-  const ASOF ="2026-10-09";   // latest price update
+  const ASOF ="2026-10-16";   // latest price update
   s.start=START;
   // [symbol, entry price, latest price, running weekly-high(optional)] — 4% each, 20% ratcheting trail.
+  // (TALBROAUTO stopped out this week → moved to closed trades below)
   const picks=[
-    ["UNITEDPOLY",44.75,50.12], ["TATVA",1744.7,1804.8,1877.4], ["VIJAYA",1560.6,1436.6],
-    ["MVGJL",215.81,207.87,224.38], ["INDGN",596.15,580.10,608.95], ["SURAKSHA",350.75,316.25],
-    ["SAMBHV",152.13,160.41,162.19],    ["QPOWER",1509.0,1547.4,1648.8], ["SPLPETRO",868.00,788.55,880.00],
-    ["GNFC",585.25,592.70,630.30], ["TALBROAUTO",464.05,402.05], ["TI",580.20,541.00,581.70],
-    ["GUFICBIO",438.15,406.30], ["SOMANYCERA",587.05,591.45,625.00], ["ACE",1244.1,1176.9,1252.2],
-    ["LUMAXTECH",2073.0,1827.4], ["STEL",658.00,545.25]];
+    ["UNITEDPOLY",44.75,51.78], ["TATVA",1744.7,1944.0], ["VIJAYA",1560.6,1381.7],
+    ["MVGJL",215.81,225.27], ["INDGN",596.15,598.30,608.95], ["SURAKSHA",350.75,306.70],
+    ["SAMBHV",152.13,172.47],    ["QPOWER",1509.0,1454.3,1648.8], ["SPLPETRO",868.00,767.25,880.00],
+    ["GNFC",585.25,564.20,630.30], ["TI",580.20,551.50,581.70],
+    ["GUFICBIO",438.15,404.50], ["SOMANYCERA",587.05,580.10,625.00], ["ACE",1244.1,1136.3,1252.2],
+    ["LUMAXTECH",2073.0,1968.5], ["STEL",658.00,562.25]];
   picks.forEach(([sym,ep,np,pk])=>{const qty=Math.floor(0.04*s.capital/ep); if(qty<=0)return;
     s.cash-=qty*ep; const hi=Math.max(ep,np,pk||0);
     s.positions.push({id:(crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2)),
@@ -296,13 +297,18 @@ function currentWeekSeed(){
   const NEW="2026-09-25";
   // [symbol, entry, qty, latest price, running weekly-high(optional)]
   const adds=[
-    ["E2E",652.15,123,704.60], ["OPTIEMUS",758.55,106,815.85,889.90], ["MARKSANS",336.95,238,309.10], ["KDDL",4033.40,19,3759.2],
-    ["PGIL",1329.10,60,1281.1],["TCPLPACK",4103.80,19,4274.7], ["GNA",617.65,130,554.55], ["ROLEXRINGS",195.35,411,169.14,196.36]];
+    ["E2E",652.15,123,694.85,704.60], ["OPTIEMUS",758.55,106,788.65,889.90], ["MARKSANS",336.95,238,311.00], ["KDDL",4033.40,19,3824.6],
+    ["PGIL",1329.10,60,1289.2],["TCPLPACK",4103.80,19,4316.8], ["GNA",617.65,130,538.50], ["ROLEXRINGS",195.35,411,173.14,196.36]];
   adds.forEach(([sym,ep,qty,np,pk])=>{ s.cash-=qty*ep; const hi=Math.max(ep,np,pk||0);
     s.positions.push({id:(crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2)),
       sym,date:NEW,entry:ep,qty,now:np,high:hi,stop:hi*(1-s.trailPct/100)});});
-  // weekly equity history (21 Sep start · 25 Sep · 2 Oct +SIP · 6 Oct recovery · 9 Oct pullback)
-  s.equity=[{date:"2026-09-21",eq:2000000},{date:"2026-09-25",eq:2011112},{date:"2026-10-02",eq:1972825},{date:"2026-10-06",eq:2014519},{date:ASOF,eq:1946678}];
+  // CLOSED — TALBROAUTO stopped out 16 Oct at the 20% trail (-20.5%). Realized P&L adjusts cash.
+  const closedTrades=[["TALBROAUTO","2026-09-21","2026-10-16",464.05,368.70,172]];
+  closedTrades.forEach(([sym,d1,d2,ep,xp,qty])=>{ s.cash+=(xp-ep)*qty;
+    s.closed.push({sym,date:d1,exitDate:d2,entry:ep,exit:xp,qty,ret:xp/ep-1,pnl:(xp-ep)*qty,
+      weeks:Math.max(0,Math.round((D(d2)-D(d1))/6048e5))});});
+  // weekly equity history (21 Sep start · 25 Sep · 2 Oct +SIP · 6 Oct · 9 Oct · 16 Oct: first stop-out)
+  s.equity=[{date:"2026-09-21",eq:2000000},{date:"2026-09-25",eq:2011112},{date:"2026-10-02",eq:1972825},{date:"2026-10-06",eq:2014519},{date:"2026-10-09",eq:1946678},{date:ASOF,eq:1952477}];
   return s;
 }
 function equityOf(st){let mv=0; st.positions.forEach(p=>mv+=p.qty*p.now); return st.cash+mv;}
