@@ -160,7 +160,7 @@ td .tag{font-family:var(--sans)}
   </header>
 
   <div class="banner" id="banner">
-    <span>📌 <b>Prices updated to 16 Oct 2026</b> — <b>first exit: TALBROAUTO stopped out −20.5%</b> (−₹16,400). 24 holdings now, <b>1 slot open</b> with ₹93.7k cash awaiting the next high-RS breakout. Equity ₹19.52 L. ₹20 L start + ₹20k/mo SIP, 4% each, 20% trailing stop. Just send screenshots and I refresh everything. <b>Reset</b> starts empty.</span>
+    <span>📌 <b>16 Oct 2026</b> — <b>TALBROAUTO stopped out −20.5%</b>, slot refilled with <b>RUBYMILLS</b> (top RS +132%). Back to 25 holdings; cash ₹15.8k. Equity ₹19.52 L. ₹20 L start + ₹20k/mo SIP, 4% each, 20% trailing stop. Just send screenshots and I refresh everything. <b>Reset</b> starts empty.</span>
     <div class="hspace"></div>
     <button class="btn" id="resetSample">Reset &amp; start empty</button>
   </div>
@@ -264,7 +264,7 @@ td .tag{font-family:var(--sans)}
 <script>
 (function(){
 "use strict";
-const KEY="cw2sigma_paper_v10";
+const KEY="cw2sigma_paper_v11";
 const $=s=>document.querySelector(s);
 const today=()=>new Date().toISOString().slice(0,10);
 const D=s=>new Date(s+"T00:00:00");
@@ -307,6 +307,12 @@ function currentWeekSeed(){
   closedTrades.forEach(([sym,d1,d2,ep,xp,qty])=>{ s.cash+=(xp-ep)*qty;
     s.closed.push({sym,date:d1,exitDate:d2,entry:ep,exit:xp,qty,ret:xp/ep-1,pnl:(xp-ep)*qty,
       weeks:Math.max(0,Math.round((D(d2)-D(d1))/6048e5))});});
+  // NEW entry 16 Oct — refilled the open slot with the top-RS screener breakout (RS +132%)
+  const WK2="2026-10-16";
+  const newbuys=[["RUBYMILLS",515.95,151]];   // [symbol, entry, qty]
+  newbuys.forEach(([sym,ep,qty])=>{ s.cash-=qty*ep;
+    s.positions.push({id:(crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2)),
+      sym,date:WK2,entry:ep,qty,now:ep,high:ep,stop:ep*(1-s.trailPct/100)});});
   // weekly equity history (21 Sep start · 25 Sep · 2 Oct +SIP · 6 Oct · 9 Oct · 16 Oct: first stop-out)
   s.equity=[{date:"2026-09-21",eq:2000000},{date:"2026-09-25",eq:2011112},{date:"2026-10-02",eq:1972825},{date:"2026-10-06",eq:2014519},{date:"2026-10-09",eq:1946678},{date:ASOF,eq:1952477}];
   return s;
