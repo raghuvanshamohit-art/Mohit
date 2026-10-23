@@ -160,7 +160,7 @@ td .tag{font-family:var(--sans)}
   </header>
 
   <div class="banner" id="banner">
-    <span>📌 <b>23 Oct 2026 — drawdown week</b>: market fell hard, <b>6 stop-outs</b> (QPOWER, GNFC, ACE, STEL, OPTIEMUS, ROLEXRINGS). 19 holdings left, <b>6 slots open</b> with ₹4.1 L cash awaiting new breakouts. Equity ₹17.74 L (−12.2%). The stops did their job — losers cut, cash raised. ₹20 L start + ₹20k/mo SIP, 4% each, 20% trailing stop. Send screenshots to refresh. <b>Reset</b> starts empty.</span>
+    <span>📌 <b>23 Oct 2026 — drawdown week</b>: 6 stop-outs, then only 2 breakouts qualified so bought <b>MAHASTEEL</b> (RS +84%) &amp; <b>PASHUPATI</b> (RS +25%). 21 holdings; <b>4 slots still in cash</b> (₹2.68 L dry powder). Equity ₹17.74 L (−12.2%). Stops cut the losers; cash waits for the recovery. ₹20 L start + ₹20k/mo SIP, 4% each, 20% trailing stop. <b>Reset</b> starts empty.</span>
     <div class="hspace"></div>
     <button class="btn" id="resetSample">Reset &amp; start empty</button>
   </div>
@@ -264,7 +264,7 @@ td .tag{font-family:var(--sans)}
 <script>
 (function(){
 "use strict";
-const KEY="cw2sigma_paper_v12";
+const KEY="cw2sigma_paper_v13";
 const $=s=>document.querySelector(s);
 const today=()=>new Date().toISOString().slice(0,10);
 const D=s=>new Date(s+"T00:00:00");
@@ -318,6 +318,13 @@ function currentWeekSeed(){
   newbuys.forEach(([sym,ep,qty,np])=>{ s.cash-=qty*ep; const hi=Math.max(ep,np);
     s.positions.push({id:(crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2)),
       sym,date:WK2,entry:ep,qty,now:np,high:hi,stop:hi*(1-s.trailPct/100)});});
+  // NEW entries 23 Oct — only 2 breakouts passed the screen in the downturn; both RS>0.2, bought.
+  // 4 slots stay in cash (no more qualifying breakouts). [symbol, entry, qty]
+  const WK3="2026-10-23";
+  const buys3=[["MAHASTEEL",1473.50,48],["PASHUPATI",104.31,680]];
+  buys3.forEach(([sym,ep,qty])=>{ s.cash-=qty*ep;
+    s.positions.push({id:(crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2)),
+      sym,date:WK3,entry:ep,qty,now:ep,high:ep,stop:ep*(1-s.trailPct/100)});});
   // weekly equity history (… 16 Oct first stop-out · 23 Oct: -12% drawdown week, 6 stop-outs)
   s.equity=[{date:"2026-09-21",eq:2000000},{date:"2026-09-25",eq:2011112},{date:"2026-10-02",eq:1972825},{date:"2026-10-06",eq:2014519},{date:"2026-10-09",eq:1946678},{date:"2026-10-16",eq:1952477},{date:ASOF,eq:1773914}];
   return s;
