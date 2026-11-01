@@ -2,3 +2,6 @@ __pycache__/
 *.pyc
 .DS_Store
 .venv/
+
+# Day-trader skill state (personal config, portfolio, trade log)
+trader/
